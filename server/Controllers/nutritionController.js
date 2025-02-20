@@ -1,32 +1,33 @@
 const Nutrition = require("../Models/Nutrition");
+const User=require("../Models/User")
 const uploadToCloudinary = require("../Utilities/imageUpload");
 
 const createNutrition = async (req, res, next) => {
   try {
-    const { title,nutritionType,meals,waterIntake,} = req.body;
-    const image = req.file ? req.file.path : ""; 
+    const { title,fitnessGoal,schedule,waterIntake,} = req.body;
+    const image = req.file ? req.file.path :  'Uploads/nutrition.jpg'; 
 
 
-    if (!title || !nutritionType || !meals || !waterIntake) {
+    if (!title || !fitnessGoal || !schedule || !waterIntake) {
       return res
         .status(400)
         .json({ error: "All required fields must be provided." });
     }
 
-    const existingNutrition = await Nutrition.findOne({ title });
-    if (existingNutrition) {
-      return res.status(400).json({ error: "This  already exists!" });
-    }
+    // const existingNutrition = await Nutrition.findOne({ title,createdBy: req.user._id });
+    // if (existingNutrition) {
+    //   return res.status(400).json({ error: "This  already exists!" });
+    // }
 
-    const parsedMeals = JSON.parse(meals); 
+    const parsedSchedule = JSON.parse(schedule); 
 
     const cloudinaryRes = await uploadToCloudinary(image);
     console.log("image in cloudinary : ", cloudinaryRes);
 
     const newNutrition = new Nutrition({
       title,
-      nutritionType,
-      meals:parsedMeals,
+      fitnessGoal,
+      schedule:parsedSchedule,
       waterIntake,
        image: cloudinaryRes,
       createdBy: req.user._id,
@@ -148,6 +149,48 @@ try {
 
 }
 
+// Get today's & tomorrow's nutrition (User Dashboard)
+// based on goals
+const getUserNutritionPlans = async (req, res) => {
+  try {
+    const userId = req.user.id;
+     const user = await User.findById(userId);
+     if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    const today = new Date();
+    const tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+
+    const getDayName = (date) => {
+      return date.toLocaleDateString("en-US", { weekday: "long" });
+    };
+
+    const todayName = getDayName(today);
+    const tomorrowName = getDayName(tomorrow);
+
+ // Find nutrition created by user's trainer OR admin and match fitness goal
+    const nutritionPlans=await Nutrition.find({
+      $or:[
+        { createdBy: user.trainerId }, 
+        { createdByType: "admin" },
+      ],
+      fitnessGoal: user.fitnessGoal,
+      "schedule.day": { $in: [todayName,todayName] },
+     })
+
+
+
+    res.status(200).json({ success: true, data: nutritionPlans });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
 
 
 
@@ -157,5 +200,6 @@ module.exports = {
   getAllNutritionPlans,
   getNutritionPlanById,
   updateNutritionPlan,
-  deleteNutritionPlan,getNutritionPlansForTrainer
+  deleteNutritionPlan,getNutritionPlansForTrainer,
+  getUserNutritionPlans
 };

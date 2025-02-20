@@ -26,8 +26,10 @@ const protect = (req, res, next) => {
 
 // Middleware for Authorization (authorize)
 const authorize = (roles = []) => {
+
+  
     return async (req, res, next) => {
-        console.log("autherization role :",roles)
+        console.log("1.autherization role :",roles)
       try {
         let user = await User.findById(req.user.id) || await Trainer.findById(req.user.id) || await Admin.findById(req.user.id);
   
@@ -37,12 +39,12 @@ const authorize = (roles = []) => {
   
         req.user = user; // Attach the full user info to the request
 
-        console.log("User role:", user.role);
+        console.log("2.User role:", user.role);
 
   
         // Check if user's role matches one of the required roles
         if (roles.length && !roles.includes(user.role.toLocaleLowerCase())) {
-            console.log("autherization role :",roles)
+            console.log("3.autherization role :",roles)
           return res.status(403).json({ msg: "Forbidden: You do not have permission for this action." });
         }
   

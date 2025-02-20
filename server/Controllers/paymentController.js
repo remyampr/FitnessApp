@@ -68,13 +68,14 @@ const confirmPayment = async (req, res, next) => {
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
-
+      
 
     // Find the payment record by transactionId
     const payment = await Payment.findOne({ transactionId });
     if (!payment) {
       return res.status(404).json({ error: "Payment record not found" });
     }
+    const amount=payment.amount;
   
     if (paymentStatus === "Success") {
         payment.status = "Completed";
@@ -82,6 +83,7 @@ const confirmPayment = async (req, res, next) => {
   
         // Activate user subscription
         user.subscription.status = "Active";
+        user.subscription.amount=amount
         user.subscription.plan = payment.plan;
         user.subscription.startDate = new Date();
         user.subscription.endDate = new Date(new Date().setFullYear(new Date().getFullYear() + 1));

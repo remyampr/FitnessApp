@@ -5,10 +5,11 @@ const trainerSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true, lowercase: true },
   password: { type: String, required: true },
   phone: { type: Number, required: true },
+  image: { type: String, default: "" },
   specialization: { type: [String], default: [] },
   experience: { type: Number, min: 0, default: 0 },
-  hourlyRate: { type: Number, min: 0, default: 0 }, 
-  rating: { type: Number, min: 1, max: 5, default: 5 }, 
+
+  // rating: { type: Number, min: 1, max: 5, default: 5 }, 
   clients: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], 
   availability: [{
     day: { type: String, enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], required: true },
@@ -19,7 +20,24 @@ const trainerSchema = new mongoose.Schema({
     }]
   }],
   certifications: { type: [String], default: [] },
-  role:{type:String,default:"trainer"}
+  isCertified: { type: Boolean, default: false }, // Whether the trainer is approved by an admin
+  role:{type:String,default:"trainer"},
+    // Ratings from clients
+    reviews: [{
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      rating: { type: Number, min: 1, max: 5, required: true },
+      comment: { type: String, trim: true }
+    }],
+  
+    // Average rating (auto-calculated)
+    averageRating: { type: Number, min: 1, max: 5, default: 5 },
+    totalRevenue: { type: Number, default: 0 }, 
+    trainerSharePercentage: { type: Number, default: 30 }, 
+    isVerified: { type: Boolean, default: false },  // Initially false until OTP verification
+  otp: { type: String }, 
+  otpExpires: { type: Date } ,
+
+
 }, { timestamps: true });
 
 module.exports = mongoose.model("Trainer", trainerSchema); 

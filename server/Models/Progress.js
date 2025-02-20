@@ -10,8 +10,9 @@ const progressSchema = new mongoose.Schema({
     arms: { type: Number, min: 0 },
     legs: { type: Number, min: 0 }
   },
-  workoutCompleted: { type: mongoose.Schema.Types.ObjectId, ref: 'Workout' }, 
-  notes: { type: String, default: "" }
+  workoutCompleted: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Workout' }], 
+  nutritionFollowed: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Nutrition' }], 
+  trainerNotes: { type: String, default: "" }
 }, { timestamps: true });
 
-module.exports = mongoose.model("Progress", progressSchema);
+module.exports = mongoose.model("Progress", progressSchema); 

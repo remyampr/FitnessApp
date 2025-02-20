@@ -7,6 +7,9 @@ const adminSchema = new mongoose.Schema({
   lastLogin: Date,
   createdAt: { type: Date, default: Date.now },
   role:{type:String,default:"admin"},
+  
+  otp: { type: String }, 
+  otpExpires: { type: Date } ,
 });
 
 module.exports = mongoose.model("Admin", adminSchema);

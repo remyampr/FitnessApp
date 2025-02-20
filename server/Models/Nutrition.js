@@ -5,17 +5,27 @@ const mongoose = require("mongoose");
 const nutritionSchema = new mongoose.Schema({
   
   title: { type: String, required: true },
-  nutritionType: {type: String,enum: ['weightLoss', 'muscleGain', 'maintenance', 'vegetarian', 'vegan'],required: true},
- 
-  meals: [{
-    type: { type:String, enum: ['breakfast', 'lunch', 'dinner', 'snack'] },
-       foods: [{
-      name: { type: String, required: true },
-      quantity: { type: Number, required: true },
-      calories: { type: Number, required: true },
-      protein: { type: Number, required: true },
-      carbs: { type: Number, required: true },
-      fats: { type: Number, required: true }
+  fitnessGoal: { 
+    type: String, 
+    enum: ["Weight Loss", "Weight Gain", "Muscle Gain", "Maintenance", "Endurance Improvement"], 
+    required: true 
+  },
+  schedule: [{
+    day: { 
+      type: String, 
+      enum: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'], 
+      required: true 
+    },
+    meals: [{
+      type: { type: String, enum: ['breakfast', 'lunch', 'dinner', 'snack'], required: true },
+      foods: [{
+        name: { type: String, required: true },
+        quantity: { type: Number, required: true },
+        calories: { type: Number, required: true },
+        protein: { type: Number, required: true },
+        carbs: { type: Number, required: true },
+        fats: { type: Number, required: true }
+      }]
     }]
   }],
 

@@ -11,7 +11,8 @@ const adminRoutes = require("./Routes/adminRoutes");
 const workoutRoutes = require("./Routes/workoutRoutes");
 const nutritionRoutes=require("./Routes/nutritionRoutes");
 const appointmentRoutes=require("./Routes/appointmentRoutes");
-const paymentRoutes =require("./Routes/paymentRoutes")
+const paymentRoutes =require("./Routes/paymentRoutes");
+const progressRoutes = require("./Routes/progressRoutes");
 
 const app = express();
 
@@ -24,13 +25,23 @@ app.get("/", (req, res) => {
   res.send("API Started....");
 });
 
+
+app.use(cors({
+  origin:"http://localhost:5173",
+  credentials:true
+}))
+
+
+
+
 app.use("/api/admin", adminRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/trainer", trainerRoutes);
 app.use("/api/workouts", workoutRoutes);
 app.use("/api/nutrition",nutritionRoutes);
 app.use("/api/appointment",appointmentRoutes);
-app.use("/api/payment",paymentRoutes)
+app.use("/api/payment",paymentRoutes);
+app.use("/api/progress",progressRoutes)
 
 const PORT = process.env.PORT || 5100;
 

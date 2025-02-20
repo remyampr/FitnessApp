@@ -13,16 +13,22 @@ const userSchema = new mongoose.Schema({
   weight: { type: Number, min: 1 }, 
   age: { type: Number, min: 1 }, 
   gender: { type: String, enum: ["Male", "Female", "Other"] }, 
-  fitnessGoal: { type: String },
+  fitnessGoal: { type: String, enum:["Weight Loss","Weight Gain","Muscle Gain","Maintenance","Endurance Improvement"] },
   joinDate: { type: Date, default: Date.now },
   
   isActive: { type: Boolean, default: true }, 
   subscription: {
     status: { type: String, enum: ["Active", "Inactive", "Expired"], default: "Inactive" }, 
     plan: { type: String, default: "Free" }, 
+    amount: { type: Number, default: 0 },  
     startDate: { type: Date },
     endDate: { type: Date },
   },
+
+  isVerified: { type: Boolean, default: false },  // Initially false until OTP verification
+  otp: { type: String }, 
+  otpExpires: { type: Date } ,
+
   role:{type:String,default:"user"},
   image: {
     type: String,
