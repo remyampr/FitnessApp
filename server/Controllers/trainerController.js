@@ -329,13 +329,6 @@ const getClientById = async (req, res, next) => {
 
 
 
-
-
-
-
-
-
-
 const logout=async(req,res,next)=>{
     try {
       res.clearCookie("token")

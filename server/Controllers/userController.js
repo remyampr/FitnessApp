@@ -6,6 +6,8 @@ const uploadToCloudinary = require("../Utilities/imageUpload");
 const crypto=require("crypto");
 const sendEmail=require("../Config/emailService")
 const {generateOTP}=require("../Utilities/generateOTP");
+const { cloudinary_js_config } = require("../Config/cloudinaryConfig");
+const { log } = require("console");
 
 
 const registerUser=async (req,res,next)=>{
@@ -38,7 +40,7 @@ const registerUser=async (req,res,next)=>{
       await sendEmail(email, "Verify Your Email", emailContent);
   
       return res.status(201).json({
-        msg: "User registered. Please verify your email.",  });
+        message: "User registered. Please verify your email.",user: newUser });
 
 
         // if(newUser){
@@ -81,7 +83,7 @@ const verifyEmail = async (req, res) => {
   res.cookie("token",token);
   console.log("uerlogin");
 
-  return res.json({ msg: "Email verified successfully!" });
+  return res.json({ msg: "Email verified successfully!",user:user });
 };
 
 
@@ -173,8 +175,24 @@ const loginUser=async (req,res,next)=>{
         const token=createToken(user._id,user.role);
         res.cookie("token",token);
         console.log("uerlogin");
+
+        // user.password = undefined;
+
+
+        if (!user.isProfileCompleted) {
+          return res.status(200).json({
+            message: "User login successful, but profile is incomplete.",
+            isProfileCompleted: false,
+            user,
+          });
+        }
         
-        return res.json({ msg: "User Login",user:{name:user.name,email:user.email,Role:user.role} });
+        return res.json({
+          message: "User login successful",
+          
+          isProfileCompleted: true,
+          user,
+        }); //should exclude password?
     }catch(err){
         next(err);
     }
@@ -184,7 +202,7 @@ const logout=async(req,res,next)=>{
     try {
       res.clearCookie("token")
       console.log("log Out");
-      res.status(200).json({msg:"logout"})
+      res.status(200).json({message:"logout"})
     } catch (error) {
       next(error)
     }
@@ -193,6 +211,8 @@ const logout=async(req,res,next)=>{
   const getCertifiedTrainers = async (req, res, next) => {
     try {
       const trainers = await Trainer.find({ isCertified: true });
+      console.log("Crtified trainers : ",trainers);
+      
 
       if (!trainers || trainers.length === 0) {
         return res.status(404).json({ success: false, message: 'No certified trainers found' });
@@ -209,32 +229,42 @@ const logout=async(req,res,next)=>{
   const assignTrainer = async (req, res, next) => {
 try {
 
+  console.log("Request body:", req.body);
+
   const user = await User.findById(req.user.id);
 
     if (!user) {
-    return res.status(404).json({ success: false, message: 'User not found' });
+    return res.status(404).json({ message: 'User not found' });
   }
 
   const { trainerId } = req.body;
+  console.log("Trainer Id from req.body : ",trainerId);
+  
 
   const trainer = await Trainer.findById(trainerId);
+  console.log("User selected trainer : ",trainer);
+  
 
-    if (!trainer || trainer.isCertified !== true) {
-      return res.status(400).json({ success: false, message: 'Trainer must be certified' });
+  if(!trainer){
+    return res.status(400).json({ error: 'No Trainer Avilable' });
+  }
+
+    if (trainer.isCertified !== true) {
+      return res.status(400).json({ error: 'Trainer must be certified' });
     }
   
     user.trainerId = trainerId;
     await user.save();
 
 
-    const subscriptionAmount = user.subscription.amount;  
-    const trainerShare = (subscriptionAmount * 0.30); 
+    // const subscriptionAmount = user.subscription.amount;  
+    // const trainerShare = (subscriptionAmount * 0.30); 
 
-    trainer.totalRevenue += trainerShare;
-    await trainer.save();
+    // trainer.totalRevenue += trainerShare;
+    // await trainer.save();
 
 
-    res.status(200).json({ success: true, message: 'Trainer assigned successfully', user });
+    res.status(200).json({ success: true, message: 'Trainer assigned successfully Proceed to payment',paymentRequired:true, user });
 
 } catch (error) {
   next(error)
@@ -249,7 +279,7 @@ try {
     if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
-      const { phone, trainerId, height, weight, age, gender, fitnessGoal } = req.body;
+      const { phone,height, weight, age, gender, fitnessGoal } = req.body;
     //   if(!phone || !trainerId || !height || !weight || !age || !gender || !fitnessGoal){
     //     return res.json({ Error: "All fields are required !" });
     //   }
@@ -265,22 +295,24 @@ try {
 
 
       if (phone) user.phone = phone;
-      if (trainerId) user.trainerId = trainerId;
+      // if (trainerId) user.trainerId = trainerId;
       if (height) user.height = height;
       if (weight) user.weight = weight;
       if (age) user.age = age;
       if (gender) user.gender = gender;
       if (fitnessGoal) user.fitnessGoal = fitnessGoal;
       user.image = image;
-
+      const userUpdated=await user.save();
       if(!user.subscription || user.subscription !== "Active"){
-        return res.status(200).json({msg:"Trainer assigned Proceed to payment", paymentRequired: true,
-            user,})
+        console.log("user aftetr updating profile : ",userUpdated)
+        return res.status(200).json({message:"Basic Profile set up done  Proceed to select trainer ", 
+            userUpdated,})
+          
       }
 
-    await user.save();
+    
 
-    res.status(200).json({ msg: "Profile updated successfully", user });
+    res.status(200).json({ msg: "Profile updated successfully", userUpdated });
     
 } catch (error) {
     next(error)

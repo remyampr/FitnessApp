@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { userLogin } from '../../services/userServices';
 import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { setProfileComplete, setUser } from '../../redux/features/userSlice';
 
 export const UserLoginPage = () => {
 
   const navigate=useNavigate();
+  const dispatch=useDispatch();
 
 const [values,setValues]=useState({
 
@@ -13,12 +16,21 @@ const [values,setValues]=useState({
   password:""
 })
 
-const onSubmit=()=>{
+const onSubmit=(event)=>{
+  event.preventDefault();
+ 
   console.log("values in state : ",values);
   userLogin(values).then((res)=>{
+    dispatch(setUser(res.data.user));
+    dispatch(setProfileComplete(res.data.user.isProfileComplete));
     console.log("res : ",res);
     toast.success("Login successful!");
-    navigate("/")
+    console.log("isProfilecompleted : ",res.data.user.isProfileComplete);
+     if(res.data.user.isProfileComplete){
+     
+            navigate("/user/dashboard");
+    }else  navigate("/user/complete-profile");
+   
     
   }).catch((err)=>{
     console.log(err);
@@ -34,7 +46,7 @@ const onSubmit=()=>{
 
   return (
     <div className="max-w-2xl mx-auto bg-transparent p-7">
-      {/* <form className="p-7"> */}
+     <form onSubmit={onSubmit} className="p-7">
       <div className='p-7'>
         {/* Email */}
         <div className="relative z-0 mb-6 w-full group">
@@ -57,7 +69,7 @@ const onSubmit=()=>{
 
         <div className="flex justify-center">
           <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" 
-          onClick={onSubmit}  >Submit</button>
+           >Submit</button>
         </div>
 
         {/* Sign Up Link */}
@@ -67,7 +79,7 @@ const onSubmit=()=>{
           </p>
         </div>
         </div>
-      {/* </form>   */}
+      </form>  
     </div>
   );
 };

@@ -1,14 +1,19 @@
-const User=require("../Models/User")
-
+const User=require("../Models/User");
+const Trainer=require("../Models/Trainer");
 const Payment = require("../Models/Payment");
 
 const createPaymentOrder = async (req, res, next) => {
   try {
-    const { userId, plan, type } = req.body;
+    const { userId, plan,trainerId } = req.body;
 
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
+    }
+
+    const trainer = await Trainer.findById(trainerId);
+    if (!trainer) {
+      return res.status(404).json({ error: "trainer not found" });
     }
 
     const amount = plan === "Premium" ? 4999 : 1999;
@@ -23,9 +28,9 @@ const createPaymentOrder = async (req, res, next) => {
 
     const payment = new Payment({
       userId,
+      trainerId,
       amount,
-      plan,
-      type, 
+      plan,    
       status: "Pending", // Mark as pending until confirmed
       transactionId,
     });
@@ -33,7 +38,7 @@ const createPaymentOrder = async (req, res, next) => {
     await payment.save();
 
     res.status(200).json({
-      msg: " Order created successfully",
+      message: " Order created successfully",
       orderId,
       transactionId,
       amount,
@@ -76,6 +81,7 @@ const confirmPayment = async (req, res, next) => {
       return res.status(404).json({ error: "Payment record not found" });
     }
     const amount=payment.amount;
+    const trainerId = payment.trainerId; 
   
     if (paymentStatus === "Success") {
         payment.status = "Completed";
@@ -87,10 +93,26 @@ const confirmPayment = async (req, res, next) => {
         user.subscription.plan = payment.plan;
         user.subscription.startDate = new Date();
         user.subscription.endDate = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
+        user.isProfileComplete=true;
   
         await user.save();
+
+
+            // Updating trainer's revenue
+      const trainer=await Trainer.findById(trainerId);
+      if(trainer){
+        const trainerShare = (trainer.trainerSharePercentage / 100) * amount;
+        trainer.totalRevenue += trainerShare;
+
+        if (!trainer.clients.includes(userId)) {
+          trainer.clients.push(userId);
+        }
+        await trainer.save();
+
+      }
+      
   
-        res.status(200).json({ msg: "Payment successful, subscription activated", user });
+        res.status(200).json({ message: "Payment successful, subscription activated", user });
       } else {
         payment.status = "Failed";
         await payment.save();
