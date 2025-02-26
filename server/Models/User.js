@@ -17,6 +17,7 @@ const userSchema = new mongoose.Schema({
   joinDate: { type: Date, default: Date.now },
   
   isActive: { type: Boolean, default: true }, 
+  
   subscription: {
     status: { type: String, enum: ["Active", "Inactive", "Expired"], default: "Inactive" }, 
     plan: { type: String, default: "Free" }, 
@@ -35,6 +36,7 @@ const userSchema = new mongoose.Schema({
     default: 'uploads/user.jpg' 
   },
   isProfileComplete:{type: Boolean, default: false},
+  lastLogin: { type: Date, default: null },
 }, { timestamps: true });
 
 module.exports = mongoose.model("User",userSchema); 

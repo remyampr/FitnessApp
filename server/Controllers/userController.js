@@ -1,5 +1,6 @@
 const User=require("../Models/User");
-const Trainer=require("../Models/Trainer")
+const Trainer=require("../Models/Trainer");
+const Activity=require("../Models/Activity")
 const { hashPassword,comparePassword } = require("../Utilities/passwordUtilities");
 const { createToken } = require("../Utilities/generateToken");
 const uploadToCloudinary = require("../Utilities/imageUpload");
@@ -8,6 +9,7 @@ const sendEmail=require("../Config/emailService")
 const {generateOTP}=require("../Utilities/generateOTP");
 const { cloudinary_js_config } = require("../Config/cloudinaryConfig");
 const { log } = require("console");
+const { logActivity } = require("../Utilities/activityServices");
 
 
 const registerUser=async (req,res,next)=>{
@@ -30,7 +32,13 @@ const registerUser=async (req,res,next)=>{
             name,email,password:hashedPassword,  otp,
             otpExpires,
         });
-        await newUser.save()
+        await newUser.save();
+
+        const logedActivity=await logActivity('NEW_USER', newUser._id, 'User', {
+      name: newUser.name,
+      email: newUser.email,
+      subscription:newUser.subscription
+    });
 
         const emailContent = `
         <h2>Email Verification</h2>
@@ -55,158 +63,158 @@ const registerUser=async (req,res,next)=>{
     }
 }
 
-const verifyEmail = async (req, res) => {
-  const { email, otp } = req.body;
+// const verifyEmail = async (req, res) => {
+//   const { email, otp } = req.body;
 
-  if (!email || !otp) {
-    return res.status(400).json({ error: "Email and OTP are required" });
-  }
+//   if (!email || !otp) {
+//     return res.status(400).json({ error: "Email and OTP are required" });
+//   }
 
-  const user = await User.findOne({ email });
+//   const user = await User.findOne({ email });
 
-  if (!user) {
-    return res.status(404).json({ error: "User not found" });
-  }
+//   if (!user) {
+//     return res.status(404).json({ error: "User not found" });
+//   }
 
-  if (user.otp !== otp || user.otpExpires < Date.now()) {
-    return res.status(400).json({ error: "Invalid or expired OTP" });
-  }
+//   if (user.otp !== otp || user.otpExpires < Date.now()) {
+//     return res.status(400).json({ error: "Invalid or expired OTP" });
+//   }
 
-  user.isVerified = true;
-  // user.otp = undefined;
-  // user.otpExpires = undefined;
+//   user.isVerified = true;
+//   // user.otp = undefined;
+//   // user.otpExpires = undefined;
 
-  user.set({ otp: undefined, otpExpires: undefined });
-  await user.save();
+//   user.set({ otp: undefined, otpExpires: undefined });
+//   await user.save();
 
-  const token=createToken(user._id,user.role);
-  res.cookie("token",token);
-  console.log("uerlogin");
+//   const token=createToken(user._id,user.role);
+//   res.cookie("token",token);
+//   console.log("uerlogin");
 
-  return res.json({ msg: "Email verified successfully!",user:user });
-};
+//   return res.json({ msg: "Email verified successfully!",user:user });
+// };
 
 
-const forgotPassword =async(req,res,next)=>{
-  try {
-    const {email}=req.body;
-    if (!email) {
-      return res.status(400).json({ error: "Email is required" });
-    }
+// const forgotPassword =async(req,res,next)=>{
+//   try {
+//     const {email}=req.body;
+//     if (!email) {
+//       return res.status(400).json({ error: "Email is required" });
+//     }
 
-    const user=await User.findOne({email})
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
+//     const user=await User.findOne({email})
+//     if (!user) {
+//       return res.status(404).json({ error: "User not found" });
+//     }
 
-    const otp=generateOTP();
-    const otpExpires = Date.now() + 10 * 60 * 1000; 
+//     const otp=generateOTP();
+//     const otpExpires = Date.now() + 10 * 60 * 1000; 
 
-    user.otp=otp;
-    user.otpExpires=otpExpires;
-    await user.save();
+//     user.otp=otp;
+//     user.otpExpires=otpExpires;
+//     await user.save();
     
 
-    console.log(`Reset OTP for ${email}: ${otp}`); 
-    const emailContent = `
-    <h2>Email Verification</h2>
-    <p>Use this OTP reset your Password <strong>${otp}</strong></p>
-    <p>This OTP will expire in 10 minutes.</p>
-  `;
-  await sendEmail(email, "Verify Your Email", emailContent);
+//     console.log(`Reset OTP for ${email}: ${otp}`); 
+//     const emailContent = `
+//     <h2>Email Verification</h2>
+//     <p>Use this OTP reset your Password <strong>${otp}</strong></p>
+//     <p>This OTP will expire in 10 minutes.</p>
+//   `;
+//   await sendEmail(email, "Verify Your Email", emailContent);
 
-    res.status(201).json({ msg: "OTP sent to your email", });
+//     res.status(201).json({ msg: "OTP sent to your email", });
 
 
-  } catch (error) {
-    next(error)
-  }
-}
+//   } catch (error) {
+//     next(error)
+//   }
+// }
 
-const resetPassword=async(req,res,next)=>{
-  try {
+// const resetPassword=async(req,res,next)=>{
+//   try {
     
-      const {email,otp,newPassword}=req.body;
-      if (!email || !otp || !newPassword) {
-        return res.status(400).json({ error: "Email, OTP, and new password are required" });
-      }
+//       const {email,otp,newPassword}=req.body;
+//       if (!email || !otp || !newPassword) {
+//         return res.status(400).json({ error: "Email, OTP, and new password are required" });
+//       }
 
-      const user = await User.findOne({ email });
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
+//       const user = await User.findOne({ email });
+//       if (!user) {
+//         return res.status(404).json({ error: "User not found" });
+//       }
 
-      if(user.otp !== otp || user.otpExpires < Date.now()){
-        return res.status(400).json({ error: "Invalid or expired OTP" });
-      }
+//       if(user.otp !== otp || user.otpExpires < Date.now()){
+//         return res.status(400).json({ error: "Invalid or expired OTP" });
+//       }
 
-      user.password=await hashPassword(newPassword);
-      user.otp = undefined;
-      user.otpExpires = undefined;
-      await user.save();
+//       user.password=await hashPassword(newPassword);
+//       user.otp = undefined;
+//       user.otpExpires = undefined;
+//       await user.save();
 
-      res.json({ msg: "Password reset successful!" });
-
-
-  } catch (error) {
-    next(error)
-  }
-}
+//       res.json({ msg: "Password reset successful!" });
 
 
+//   } catch (error) {
+//     next(error)
+//   }
+// }
 
 
-const loginUser=async (req,res,next)=>{
-    try{
-        const {email,password}=req.body;
-        if(!email || !password){
-            return res.status(400).json({ error: "All fields are required !" });
-        }
-        const user=await User.findOne({email});
-        if(!user){
-            return res.status(400).json({ error: "User not Found !" });
-        }
-
-        const passwordMatch=await comparePassword(password,user.password);
-        if(!passwordMatch){
-            return res.status(400).json({ error: "Password not match !" });
-        }
-
-        const token=createToken(user._id,user.role);
-        res.cookie("token",token);
-        console.log("uerlogin");
-
-        // user.password = undefined;
 
 
-        if (!user.isProfileCompleted) {
-          return res.status(200).json({
-            message: "User login successful, but profile is incomplete.",
-            isProfileCompleted: false,
-            user,
-          });
-        }
+// const loginUser=async (req,res,next)=>{
+//     try{
+//         const {email,password}=req.body;
+//         if(!email || !password){
+//             return res.status(400).json({ error: "All fields are required !" });
+//         }
+//         const user=await User.findOne({email});
+//         if(!user){
+//             return res.status(400).json({ error: "User not Found !" });
+//         }
+
+//         const passwordMatch=await comparePassword(password,user.password);
+//         if(!passwordMatch){
+//             return res.status(400).json({ error: "Password not match !" });
+//         }
+
+//         const token=createToken(user._id,user.role);
+//         res.cookie("token",token);
+//         console.log("uerlogin");
+
+//         // user.password = undefined;
+
+
+//         if (!user.isProfileCompleted) {
+//           return res.status(200).json({
+//             message: "User login successful, but profile is incomplete.",
+//             isProfileCompleted: false,
+//             user,
+//           });
+//         }
         
-        return res.json({
-          message: "User login successful",
+//         return res.json({
+//           message: "User login successful",
           
-          isProfileCompleted: true,
-          user,
-        }); //should exclude password?
-    }catch(err){
-        next(err);
-    }
-}
+//           isProfileCompleted: true,
+//           user,
+//         }); //should exclude password?
+//     }catch(err){
+//         next(err);
+//     }
+// }
 
-const logout=async(req,res,next)=>{
-    try {
-      res.clearCookie("token")
-      console.log("log Out");
-      res.status(200).json({message:"logout"})
-    } catch (error) {
-      next(error)
-    }
-  }
+// const logout=async(req,res,next)=>{
+//     try {
+//       res.clearCookie("token")
+//       console.log("log Out");
+//       res.status(200).json({message:"logout"})
+//     } catch (error) {
+//       next(error)
+//     }
+//   }
 
   const getCertifiedTrainers = async (req, res, next) => {
     try {
@@ -249,7 +257,7 @@ try {
     return res.status(400).json({ error: 'No Trainer Avilable' });
   }
 
-    if (trainer.isCertified !== true) {
+    if (trainer.isApproved !== true) {
       return res.status(400).json({ error: 'Trainer must be certified' });
     }
   
@@ -402,11 +410,10 @@ trainer.reviews.push({ userId, rating, comment });
 
 
 
-module.exports={registerUser,loginUser,
-  logout,updateUserProfile,
-  getUserProfile,getCertifiedTrainers
+module.exports={registerUser,
+  updateUserProfile,
+  getUserProfile,
+  getCertifiedTrainers
   ,assignTrainer,
-verifyEmail,
-forgotPassword,
-resetPassword,myTrainer
+myTrainer
 }

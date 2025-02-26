@@ -1,6 +1,7 @@
 const User=require("../Models/User");
 const Trainer=require("../Models/Trainer");
 const Payment = require("../Models/Payment");
+const { logActivity } = require("../Utilities/activityServices");
 
 const createPaymentOrder = async (req, res, next) => {
   try {
@@ -110,6 +111,9 @@ const confirmPayment = async (req, res, next) => {
         await trainer.save();
 
       }
+
+      const logedActivity=await logActivity( "PAYMENT_RECEIVED",payment._id,"Payment",{user:user._id,trainer:trainer._id});
+
       
   
         res.status(200).json({ message: "Payment successful, subscription activated", user });

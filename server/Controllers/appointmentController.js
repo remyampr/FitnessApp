@@ -1,5 +1,7 @@
+const Activity = require("../Models/Activity");
 const Appointment=require("../Models/Appointment");
 const User = require("../Models/User");
+const { logActivity } = require("../Utilities/activityServices");
 
 
 //  creating an appointment (user books with trainer)
@@ -22,6 +24,11 @@ const createAppointment = async (req, res,next) => {
             notes,
         })
         await newAppointment.save();
+
+        await logActivity("NEW_APPOINTMENT",newAppointment._id,"appointment", { userId: newAppointment.userId, trainerId: newAppointment.trainerId })
+       
+
+
     res.status(201).json({msg:"New appointment created",newAppointment});
 
 

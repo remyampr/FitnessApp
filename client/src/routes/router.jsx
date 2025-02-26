@@ -14,6 +14,13 @@ import { ProtectedRoute } from "../components/shared/ProtectedRoute/ProtectedRou
 import { TrainerLayout } from "../layout/TrainerLayout";
 import { PendingApproval } from "../pages/trainer/PendingApproval";
 import { TrainerDashboard } from "../pages/trainer/TrainerDashboard";
+import { ForgotPassword } from "../pages/shared/forgotPassword";
+import { AdminLayout } from "../layout/AdminLayout";
+import { AdminLoginPage } from "../pages/admin/AdminLoginPage";
+import { AdminDashboard } from "../pages/admin/AdminDashboard";
+import { AdminForgotPassword } from "../pages/admin/AdminForgotPassword";
+import { AdminProtectedRoute } from "../components/shared/ProtectedRoute/AdminProtectedRoute";
+import { AdminUsersPage } from "../pages/admin/AdminUsersPage";
 
 
 export const router = createBrowserRouter([
@@ -43,6 +50,11 @@ export const router = createBrowserRouter([
             path:"/trainer/signup",
             element:<TrainerSignupPage/>
         },
+        {
+          path: "/forgot-password",
+          element: <ForgotPassword/>,
+        },
+
       ]
     },
     {
@@ -93,6 +105,40 @@ export const router = createBrowserRouter([
             )
         },
         
+      ]
+    },
+    {
+      path: "/admin",
+      element: <AdminLayout />,
+      errorElement: <h1>Error page</h1>,
+      children: [
+        {
+          path: "login",
+          element: <AdminLoginPage />
+        },
+        {
+          path: "forgot-password",
+          element: <AdminForgotPassword />
+        },
+        {
+          path: "dashboard",
+          element: (
+           <AdminProtectedRoute>
+              <AdminDashboard />
+              </AdminProtectedRoute>
+            
+          )
+        },
+        {
+          path: "users",
+          element: (
+           <AdminProtectedRoute>
+              <AdminUsersPage />
+              </AdminProtectedRoute>
+            
+          )
+        },
+        // admin routes 
       ]
     },
   ]);

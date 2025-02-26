@@ -16,7 +16,7 @@ const rootReducer = combineReducers({
 const persistConfig = {
     key: 'root',
     storage,
-    whitelist: ['user', 'admin', 'trainer'] // These slices will be persisted
+    whitelist: ['user','admin','trainer'] // These slices will be persisted 
 };
 
 // Apply persistence to the combined reducer
@@ -33,3 +33,9 @@ export const store = configureStore({
 
 // Persistor
 export const persistor = persistStore(store);
+
+// console.log("Store state:", store.getState()); 
+
+// setTimeout(() => {
+//     console.log("State after rehydration:", store.getState());
+// }, 2000);

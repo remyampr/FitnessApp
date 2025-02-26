@@ -5,21 +5,21 @@ const {protect,authorize}=require("../middleware/authMiddleware");
 
 const {
   registerTrainer,
-  loginTrainer,
-  logout,
-  getTrainerRevenue,
+    getTrainerRevenue,
   updateTrainerProfile,
   getTrainerProfile,
   getTrainerClients,
   getClientById,
-  verifyEmail,
-  forgotPassword,
-  resetPassword
+
 } = require("../Controllers/trainerController");
+
+const { verifyEmail,forgotPassword, resetPassword,
+login,logout
+ } = require("../Controllers/commonController")
 
 router.post("/register",upload.single("image"), registerTrainer);
 router.post("/verify-email", verifyEmail);
-router.post("/login", loginTrainer);
+router.post("/login", login);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
 router.post("/logout", logout);

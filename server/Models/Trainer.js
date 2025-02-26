@@ -20,8 +20,12 @@ const trainerSchema = new mongoose.Schema({
     }]
   }],
   certifications: { type: [String], default: [] },
-  isCertified: { type: Boolean, default: false }, // Whether the trainer is approved by an admin
-  role:{type:String,default:"trainer"},
+  bio: { type: String, trim: true },
+  socialLinks: [{ platform: String, url: String }],
+
+
+  isApproved: { type: Boolean, default: false }, // Whether the trainer is approved by an admin
+  role:{type:String,default:"trainer",enum: ["trainer"]},
     // Ratings from clients
     reviews: [{
       userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
@@ -39,5 +43,10 @@ const trainerSchema = new mongoose.Schema({
 
 
 }, { timestamps: true });
+
+trainerSchema.index({ email: 1 });
+trainerSchema.index({ isApproved: 1 });
+
+
 
 module.exports = mongoose.model("Trainer", trainerSchema); 

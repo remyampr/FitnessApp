@@ -18,9 +18,15 @@ const [values,setValues]=useState({
 
 const onSubmit=(event)=>{
   event.preventDefault();
+
+  if (!values.email || !values.password) {
+    // return setError("Please fill in all fields");
+    toast.error("Please fill in all fields")
+  }
  
   console.log("values in state : ",values);
   userLogin(values).then((res)=>{
+    
     dispatch(setUser(res.data.user));
     dispatch(setProfileComplete(res.data.user.isProfileComplete));
     console.log("res : ",res);
@@ -41,6 +47,14 @@ const onSubmit=(event)=>{
     }
   })
 
+}
+
+const handleFrogotPassword=async ()=>{
+  try {
+    
+  } catch (error) {
+    
+  }
 }
 
 
@@ -64,7 +78,9 @@ const onSubmit=(event)=>{
 
         {/* Forgot Password */}
         <div className="mb-6 text-right">
-          <Link to="/forgot-password" className="text-sm text-blue-600 hover:underline">Forgot Password?</Link>
+          <Link to="/forgot-password" className="text-sm text-blue-600 hover:underline"
+        
+          >Forgot Password?</Link>
         </div>
 
         <div className="flex justify-center">

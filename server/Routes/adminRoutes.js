@@ -1,18 +1,21 @@
 const express=require("express");
 const router=express.Router();
 const {protect,authorize}=require("../middleware/authMiddleware");
-const {createAdmin,loginAdmin, logout,
-    forgotPassword,
-    resetPassword,
-    getAllTrainers,getTrainer,updateTrainer,deleteTrainer,
+const {createAdmin,
+      getAllTrainers,getTrainer,updateTrainer,deleteTrainer,
      getUnapprovedTrainers,
      approveTrainer,
-     getAllUsers,getUser,updateUser,deleteUser
+     getAllUsers,getUser,updateUser,deleteUser,
+     getDashboard
     }=require("../Controllers/adminController");
+
+    const { forgotPassword, resetPassword ,
+       login, logout
+    } = require("../Controllers/commonController");
 
 
 router.post("/create",createAdmin);
-router.post("/login",loginAdmin);
+router.post("/login",login);
 router.post("/logout",logout);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
@@ -32,13 +35,15 @@ router.get("/user/:id", protect, authorize(["admin"]), getUser);
 router.patch('/user/:userId', protect,authorize(["admin"]),updateUser);
 router.delete('/user/:userId',protect,authorize(["admin"]), deleteUser);
 
+// Admin Dashboard
+router.get("/dashboard", protect, authorize(["admin"]), getDashboard);
+
+
 // Payments & Revenue
 // router.get("/payments", protect, authorize(["admin"]), getPayments);
 // router.get("/revenue", protect, authorize(["admin"]), getRevenue);
 // router.get("/subscriptions", protect, authorize(["admin"]), getSubscriptions);
 
-// Admin Dashboard
-// router.get("/dashboard", protect, authorize(["admin"]), getDashboard);
 
 
 // Admin Dashboard

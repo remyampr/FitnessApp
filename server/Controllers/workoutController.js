@@ -1,6 +1,7 @@
 const Workout = require("../Models/Workout");
 const User = require("../Models/User");
 const uploadToCloudinary = require("../Utilities/imageUpload");
+const Activity = require("../Models/Activity");
 
 const createWorkout = async (req, res, next) => {
   try {
@@ -42,9 +43,14 @@ const createWorkout = async (req, res, next) => {
       createdByType: req.user.role,
     });
     let savedWorkout = await newWorkout.save();
+
+    await logActivity("NEW_WORKOUT", newWorkout._id, "workout", { createdBy: newWorkout.createdBy });
+
+
     if (savedWorkout) {
       return res.status(200).json({ msg: "New Workout added", savedWorkout });
     }
+
   } catch (error) {
     next(error);
   }

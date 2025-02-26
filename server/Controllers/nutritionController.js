@@ -1,3 +1,4 @@
+const Activity = require("../Models/Activity");
 const Nutrition = require("../Models/Nutrition");
 const User=require("../Models/User")
 const uploadToCloudinary = require("../Utilities/imageUpload");
@@ -35,6 +36,11 @@ const createNutrition = async (req, res, next) => {
     });
 
     let savedNutrition=await newNutrition.save();
+
+    await logActivity("NEW_NUTRITION_PLAN",newNutrition._id,"nutritionPlan", { createdBy: newNutrition.createdBy, goal: newNutrition.goal })
+
+ 
+
     if(savedNutrition){
         return res.status(200).json({msg:"New Nutrition data added",savedNutrition})
     }
