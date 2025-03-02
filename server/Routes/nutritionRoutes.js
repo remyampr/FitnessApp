@@ -14,10 +14,10 @@ const {
 
 router.post("/create",protect,authorize(["trainer", "admin"]),upload.single("image"),createNutrition);
 router.get("/all", protect, authorize(["admin"]), getAllNutritionPlans);
-router.get("/:id", protect, authorize(["trainer,admin"]), getNutritionPlanById);
+router.get("nutrition/:id", protect, authorize(["trainer,admin"]), getNutritionPlanById);
 router.put("/:id", protect, authorize(["admin"]), updateNutritionPlan);
 router.delete("/:id", protect, authorize(["admin"]), deleteNutritionPlan);
-router.get("/", protect, authorize(["trainer"]), getNutritionPlansForTrainer);
+router.get("/trainer", protect, authorize(["trainer"]), getNutritionPlansForTrainer);
 
 
 // Get today's & tomorrow's nutrition plans (User Dashboard)

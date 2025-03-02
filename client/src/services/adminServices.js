@@ -23,8 +23,11 @@ export const getAdminDashboard=( )=>{
 export const getAdminUsers=( )=>{
     return axiosInstance.get("/admin/users")
 }
-export const editUser=(data)=>{
-    return axiosInstance.patch('admin/user/:userId',data)
+export const updateUser=(userId,data)=>{
+    return axiosInstance.patch(`admin/user/${userId}`,data)
+}
+export const deleteUser=(userId)=>{
+    return axiosInstance.delete(`admin/user/${userId}`)
 }
 export const getTrainers=()=>{
     return axiosInstance.get("admin/trainers")

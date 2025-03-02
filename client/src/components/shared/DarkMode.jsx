@@ -1,13 +1,23 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 export const DarkMode = () => {
-    const [toggle,setToggle]=useState(false);
 
-    document.querySelector("html").setAttribute("data-theme",toggle ? 'dark' : 'light');
+  
+    const [toggle, setToggle] = useState(false);
 
-    const handleToggle=()=>{
-        setToggle((!toggle));
-    }
+    useEffect(() => {
+        document.querySelector("html").setAttribute("data-theme", toggle ? "dark" : "light");
+    }, [toggle]); // Runs only when `toggle` changes
+
+    const handleToggle = () => {
+        setToggle(!toggle);
+    };
+
+
+
+    // document.querySelector("html").setAttribute("data-theme",toggle ? 'dark' : 'light');
+
+    
 
   return (
     <label className="swap swap-rotate">

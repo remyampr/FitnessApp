@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Navigate, useLocation } from 'react-router-dom';
-import { clearAdmin } from '../../../redux/features/adminSlice';
+import { clearAdmin } from '../../redux/features/adminSlice';
 
 export const AdminProtectedRoute = ({ children }) => {
   const location = useLocation();

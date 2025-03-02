@@ -39,7 +39,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/trainer", trainerRoutes);
 app.use("/api/workouts", workoutRoutes);
 app.use("/api/nutrition",nutritionRoutes);
-app.use("/api/appointment",appointmentRoutes);
+app.use("/api/appointments",appointmentRoutes);
 app.use("/api/payment",paymentRoutes);
 app.use("/api/progress",progressRoutes)
 

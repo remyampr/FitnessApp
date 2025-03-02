@@ -2,6 +2,7 @@ const Workout = require("../Models/Workout");
 const User = require("../Models/User");
 const uploadToCloudinary = require("../Utilities/imageUpload");
 const Activity = require("../Models/Activity");
+const mongoose=require("mongoose")
 
 const createWorkout = async (req, res, next) => {
   try {
@@ -60,7 +61,7 @@ const createWorkout = async (req, res, next) => {
 const getAllWorkouts = async (req, res, next) => {
   try {
     const workouts = await Workout.find();
-    res.status(200).json(workouts);
+    res.status(200).json({workouts});
   } catch (error) {
     next(error);
   }
@@ -69,11 +70,13 @@ const getAllWorkouts = async (req, res, next) => {
 // get workout by ID
 const getWorkoutById = async (req, res, next) => {
   try {
-    const workout = await Workout.findById(req.params.id);
+    const{id}=req.params;
+    console.log("id  :  ",id);
+    const workout = await Workout.findById(id);
     if (!workout) {
       return res.status(404).json({ error: "Workout not found." });
     }
-    res.status(200).json(workout);
+    res.status(200).json({workout});
   } catch (error) {
     next(error);
   }
@@ -131,8 +134,15 @@ const deleteWorkoutPlan = async (req, res, next) => {
 //  getting workouts created by a specific trainer
 const getWorkoutsForTrainer = async (req, res, next) => {
   try {
-    const workouts = await Workout.find({ createdBy: req.user.id });
-    res.status(200).json(workouts);
+
+    const trainerId = new mongoose.Types.ObjectId(req.user.id);
+    console.log("Trainer ID:", req.user.id, typeof req.user.id);
+
+    const workouts = await Workout.find({ createdBy: trainerId });
+
+    res.status(200).json({data:workouts, count: workouts.length,});
+    // console.log("workouts", workouts,"count: ", workouts.length);
+    
   } catch (error) {
     next(error);
   }

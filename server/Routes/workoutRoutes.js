@@ -19,10 +19,11 @@ router.get("/user", protect, authorize(["user"]), getUserWorkouts);
 
 router.post("/create",protect,authorize(["admin","trainer"]),upload.single("image"),createWorkout);
 router.get("/all", protect, authorize(["admin"]), getAllWorkouts);
-router.get("/:id", protect, authorize(["admin","trainer"]), getWorkoutById);
+router.get("workout/:id", protect, authorize(["admin","trainer"]), getWorkoutById);
 router.put("/:id", protect, authorize(["admin"]), updateWorkoutPlan);
 router.delete("/:id", protect, authorize(["admin"]), deleteWorkoutPlan);
-router.get("/", protect, authorize(["trainer"]), getWorkoutsForTrainer);
+
+router.get("/trainer", protect, authorize(["trainer"]), getWorkoutsForTrainer);
 
 
 

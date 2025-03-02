@@ -51,7 +51,7 @@ const createNutrition = async (req, res, next) => {
 };
 
 
-const getAllNutritionPlans = async (req, res) => {
+const getAllNutritionPlans = async (req, res,next) => {
 
 try {
     const nutritionPlans=await Nutrition.find();
@@ -59,7 +59,7 @@ try {
     if (nutritionPlans.length === 0) {
         return res.status(404).json({ message: "No nutrition plans found" });
       }
-      return res.status(200).json(nutritionPlans);
+      return res.status(200).json({nutritionPlans, count: nutritionPlans.length,});
 
 
 
@@ -69,7 +69,7 @@ try {
 
 }
 
-const getNutritionPlanById = async (req, res) => {
+const getNutritionPlanById = async (req, res,next) => {
 
 try {
     const { id } = req.params;
@@ -88,7 +88,7 @@ try {
 
 }
 
-const updateNutritionPlan = async (req, res) => {
+const updateNutritionPlan = async (req, res,next) => {
 try {
     
     const { id } = req.params;
@@ -113,7 +113,7 @@ try {
 
 }
 
-const deleteNutritionPlan = async (req, res) => {
+const deleteNutritionPlan = async (req, res,next) => {
     try {
 
         const { id } = req.params;
@@ -136,17 +136,19 @@ const deleteNutritionPlan = async (req, res) => {
 
 }
 
-const getNutritionPlansForTrainer = async (req, res) => {
+const getNutritionPlansForTrainer = async (req, res,next) => {
 try {
 
     const trainerId = req.user._id; 
     const nutritionPlans = await Nutrition.find({ createdBy: trainerId });
 
-    if (nutritionPlans.length === 0) {
-        return res.status(404).json({ message: "No nutrition plans found for this trainer" });
-      }
-
-      return res.status(200).json(nutritionPlans);
+    // if (nutritionPlans.length === 0) {
+    //     return res.status(404).json({ message: "No nutrition plans found for this trainer" });
+    //   }
+    return res.status(200).json({
+      data: nutritionPlans,
+      count: nutritionPlans.length || 0
+    });
 
 
 } catch (error) {
@@ -157,7 +159,7 @@ try {
 
 // Get today's & tomorrow's nutrition (User Dashboard)
 // based on goals
-const getUserNutritionPlans = async (req, res) => {
+const getUserNutritionPlans = async (req, res,next) => {
   try {
     const userId = req.user.id;
      const user = await User.findById(userId);
@@ -192,7 +194,7 @@ const getUserNutritionPlans = async (req, res) => {
 
     res.status(200).json({ success: true, data: nutritionPlans });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    next(error)
   }
 };
 

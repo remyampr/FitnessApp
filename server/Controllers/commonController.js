@@ -54,6 +54,9 @@ const resetPassword = async (req, res, next) => {
   try {
     const { email, role, otp, newPassword } = req.body;
 
+    console.log("in resetPassword: ",req.body)
+
+
     if (!email || !role || !otp || !newPassword) {
       return res
         .status(400)
@@ -67,6 +70,8 @@ const resetPassword = async (req, res, next) => {
     else return res.status(400).json({ error: "Invalid role" });
 
     const account = await Model.findOne({ email });
+    console.log("name",account.name);
+    
     if (!account) {
       return res.status(404).json({ error: `${role} not found` });
     }

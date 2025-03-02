@@ -10,7 +10,11 @@ const trainerSchema = new mongoose.Schema({
   experience: { type: Number, min: 0, default: 0 },
 
   // rating: { type: Number, min: 1, max: 5, default: 5 }, 
-  clients: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], 
+
+ 
+  // *****************************
+ 
+  
   availability: [{
     day: { type: String, enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], required: true },
     slots: [{
@@ -35,8 +39,28 @@ const trainerSchema = new mongoose.Schema({
   
     // Average rating (auto-calculated)
     averageRating: { type: Number, min: 1, max: 5, default: 5 },
+
+    // revenue
     totalRevenue: { type: Number, default: 0 }, 
     trainerSharePercentage: { type: Number, default: 30 }, 
+    clients: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+
+  // monthly revenue tracking
+  revenueHistory: [{
+    year: { type: Number },
+    month: { type: Number }, // 0-11 for Jan-Dec
+    revenue: { type: Number, default: 0 },
+    clientCount: { type: Number, default: 0 }
+  }],
+  // payments: [{
+  //   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  //   transactionId: { type: String, required: true },
+  //   amount: { type: Number, required: true },
+  //   date: { type: Date, default: Date.now }
+  // }],
+
+
+
     isVerified: { type: Boolean, default: false },  // Initially false until OTP verification
   otp: { type: String }, 
   otpExpires: { type: Date } ,

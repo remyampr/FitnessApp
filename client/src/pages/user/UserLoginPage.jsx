@@ -49,13 +49,11 @@ const onSubmit=(event)=>{
 
 }
 
-const handleFrogotPassword=async ()=>{
-  try {
-    
-  } catch (error) {
-    
-  }
-}
+const handleForgotPassword = () => {
+  navigate("/forgot-password", { state: { role: "user" } });
+};
+
+
 
 
   return (
@@ -78,9 +76,9 @@ const handleFrogotPassword=async ()=>{
 
         {/* Forgot Password */}
         <div className="mb-6 text-right">
-          <Link to="/forgot-password" className="text-sm text-blue-600 hover:underline"
-        
-          >Forgot Password?</Link>
+          <button onClick={handleForgotPassword} className="text-sm text-blue-600 hover:underline"
+
+          >Forgot Password?</button> 
         </div>
 
         <div className="flex justify-center">

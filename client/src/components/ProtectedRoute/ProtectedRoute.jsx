@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
-import { clearUser } from '../../../redux/features/userSlice';
-import { clearTrainer } from '../../../redux/features/trainerSlice';
-import { clearAdmin } from '../../../redux/features/adminSlice';
+import { clearUser } from '../../redux/features/userSlice';
+import { clearTrainer } from '../../redux/features/trainerSlice';
+import { clearAdmin } from '../../redux/features/adminSlice';
+
 
 export const ProtectedRoute = ({ children, allowIncomplete = false, requiredRole}) => {
 

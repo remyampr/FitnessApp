@@ -3,6 +3,7 @@ const User = require("../Models/User");
 const Trainer = require("../Models/Trainer");
 const Admin = require("../Models/Admin");
 
+
 // Middleware for Authentication (protect)
 const protect = async (req, res, next) => {
   try {
@@ -19,6 +20,11 @@ const protect = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+//     console.log("Decoded ID:", decoded.id);
+// console.log("Is valid ObjectId:", mongoose.Types.ObjectId.isValid(decoded.id));
+
+
     // Find user based on decoded token
     const user =
       (await User.findById(decoded.id)) ||
@@ -57,7 +63,7 @@ const authorize = (roles = []) => {
 
       // Check if user's role matches one of the required roles
       if (roles.length && !roles.includes(user.role.toLocaleLowerCase())) {
-        console.log("3.autherization role :", roles);
+        console.log("3.authorization role mismatch:", roles, user.role);
         return res
           .status(403)
           .json({

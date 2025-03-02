@@ -4,8 +4,10 @@ import {
   setDashboardStats,
   setLoading,
   setError,
+  setUsers,
+  setTrainers,
 } from "../../redux/features/adminSlice";
-import { getAdminDashboard } from "../../services/adminServices";
+import { getAdminDashboard, getAdminUsers, getTrainers } from "../../services/adminServices";
 import { AdminSidebar } from "../../components/admin/AdminSidebar";
 import { Link, useNavigate } from "react-router-dom";
 import { dashboardMetadata } from "../../data/dashboardMetadata";
@@ -16,7 +18,7 @@ export const AdminDashboard = () => {
 
   const navigate=useNavigate();
   const dispatch = useDispatch();
-  const { dashboardStats, loading, error } = useSelector(
+  const { users,trainers,dashboardStats, loading, error } = useSelector(
     (state) => state.admin
   );
 
@@ -27,11 +29,20 @@ export const AdminDashboard = () => {
         dispatch(setLoading(true));
         const response = await getAdminDashboard();
 
-        // console.log("response : ", response);
-        // console.log("in state dashboard stats: ", dashboardStats);
+          const userResponse = await getAdminUsers();
+          const trainerResponse = await getTrainers();
+
+        // console.log("Trainer Response : ", trainerResponse);
    
 
         dispatch(setDashboardStats(response.data));
+        dispatch(setUsers(userResponse.data.users));
+        dispatch(setTrainers(trainerResponse.data.users));
+
+        // console.log("in state dashboard stats: ", dashboardStats);
+        // console.log("in state users: ",users);
+        // console.log("in state Trainers: ", trainers);
+
 
         dispatch(setLoading(false));
       } catch (error) {
@@ -53,7 +64,7 @@ export const AdminDashboard = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-base-200">
+    <div className="flex flex-col lg:flex-row min-h-screen bg-base-200 w-full">
       <div className="hidden lg:block">
         <AdminSidebar />
       </div>
@@ -94,13 +105,16 @@ export const AdminDashboard = () => {
 
               {Object.keys(dashboardMetadata).map((key)=>{
                 const metadata=dashboardMetadata[key];
+              
+
+
                 return(
                   <DashboardCard
                   key={key}
               title={metadata.title}
               iconColor={metadata.iconColor}
               iconPath={metadata.iconPath}
-              link={metadata.link}
+              link={metadata.title === "Active Users" ? null : metadata.link}
               linkText={metadata.linkText}
               value={dashboardStats[key]} 
                   />

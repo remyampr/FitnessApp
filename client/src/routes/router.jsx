@@ -10,7 +10,7 @@ import { TrainerSignupPage } from "../pages/trainer/TrainerSignupPage";
 import { UserDashboard } from "../pages/user/UserDashboard";
 import { UserLayout } from "../layout/UserLayout";
 import { CompleteProfile } from "../pages/user/CompleteProfile";
-import { ProtectedRoute } from "../components/shared/ProtectedRoute/ProtectedRoute";
+import { ProtectedRoute } from "../components/ProtectedRoute/ProtectedRoute";
 import { TrainerLayout } from "../layout/TrainerLayout";
 import { PendingApproval } from "../pages/trainer/PendingApproval";
 import { TrainerDashboard } from "../pages/trainer/TrainerDashboard";
@@ -19,8 +19,9 @@ import { AdminLayout } from "../layout/AdminLayout";
 import { AdminLoginPage } from "../pages/admin/AdminLoginPage";
 import { AdminDashboard } from "../pages/admin/AdminDashboard";
 import { AdminForgotPassword } from "../pages/admin/AdminForgotPassword";
-import { AdminProtectedRoute } from "../components/shared/ProtectedRoute/AdminProtectedRoute";
-import { AdminUsersPage } from "../pages/admin/AdminUsersPage";
+import { AdminProtectedRoute } from "../components/ProtectedRoute/AdminProtectedRoute";
+import { AdminTrainersUsersPage } from "../pages/admin/AdminTrainersUsersPage";
+import { TrainerProtectedRoute } from "../components/ProtectedRoute/TrainerProtectedRoute";
 
 
 export const router = createBrowserRouter([
@@ -90,20 +91,28 @@ export const router = createBrowserRouter([
         {
           path: "pending-approval",
           element:(
-            <ProtectedRoute requiredRole="trainer">
+            <TrainerProtectedRoute requiredRole="trainer">
                 <PendingApproval/>
-            </ProtectedRoute>
+            </TrainerProtectedRoute>
           )
            
         },    
         {
             path:"dashboard",
             element:(
-              <ProtectedRoute requiredRole="trainer">
-              <TrainerDashboard />
-            </ProtectedRoute>
+              <TrainerProtectedRoute requiredRole="trainer">
+            <TrainerDashboard/>
+            </TrainerProtectedRoute>
             )
         },
+        // {
+        //     path:"dashboard",
+        //     element:(
+        //       <TrainerProtectedRoute requiredRole="trainer">
+        //       <TrainerDashboard />
+        //     </TrainerProtectedRoute>
+        //     )
+        // },
         
       ]
     },
@@ -133,11 +142,12 @@ export const router = createBrowserRouter([
           path: "users",
           element: (
            <AdminProtectedRoute>
-              <AdminUsersPage />
+              <AdminTrainersUsersPage />
               </AdminProtectedRoute>
             
           )
         },
+      
         // admin routes 
       ]
     },

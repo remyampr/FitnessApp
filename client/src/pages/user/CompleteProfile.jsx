@@ -9,7 +9,10 @@ import {
   getCertifiedTrainers,
   updateProfile,
 } from "../../services/userServices";
-import { setProfileComplete, setSelectedTrainer } from "../../redux/features/userSlice";
+import {
+  setProfileComplete,
+  setSelectedTrainer,
+} from "../../redux/features/userSlice";
 
 export const CompleteProfile = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -24,14 +27,13 @@ export const CompleteProfile = () => {
     fitnessGoal: "",
     image: null,
     trainerId: "",
-    plan:"",
-    
+    plan: "",
+    duration: "",
   });
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.user.user); 
-
+  const user = useSelector((state) => state.user.user);
 
   useEffect(() => {
     if (currentStep === 2) {
@@ -83,7 +85,7 @@ export const CompleteProfile = () => {
       await updateProfile(formDataToSend);
       setCurrentStep(2);
       console.log("Profile updated successfully");
- 
+
       toast.success("Profile updated successfully");
     } catch (error) {
       toast.error("Failed to update profile");
@@ -93,15 +95,13 @@ export const CompleteProfile = () => {
   const handleTrainerSelect = async () => {
     try {
       const res = await assignTrainer({ trainerId: formData.trainerId });
-      console.log("response : ",res);
-      
-  
-      if (res.data) { 
+      console.log("response : ", res);
+
+      if (res.data) {
         dispatch(setSelectedTrainer(formData.trainerId));
         console.log("Trainer id set in form data", formData.trainerId);
-          setCurrentStep(3);  // Move to the next step only on success
+        setCurrentStep(3); // Move to the next step only on success
       } else {
-        
         toast.error(res.data.message || "Failed to assign trainer");
       }
     } catch (error) {
@@ -110,57 +110,57 @@ export const CompleteProfile = () => {
       console.error("Error:", error);
     }
   };
-  
 
   const handlePayment = async () => {
+    if (!formData.plan || !formData.duration) {
+      alert("Please select a subscription plan and duration.");
+      return;
+    }
     try {
-      const userId=user?._id;
-      console.log("userId :", userId);  
-      console.log("TrainerId :", formData.trainerId);  
-      
+      const userId = user?._id;
+      console.log("userId :", userId);
+      console.log("TrainerId :", formData.trainerId);
+
       const resOrderData = await createPaymentOrder({
-        userId,  
+        userId,
         plan: formData.plan,
-        trainerId: formData.trainerId
+        trainerId: formData.trainerId,
+        duration: formData.duration,
       });
 
       // payment gateway here
       const confirmation = await confirmPayment({
         userId,
-        transactionId:resOrderData.data.transactionId,
-        paymentStatus:"Success"
-      }
-      );
-      console.log("orderData ",resOrderData);
+        transactionId: resOrderData.data.transactionId,
+        paymentStatus: "Success",
+      });
+      console.log("orderData ", resOrderData);
       console.log("confirmation:", confirmation);
 
-      if (confirmation?.data?.message === "Payment successful, subscription activated") {
+      if (
+        confirmation?.data?.message ===
+        "Payment successful, subscription activated"
+      ) {
         console.log("Payment successful");
         dispatch(setProfileComplete(true));
-    
 
         console.log("Payment successful!!!!!!!!!!!1");
         // console.log("Redux isProfileComplete state:", isProfileComplete);
         // navigate("/user/dashboard");
         toast.success("Payment successful");
-    
-              console.log("Profile updated! Navigating...");
-              navigate("/user/dashboard");
-         
+
+        console.log("Profile updated! Navigating...");
+        navigate("/user/dashboard");
       } else {
         console.error("Unexpected response message:", confirmation?.data);
         toast.error("Payment failed");
       }
-
     } catch (error) {
-      console.log("error ",error);
-      
+      console.log("error ", error);
+
       toast.error(" Internal error Payment failed");
     }
   };
-
-
-
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -388,7 +388,9 @@ export const CompleteProfile = () => {
           <div className="max-w-2xl mx-auto bg-transparent p-7">
             <h2>Select a Trainer</h2>
             {trainers.length === 0 ? (
-              <p>No trainers available at the moment. Please try again later.</p>
+              <p>
+                No trainers available at the moment. Please try again later.
+              </p>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {trainers.map((trainer) => (
@@ -410,7 +412,7 @@ export const CompleteProfile = () => {
                       <button
                         className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg"
                         onClick={() => {
-                          console.log('Select Trainer Button Clicked');
+                          console.log("Select Trainer Button Clicked");
                           setFormData({ ...formData, trainerId: trainer._id });
                         }}
                       >
@@ -424,7 +426,7 @@ export const CompleteProfile = () => {
             <div className="mt-6">
               <button
                 onClick={handleTrainerSelect} // Ensure this function is correctly defined
-                disabled={!formData.trainerId}  // Disable until a trainer is selected
+                disabled={!formData.trainerId} // Disable until a trainer is selected
                 className="bg-blue-700 text-white px-6 py-3 rounded-lg"
               >
                 Continue to payment
@@ -432,10 +434,10 @@ export const CompleteProfile = () => {
             </div>
           </div>
         );
-        
-        case 3:
-          return(
-            <div className="card bg-base-100 shadow-xl">
+
+      case 3:
+        return (
+          <div className="card bg-base-100 shadow-xl">
             <div className="card-body">
               <h2 className="card-title">Complete Payment</h2>
               <div className="p-4">
@@ -445,10 +447,22 @@ export const CompleteProfile = () => {
                     Selected Trainer:{" "}
                     {trainers.find((t) => t._id === formData.trainerId)?.name}
                   </p>
-                  <p className="mb-2">Subscription Period: 1 Month</p>
-                  <p className="text-xl font-bold">Total: $99.99</p>
+                  <p className="mb-2">
+                    Subscription Period:{" "}
+                    {formData.duration === "6month" ? "6 Months" : "3 Months"}
+                  </p>
+                  <p className="text-xl font-bold">
+                    Total: ₹
+                    {formData.plan === "premium"
+                      ? formData.duration === "3month"
+                        ? 4999
+                        : 8999
+                      : formData.duration === "3month"
+                      ? 1999
+                      : 3599}
+                  </p>
                 </div>
-      
+
                 <div className="mt-6 space-y-4">
                   {/* <div>
                     <label className="label">Payment Method</label>
@@ -469,24 +483,46 @@ export const CompleteProfile = () => {
               <option value="Wallet">Wallet</option>
                     </select>
                   </div> */}
-      
+
+                  {/* Subscription Plan Selection */}
                   <div>
                     <label className="label">Subscription Plan</label>
-                    <select 
+                    <select
                       className="select select-bordered w-full"
                       value={formData.plan}
-                      onChange={(e) => setFormData((prev) => ({ 
-                        ...prev, 
-                        plan: e.target.value 
-                      }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          plan: e.target.value,
+                        }))
+                      }
                     >
                       <option value="">Select Plan</option>
                       <option value="basic">Basic</option>
                       <option value="premium">Premium</option>
                     </select>
                   </div>
+
+                  {/* Subscription Duration Selection */}
+                  <div>
+                    <label className="label">Subscription Duration</label>
+                    <select
+                      className="select select-bordered w-full"
+                      value={formData.duration}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          duration: e.target.value,
+                        }))
+                      }
+                    >
+                      <option value="">Select Duration</option>
+                      <option value="3month">3 Months</option>
+                      <option value="6month">6 Months</option>
+                    </select>
+                  </div>
                 </div>
-      
+
                 <button
                   className="btn btn-primary w-full mt-6"
                   onClick={handlePayment}
@@ -496,37 +532,7 @@ export const CompleteProfile = () => {
               </div>
             </div>
           </div>
-          );
-
-
-      // case 3:
-      //   return (
-      //     <div className="card bg-base-100 shadow-xl">
-      //       <div className="card-body">
-      //         <h2 className="card-title">Complete Payment</h2>
-      //         <div className="p-4">
-      //           <h3 className="font-semibold mb-4">Subscription Details</h3>
-      //           <div className="bg-base-200 p-4 rounded-lg">
-      //             <p className="mb-2">
-      //               Selected Trainer:{" "}
-      //               {trainers.find((t) => t._id === formData.trainerId)?.name}
-      //             </p>
-      //             <p className="mb-4">Subscription Period: 1 Month</p>
-      //             <p className="text-xl font-bold">Total: $99.99</p>
-      //           </div>
-
-      //           {/* Add your payment form here */}
-      //           <button
-      //             className="btn btn-primary w-full mt-6"
-      //             onClick={handlePayment}
-      //           >
-      //             Process Payment
-      //           </button>
-      //         </div>
-      //       </div>
-      //     </div>
-      //   );
-
+        );
 
       default:
         return null;

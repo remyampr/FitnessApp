@@ -53,8 +53,15 @@ const adminSlice=createSlice({
         setUsers: (state, action) => {
             state.users = action.payload;  
         },
+        updateUserInStore:(state,action)=>{
+            state.users=state.users.map((user)=>
+            user._id === action.payload._id ? action.payload :user )
+        },
+        deleteUserFromStore: (state, action) => {
+            state.users = state.users.filter((user) => user._id !== action.payload);
+          },
         setTrainers: (state, action) => {
-            state.users = action.payload;  
+            state.trainers = action.payload;  
         },
         clearAdmin:(state)=>{
             state.admin=null;
@@ -69,5 +76,7 @@ const adminSlice=createSlice({
     }
 })
 
-export const {setAdmin,clearAdmin,setLoading,setError,setDashboardStats,setUsers,setTrainers}=adminSlice.actions;
+export const {setAdmin,clearAdmin,setLoading,setError,setDashboardStats,
+    setUsers,updateUserInStore,deleteUserFromStore,
+    setTrainers}=adminSlice.actions;
 export default adminSlice.reducer;

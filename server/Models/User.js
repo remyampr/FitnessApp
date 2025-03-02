@@ -3,10 +3,13 @@ const mongoose = require("mongoose");
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
   email: { type: String, required: true, unique: true},
+
   trainerId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Trainer'
   },
+
+
   password: { type: String, required: true },
   phone: { type: Number }, 
   height: { type: Number, min: 1 }, 
@@ -25,6 +28,12 @@ const userSchema = new mongoose.Schema({
     startDate: { type: Date },
     endDate: { type: Date },
   },
+  paymentHistory: [{
+    transactionId: { type: String, required: true }, 
+    amount: { type: Number, required: true },
+    paymentStatus: { type: String, enum: ["Success", "Failed"], required: true },
+    paymentDate: { type: Date, default: Date.now }
+  }],
 
   isVerified: { type: Boolean, default: false },  // Initially false until OTP verification
   otp: { type: String }, 

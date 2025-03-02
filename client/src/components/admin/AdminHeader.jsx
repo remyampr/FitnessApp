@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { adminLogout } from "../../services/adminServices";
 import { toast } from "react-toastify";
 import { clearAdmin } from "../../redux/features/adminSlice";
+import { DarkMode } from "../shared/DarkMode";
 
 export const AdminHeader = () => {
 
@@ -78,6 +79,8 @@ export const AdminHeader = () => {
             ) : (
               <Link to="/admin/login" className="btn btn-outline btn-sm">Login</Link>
             )}
+
+            <DarkMode/>
           </div>
         </div>
       </div>

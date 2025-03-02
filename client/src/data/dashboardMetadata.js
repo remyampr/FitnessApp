@@ -16,11 +16,11 @@ export const dashboardMetadata = {
     totalTrainers: {
       title: "Total Trainers",
       iconColor: "bg-purple-100 text-purple-500",
-      link: "/admin/trainers",
+     link: "/admin/users?type=trainer",
       linkText: "View all trainers →",
       iconPath: "M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z",
     },
-    pendingApprovals: {
+    pendingApproval: {
       title: "Pending Approvals",
       iconColor: "bg-yellow-100 text-yellow-600",
       link: "/admin/approvals",

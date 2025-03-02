@@ -1,0 +1,64 @@
+// File structure organization
+/*
+src/
+├── components/
+│   ├── layout/
+│   │   ├── Sidebar.jsx
+│   │   ├── Navbar.jsx
+│   │   ├── DashboardLayout.jsx
+│   ├── trainer/
+│   │   ├── dashboard/
+│   │   │   ├── StatsCard.jsx
+│   │   │   ├── RevenueChart.jsx
+│   │   │   ├── UpcomingAppointments.jsx
+│   │   │   ├── ClientsOverview.jsx
+│   │   ├── clients/
+│   │   │   ├── ClientsList.jsx
+│   │   │   ├── ClientDetails.jsx
+│   │   │   ├── ClientProgress.jsx
+│   │   │   ├── AddProgressNote.jsx
+│   │   ├── appointments/
+│   │   │   ├── AppointmentsList.jsx
+│   │   │   ├── AppointmentDetails.jsx
+│   │   │   ├── AppointmentCalendar.jsx
+│   │   ├── workouts/
+│   │   │   ├── WorkoutsList.jsx
+│   │   │   ├── WorkoutForm.jsx
+│   │   │   ├── WorkoutDetails.jsx
+│   │   ├── nutrition/
+│   │   │   ├── NutritionPlansList.jsx
+│   │   │   ├── NutritionPlanForm.jsx
+│   │   │   ├── NutritionPlanDetails.jsx
+│   │   ├── profile/
+│   │   │   ├── ProfileForm.jsx
+│   │   │   ├── ProfileDetails.jsx
+│   │   ├── revenue/
+│   │   │   ├── RevenueDetails.jsx
+│   │   │   ├── PaymentHistory.jsx
+├── pages/
+│   ├── trainer/
+│   │   ├── Dashboard.jsx
+│   │   ├── Clients.jsx
+│   │   ├── ClientDetail.jsx
+│   │   ├── Appointments.jsx
+│   │   ├── Workouts.jsx
+│   │   ├── CreateWorkout.jsx
+│   │   ├── NutritionPlans.jsx
+│   │   ├── CreateNutritionPlan.jsx
+│   │   ├── Profile.jsx
+│   │   ├── Revenue.jsx
+├── services/
+│   ├── api.js
+│   ├── trainerService.js
+│   ├── appointmentService.js
+│   ├── workoutService.js
+│   ├── nutritionService.js
+│   ├── progressService.js
+├── utils/
+│   ├── dateUtils.js
+│   ├── formatters.js
+├── context/
+│   ├── AuthContext.jsx
+│   ├── TrainerContext.jsx
+└── App.jsx
+*/

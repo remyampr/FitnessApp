@@ -229,6 +229,7 @@ const getTrainerRevenue = async (req, res, next) => {
     res.status(200).json({
       success: true,
       totalRevenue: trainer.totalRevenue,
+      revenueHistory: trainer.revenueHistory,
     });
   } catch (error) {
     next(error);
@@ -279,7 +280,7 @@ const updateTrainerProfile = async (req, res, next) => {
 
 const getTrainerProfile = async (req, res, next) => {
   try {
-    const trainer = await Trainer.findById(req.user.id);
+    const trainer = await Trainer.findById(req.user.id).select("-password").populate("clients", "name");
 
     if (!trainer) {
       return res
@@ -289,19 +290,7 @@ const getTrainerProfile = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      trainer: {
-        name: trainer.name,
-        email: trainer.email,
-        phone: trainer.phone,
-        image: trainer.image,
-        specialization: trainer.specialization,
-        experience: trainer.experience,
-        certifications: trainer.certifications,
-        availability: trainer.availability,
-        averageRating: trainer.averageRating,
-        totalRevenue: trainer.totalRevenue,
-        trainerSharePercentage: trainer.trainerSharePercentage,
-      },
+      trainer
     });
   } catch (error) {
     next(error);
@@ -323,6 +312,7 @@ const getTrainerClients = async (req, res, next) => {
     res.status(200).json({
       success: true,
       clients: trainer.clients,
+      count:trainer.clients.length,
     });
   } catch (error) {
     next(error);

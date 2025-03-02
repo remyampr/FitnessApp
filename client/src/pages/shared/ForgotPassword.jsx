@@ -1,16 +1,23 @@
 import React, { useState } from 'react'
 import { userForgotPassword, userResetPassword } from '../../services/userServices';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { trainerForgotPassword, trainerResetPassword } from '../../services/trainerServices';
 
 export const ForgotPassword = () => {
+
+  const location = useLocation();
+  const role = location.state?.role || "unknown"; 
 
 const [step,setStep]=useState("email");
 // const [email, setEmail] = useState("");
 const [data, setData] = useState({
      email:"",
-  role:"user"
+  role:role
 });
+
+console.log("Role ForgotPassword : ",data.role);
+
 const [maskedEmail, setMaskedEmail] = useState("");
 const [otp, setOtp] = useState("");
 const [newPassword, setNewPassword] = useState("");
@@ -23,8 +30,18 @@ const handleSendOTP=async ()=>{
     try {
         console.log("step : ",step);
         
-        const response=await userForgotPassword(data);
-        toast.success(response.data.msg);
+        if(data.role === "user"){
+          const response=await userForgotPassword(data);
+          console.log("at handle otp data : ",data);
+          console.log("at handle otp response : ",response);
+        }
+        else if(data.role === "trainer"){
+          const response=await trainerForgotPassword(data);
+          console.log("at handle otp data : ",data);
+          console.log("at handle otp response : ",response);
+        }
+       
+        toast.success("otp send");
         setMaskedEmail(maskEmail(data.email));
         setStep("otp");
         
@@ -43,8 +60,17 @@ const maskEmail = (email) => {
 const handleResetPassword=async () =>{
     try {
 
+      if(data.role === "user"){
         const response=await userResetPassword(data.email,otp,newPassword);
-        toast.success(response.data.message);
+        console.log("at handle resetPassword data : ",data);
+        console.log("at handle resetPassword response : ",response);
+      }else if(data.role === "trainer"){
+        const response=await trainerResetPassword(data.email,otp,newPassword);
+        console.log("at handle resetPassword data : ",data);
+        console.log("at handle resetPassword response : ",response);
+      }
+        
+        toast.success("password reset ");
         navigate(`/${data.role}/login`);
         
     } catch (error) {

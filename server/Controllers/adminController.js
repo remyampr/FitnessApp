@@ -143,11 +143,15 @@ const createAdmin = async (req, res, next) => {
 
 const getAllTrainers = async (req, res, next) => {
   try {
-    const trainers = await Trainer.find({}).select("-password");
+   
+    const trainers = await Trainer.find({})
+  .select("-password")
+  .populate("clients", "name");
+
     if (!trainers) {
       return res.status(401).json({ error: "Empty!" });
     }
-    res.status(200).json({ success: true, trainers });
+    res.status(200).json({ success: true, users:trainers });
   } catch (error) {
     next(error);
   }
@@ -246,7 +250,7 @@ const approveTrainer = async (req, res, next) => {
 
 const getAllUsers = async (req, res, next) => {
   try {
-    const users = await User.find({});
+    const users = await User.find().populate("trainerId","name");
     if (!users) {
       return res.status(401).json({ error: "Empty!" });
     }
@@ -273,20 +277,47 @@ const getUser = async (req, res, next) => {
 
 const updateUser = async (req, res, next) => {
   try {
-    const { id } = req.params;
+    const { userId } = req.params;
 
-    const updatedUser = await User.findByIdAndUpdate(id, req.body, {
+    const { trainerId } = req.body;
+
+    console.log("user id",userId);
+    
+
+    const existingUser = await User.findById(userId);
+    if (!existingUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    if (trainerId && trainerId !== existingUser.trainerId) {
+   
+      if (existingUser.trainerId) {
+        await Trainer.findByIdAndUpdate(existingUser.trainerId, {
+          $pull: { clients: userId },
+        });
+      }
+
+           // Add user to the new trainer
+           await Trainer.findByIdAndUpdate(trainerId, {
+            $push: { clients: userId },
+          });
+          
+     
+    }
+
+
+    const updatedUser = await User.findByIdAndUpdate(userId, req.body, {
       new: true,
       runValidators: true,
-    }).select("-password");
+    }).populate("trainerId","name").select("-password");
 
     if (!updatedUser) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ error: "User not found !!" });
     }
 
     res
       .status(200)
-      .json({ msg: "User updated successfully", user: updatedUser });
+      .json({ message: "User updated successfully", user: updatedUser });
   } catch (error) {
     next(error);
   }
@@ -294,9 +325,14 @@ const updateUser = async (req, res, next) => {
 
 const deleteUser = async (req, res, next) => {
   try {
-    const { id } = req.params;
+    const { userId } = req.params;
 
-    const deletedUser = await User.findByIdAndDelete(id);
+    const deletedUser = await User.findByIdAndDelete(userId);
+
+    await Trainer.updateMany(
+      { clients: userId },
+      { $pull: { clients: userId } }  
+    );
 
     if (!deletedUser) {
       return res.status(404).json({ error: "User not found" });

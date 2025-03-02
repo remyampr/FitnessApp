@@ -9,6 +9,10 @@ export const DashboardCard = ({
   linkText,
   value,
 }) => {
+
+
+
+
   // Extract the text color class from iconColor to apply to link
   const textColorClass = iconColor.split(" ").find(cls => cls.startsWith("text-"));
   

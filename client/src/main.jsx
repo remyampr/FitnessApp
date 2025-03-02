@@ -5,6 +5,8 @@ import App from './App.jsx'
 import { ToastContainer, toast } from 'react-toastify';
 import { store } from './redux/store.js'
 import { Provider } from 'react-redux'
+import 'font-awesome/css/font-awesome.min.css';
+
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
