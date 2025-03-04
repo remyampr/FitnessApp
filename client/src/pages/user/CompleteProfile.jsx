@@ -13,8 +13,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import {
   assignTrainer,
-  confirmPayment,
-  createPaymentOrder,
   getApprovedTrainers,
   makePaymentOnStripe,
   updateProfile,
