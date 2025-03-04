@@ -14,7 +14,6 @@ import { ProtectedRoute } from "../components/ProtectedRoute/ProtectedRoute";
 import { TrainerLayout } from "../layout/TrainerLayout";
 import { PendingApproval } from "../pages/trainer/PendingApproval";
 import { TrainerDashboard } from "../pages/trainer/TrainerDashboard";
-import { ForgotPassword } from "../pages/shared/forgotPassword";
 import { AdminLayout } from "../layout/AdminLayout";
 import { AdminLoginPage } from "../pages/admin/AdminLoginPage";
 import { AdminDashboard } from "../pages/admin/AdminDashboard";
@@ -22,6 +21,7 @@ import { AdminForgotPassword } from "../pages/admin/AdminForgotPassword";
 import { AdminProtectedRoute } from "../components/ProtectedRoute/AdminProtectedRoute";
 import { AdminTrainersUsersPage } from "../pages/admin/AdminTrainersUsersPage";
 import { TrainerProtectedRoute } from "../components/ProtectedRoute/TrainerProtectedRoute";
+import { ForgotPassword } from "../pages/shared/ForgotPassword";
 
 
 export const router = createBrowserRouter([
