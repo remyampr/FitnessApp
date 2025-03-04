@@ -143,7 +143,7 @@ const logout = async (req, res, next) => {
 const login = async (req, res, next) => {
   try {
     const { email, password, role } = req.body;
-    console.log("from frontend data :",req.body)
+    console.log("Received from frontend:",req.body)
 
     if (!email || !password || !role) {
       return res
@@ -173,11 +173,26 @@ const login = async (req, res, next) => {
       }
 
       const token = createToken(user._id, user.role);
-      res.cookie("token", token, { httpOnly: true });
+      // res.cookie("token", token, { httpOnly: true });
+
+
+    //   res.cookie("token", token, {
+    //     httpOnly: true,
+    //     secure: true, 
+    //     sameSite: "None",
+    //     path: "/"
+    // });
+
+          res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",  // Secure only in production
+        sameSite: "None",
+        path: "/"
+    });
 
       console.log(`${role.charAt(0).toUpperCase() + role.slice(1)} login successful`);
   
-
+// for user  update last login and check profile completion
       if(role === "user"){
         user.lastLogin=new Date();
         await user.save();
