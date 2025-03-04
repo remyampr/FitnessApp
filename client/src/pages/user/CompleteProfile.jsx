@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {loadStripe} from '@stripe/stripe-js';
+// import {loadStripe} from '@stripe/stripe-js';
 
 import {
   faUserTimes,
@@ -22,10 +22,11 @@ import {
   setProfileComplete,
   setSelectedTrainer,
 } from "../../redux/features/userSlice";
+import stripePromise from "../../Stripe/stripe";
 
 export const CompleteProfile = () => {
 
-  const stripePromise=loadStripe(import.meta.env.VITE_PUBLISHED_KEY_STRIPE)
+  // const stripePromise=loadStripe(import.meta.env.VITE_PUBLISHED_KEY_STRIPE)
 
   const [currentStep, setCurrentStep] = useState(1);
   const [trainers, setTrainers] = useState([]);
