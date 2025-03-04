@@ -22,6 +22,7 @@ import { AdminProtectedRoute } from "../components/ProtectedRoute/AdminProtected
 import { AdminTrainersUsersPage } from "../pages/admin/AdminTrainersUsersPage";
 import { TrainerProtectedRoute } from "../components/ProtectedRoute/TrainerProtectedRoute";
 import { ForgotPassword } from "../pages/shared/ForgotPassword";
+import { PaymentSuccess } from "../pages/user/PaymentSuccess";
 
 
 export const router = createBrowserRouter([
@@ -68,6 +69,15 @@ export const router = createBrowserRouter([
           element:(
             <ProtectedRoute requiredRole="user" allowIncomplete={true}>
                 <CompleteProfile/>
+            </ProtectedRoute>
+          )
+           
+        },    
+        {
+          path: "payment-success",
+          element:(
+            <ProtectedRoute requiredRole="user" >
+                <PaymentSuccess/>
             </ProtectedRoute>
           )
            

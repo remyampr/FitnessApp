@@ -16,6 +16,7 @@ import {
   confirmPayment,
   createPaymentOrder,
   getApprovedTrainers,
+  makePaymentOnStripe,
   updateProfile,
 } from "../../services/userServices";
 import {
