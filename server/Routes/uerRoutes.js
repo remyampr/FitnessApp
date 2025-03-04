@@ -9,7 +9,8 @@ const {
     getUserProfile,
     getCertifiedTrainers,
     assignTrainer,
-     myTrainer
+     myTrainer,
+     getApprovedTrainers
   } = require("../Controllers/userController");
 
   const {verifyEmail,forgotPassword,resetPassword,
@@ -22,7 +23,7 @@ router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
 router.post("/login",login);
 router.post("/logout",logout);
-router.get("/trainers/certified",protect, authorize(["user"]),getCertifiedTrainers);
+router.get("/trainers/approved",protect, authorize(["user"]),getApprovedTrainers);
 router.put("/trainers/assign",protect, authorize(["user"]),assignTrainer);
 router.put("/profile/update", protect, authorize(["user"]),upload.single("image"),updateUserProfile);
 router.get("/profile", protect, authorize(["user"]), getUserProfile);

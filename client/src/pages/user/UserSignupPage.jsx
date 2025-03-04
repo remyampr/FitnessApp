@@ -24,11 +24,13 @@ export const UserSignupPage = () => {
   const onSubmit = async () => {
     setLoading(true);
     try {
+      console.log("Sending request to backend with:", values);
+      
       const res=await userSignup(values);
       console.log("res :",res);
       toast.success("SignUp Successful! Check your email for the OTP.");
       setOtpSent(true);
-    } catch (error) {
+    } catch (err) {
       console.log(err); 
       if (err.response && err.response.data && err.response.data.error) {
         toast.error(err.response.data.error); 

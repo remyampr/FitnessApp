@@ -34,7 +34,7 @@ const registerUser=async (req,res,next)=>{
         });
         await newUser.save();
 
-        const logedActivity=await logActivity('NEW_USER', newUser._id, 'User', {
+        const logedActivity=await logActivity('NEW_USER', newUser._id, 'user', {
       name: newUser.name,
       email: newUser.email,
       subscription:newUser.subscription
@@ -46,6 +46,9 @@ const registerUser=async (req,res,next)=>{
         <p>This OTP will expire in 10 minutes.</p>
       `;
       await sendEmail(email, "Verify Your Email", emailContent);
+
+      console.log("nre user and OTP : ",newUser,otp);
+      
   
       return res.status(201).json({
         message: "User registered. Please verify your email.",user: newUser });
@@ -216,14 +219,16 @@ const registerUser=async (req,res,next)=>{
 //     }
 //   }
 
-  const getCertifiedTrainers = async (req, res, next) => {
+  const getApprovedTrainers = async (req, res, next) => {
     try {
-      const trainers = await Trainer.find({ isCertified: true });
-      console.log("Crtified trainers : ",trainers);
+      console.log("Searching Approved trainers :..");
+      
+      const trainers = await Trainer.find({ isApproved: true });
+      console.log("Approved : ",trainers);
       
 
       if (!trainers || trainers.length === 0) {
-        return res.status(404).json({ success: false, message: 'No certified trainers found' });
+        return res.status(404).json({ success: false, message: 'No approved trainers found' });
       }
        // Send certified trainers to the frontend
       res.status(200).json({ success: true, trainers });
@@ -258,7 +263,7 @@ try {
   }
 
     if (trainer.isApproved !== true) {
-      return res.status(400).json({ error: 'Trainer must be certified' });
+      return res.status(400).json({ error: 'Trainer must be approved' });
     }
   
     user.trainerId = trainerId;
@@ -413,7 +418,7 @@ trainer.reviews.push({ userId, rating, comment });
 module.exports={registerUser,
   updateUserProfile,
   getUserProfile,
-  getCertifiedTrainers
+  getApprovedTrainers
   ,assignTrainer,
 myTrainer
 }

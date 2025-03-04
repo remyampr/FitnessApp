@@ -2,6 +2,9 @@ const User=require("../Models/User");
 const Trainer=require("../Models/Trainer");
 const Payment = require("../Models/Payment");
 const { logActivity } = require("../Utilities/activityServices");
+const Stripe=require("stripe");
+
+const stripe= new Stripe(process.env.SRTIPE_SECRETE)
 
 const createPaymentOrder = async (req, res, next) => {
   try {
@@ -12,10 +15,7 @@ const createPaymentOrder = async (req, res, next) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    const trainer = await Trainer.findById(trainerId);
-    if (!trainer) {
-      return res.status(404).json({ error: "trainer not found" });
-    }
+  
 
 
      // Determine amount based on plan and duration
@@ -179,4 +179,96 @@ const confirmPayment = async (req, res, next) => {
     }
   };
 
-  module.exports={createPaymentOrder,confirmPayment}
+
+
+  const  paymentFunction=async (req,res,next)=>{
+    try {
+
+      const { trainerId, plan, amount, startDate, endDate, duration } = req.body;
+      const userId = req.user.id;
+
+      const trainer = await Trainer.findById(trainerId)
+      if (!trainer) {
+        return res.status(404).json({ message: 'Trainer not found' });
+      }
+
+        // Format plan name for Stripe
+    const planName = plan === 'basic' ? 'Basic Fitness Plan' : 'Premium Fitness Plan';
+    const planDuration = duration === 3 ? '3 Month' : '6 Month';
+
+     // checkout session
+     const session=await stripe.checkout.sessions.create({
+
+      payment_method_types:['card'],
+      line_items:[
+        {
+          price_data:{
+            currency: 'inr',
+            product_data:{
+              name: `${planName} - ${planDuration}`,
+              description: `Fitness training with ${trainer.name} for ${duration} months`,
+            },
+            unit_amount: amount * 100, 
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: `${process.env.FRONTEND_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      // success_url: `${process.env.FRONTEND_URL}/payment/success`,
+      cancel_url: `${process.env.FRONTEND_URL}/subscription`,
+      metadata: {
+        userId,
+        trainerId,
+        plan,
+        amount,
+        startDate,
+        endDate,
+        duration
+      },
+     })
+     res.status(200).json({success:true, sessionId: session.id });
+      
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // const stripeWebhookHandler = async (req, res,next) =>{
+  //   try {
+
+  //     const sig = req.headers['stripe-signature'];
+  // let event;
+      
+  //   } catch (error) {
+  //     next(error)
+  //   }
+  // }
+
+
+
+
+  const getUserPaymentHistory=async (req,res,next)=>{
+    try {
+      
+      const userId=req.user.id;
+
+      const user=await User.findById(userId).select('paymentHistory subscription');
+         
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json({
+      paymentHistory: user.paymentHistory,
+      subscription: user.subscription
+    });
+
+
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  module.exports={paymentFunction,getUserPaymentHistory,
+    createPaymentOrder,confirmPayment}

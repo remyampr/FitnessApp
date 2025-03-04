@@ -68,9 +68,8 @@ const trainerSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
-trainerSchema.index({ email: 1 });
-trainerSchema.index({ isApproved: 1 });
-
-
 
 module.exports = mongoose.model("Trainer", trainerSchema); 
+
+
+

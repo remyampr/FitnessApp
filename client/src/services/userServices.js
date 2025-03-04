@@ -17,6 +17,8 @@ export const userResetPassword=(email, otp, newPassword , role="user" )=>{
 
 
 export const userSignup=(data)=>{
+    console.log("in axios User Signup : ",data);
+    
     return axiosInstance.post("/user/register",data)
 }
 export const userVerify=(email,otp, role = "user")=>{
@@ -34,8 +36,8 @@ export const updateProfile =(formDataToSend)=>{
     }
     
 }
-export const getCertifiedTrainers=()=>{
-    return axiosInstance.get("/user/trainers/certified")
+export const getApprovedTrainers=()=>{
+    return axiosInstance.get("/user/trainers/approved")
 }
 export const assignTrainer=(data)=>{
     return axiosInstance.put("/user/trainers/assign",data)
@@ -44,6 +46,11 @@ export const assignTrainer=(data)=>{
     //         "Content-Type": "application/json",
     //     }
     // }
+}
+
+export const makePaymentOnStripe=(data)=>{
+    return axiosInstance.post("/payment/makepayment",data)
+
 }
 
 export const createPaymentOrder=(data)=>{
