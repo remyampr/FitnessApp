@@ -21,6 +21,7 @@ app.use(express.json());
 app.use(cookieparser());
 app.use(errorHandler);
 
+
 app.get("/", (req, res) => {
   res.send("API Started....");
 });
