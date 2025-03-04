@@ -27,8 +27,8 @@ app.get("/", (req, res) => {
 
 
 app.use(cors({
-  origin:"http://localhost:5173",
-  credentials:true
+  origin:['https://fitness-appfrontend.vercel.app', 'http://localhost:5173'],
+  credentials: true 
 }))
 
 
