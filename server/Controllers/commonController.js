@@ -176,19 +176,19 @@ const login = async (req, res, next) => {
       // res.cookie("token", token, { httpOnly: true });
 
 
-    //   res.cookie("token", token, {
-    //     httpOnly: true,
-    //     secure: true, 
-    //     sameSite: "None",
-    //     path: "/"
-    // });
-
-          res.cookie("token", token, {
+      res.cookie("token", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",  // Secure only in production
+        secure: true, 
         sameSite: "None",
         path: "/"
     });
+
+    //       res.cookie("token", token, {
+    //     httpOnly: true,
+    //     secure: process.env.NODE_ENV === "production",  // Secure only in production
+    //     sameSite: "None",
+    //     path: "/"
+    // });
 
       console.log(`${role.charAt(0).toUpperCase() + role.slice(1)} login successful`);
   
