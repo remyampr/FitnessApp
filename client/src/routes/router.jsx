@@ -76,9 +76,9 @@ export const router = createBrowserRouter([
         {
           path: "payment-success",
           element:(
-            <ProtectedRoute requiredRole="user" >
+           
                 <PaymentSuccess/>
-            </ProtectedRoute>
+         
           )
            
         },    
