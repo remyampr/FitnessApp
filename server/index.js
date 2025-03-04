@@ -17,6 +17,10 @@ const progressRoutes = require("./Routes/progressRoutes");
 const app = express();
 
 connectDB();
+
+app.use('/api/payment/webhook', express.raw({type: 'application/json'}));
+
+
 app.use(express.json());
 app.use(cookieparser());
 app.use(errorHandler);
