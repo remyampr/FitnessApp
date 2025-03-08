@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 
 const nutritionSchema = new mongoose.Schema({
   
-  title: { type: String, required: true },
+  name: { type: String, required: true },
   fitnessGoal: { 
     type: String, 
     enum: ["Weight Loss", "Weight Gain", "Muscle Gain", "Maintenance", "Endurance Improvement"], 
@@ -30,10 +30,65 @@ const nutritionSchema = new mongoose.Schema({
   }],
 
   waterIntake: { type: Number, default: 0 },
-  image: { type: String, default: "" }, // Store image URL
+  image: { type: String, default: "" }, 
  createdBy: { type: mongoose.Schema.Types.ObjectId, required: true }, // Can be Trainer or Admin
    createdByType: { type: String, enum: ['trainer', 'admin'], required: true }, // Distinguish creator type
+
+   status:{type:String,default:"active", enum:["active","inactive"]}
 }, { timestamps: true });
 
 module.exports = mongoose.model("Nutrition", nutritionSchema); 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

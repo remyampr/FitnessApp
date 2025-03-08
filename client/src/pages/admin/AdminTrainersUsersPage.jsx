@@ -28,11 +28,6 @@ export const AdminTrainersUsersPage = () => {
 
   const location = useLocation();
  
- 
-
-  // console.log("inside AdminTrainersUsersPage Users in state** : ",users);
-  // console.log("inside AdminTrainersUsersPage Users in state :** ",trainers);
-
 
   useEffect(() => {
 
@@ -65,14 +60,7 @@ export const AdminTrainersUsersPage = () => {
 
   const dataToDisplay = selectedType === "users" ? users : trainers;
 
-  // useEffect(() => {
-  //   if (users && users.length > 0) {
-    
-  //     console.log("Updated users in state:", users);
-  //     // console.log("Filtered users in state:", filteredUsers);
-      
-  //   }
-  // }, [users]); 
+  
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-base-200">

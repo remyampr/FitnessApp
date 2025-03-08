@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema({
   isActive: { type: Boolean, default: true }, 
   
   subscription: {
-    status: { type: String, enum: ["Active", "Inactive", "Expired"], default: "Inactive" }, 
+    status: { type: String, enum: ["Active", "Inactive", "Suspended"], default: "Inactive" }, 
     plan: { type: String, default: "Free" }, 
     amount: { type: Number, default: 0 },  
     startDate: { type: Date },

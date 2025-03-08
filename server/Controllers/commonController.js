@@ -191,12 +191,13 @@ const login = async (req, res, next) => {
     // });
 
       console.log(`${role.charAt(0).toUpperCase() + role.slice(1)} login successful`);
+      console.log(`isprofilecompleted? ${user.isProfileComplete}`);
   
 // for user  update last login and check profile completion
       if(role === "user"){
         user.lastLogin=new Date();
         await user.save();
-        if (!user.isProfileCompleted) {
+        if (!user.isProfileComplete) {
             return res.status(200).json({
               message: "User login successful, but profile is incomplete.",
               isProfileCompleted: false,
@@ -205,7 +206,7 @@ const login = async (req, res, next) => {
           }
       }
 
-      return res.status(200).json({ message: `${role.charAt(0).toUpperCase() + role.slice(1)} login successful`, token,user:user });
+      return res.status(200).json({ message: `${role.charAt(0).toUpperCase() + role.slice(1)} login successful`, token,user });
 
 
   } catch (error) {

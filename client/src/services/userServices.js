@@ -49,6 +49,8 @@ export const assignTrainer=(data)=>{
 }
 
 export const makePaymentOnStripe=(data)=>{
+    console.log("Payment data : ",data);
+    
     return axiosInstance.post("/payment/makepayment",data)
 
 }
@@ -58,5 +60,40 @@ export const createPaymentOrder=(data)=>{
 }
 export const confirmPayment=(data)=>{
     return axiosInstance.post("/payment/confirm",data)
+}
+
+
+export const getUserProfile=()=>{
+    return axiosInstance.get("/user/profile")
+}
+// export const getUserProgress=()=>{
+//     return axiosInstance.get("/progress/user")
+// }
+export const getUserWorkouts=()=>{
+    return axiosInstance.get("/workouts/user")
+}
+export const getUserNutritionPlans=()=>{
+    return axiosInstance.get("/nutrition/user")
+}
+export const getUserAppointments=()=>{
+    return axiosInstance.get("/appointments/user")
+}
+export const getUserNotifications=()=>{
+    return axiosInstance.get("/notifications/notification")
+}
+
+
+export const checkWorkoutStatus=()=>{
+    return axiosInstance.get("/progress/check")
+}
+export const saveProgress=(progressData)=>{
+    return axiosInstance.post("/progress",progressData)
+}
+export const getProgressHistory=()=>{
+    return axiosInstance.get("/progress/history")
+}
+
+export const getProgressSummary = ()=>{
+    return axiosInstance.get("/progress/summary")
 }
 

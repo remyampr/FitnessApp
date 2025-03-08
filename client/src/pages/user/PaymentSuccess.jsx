@@ -1,21 +1,28 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { setProfileComplete } from "../../redux/features/userSlice";
 
 export const PaymentSuccess = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch=useDispatch()
 
   useEffect(() => {
     const query = new URLSearchParams(location.search);
     const sessionId = query.get("session_id");
     if (sessionId) {
-      // Optionally verify the payment status with your backend
       verifyPaymentAndRedirect(sessionId);
+      const newUrl = window.location.pathname;
+      window.history.replaceState(null, "", newUrl);
+
     } else {
       toast.error("Payment verification failed: Missing session ID");
-      navigate("/subscription");
+      console.log("Payment verification failed: Missing session ID");
+      
+      navigate("complete-profile");
     }
   }, [location, navigate]);
 
@@ -25,7 +32,10 @@ export const PaymentSuccess = () => {
         toast.success('Payment successful! Your subscription is now active.');
         // Redirect to dashboard after a brief delay
       setTimeout(() => {
-        navigate('dashboard');
+        
+        dispatch(setProfileComplete(true))
+
+        navigate('user/dashboard');
       }, 2000);
         
     } catch (error) {

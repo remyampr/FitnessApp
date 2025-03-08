@@ -20,6 +20,7 @@ export const TrainerProtectedRoute = ({ children }) => {
   
   // Check if the trainer has the isApproved property
   const isApproved = trainer?.isApproved || false;
+  const isActive = trainer?.status === "active";
 
   useEffect(() => {
   
@@ -39,6 +40,10 @@ export const TrainerProtectedRoute = ({ children }) => {
     return <Navigate to="/trainer/login" replace />;
   }
   
+  if (!isActive) {
+    return <Navigate to="/trainer/account-suspended" replace />;
+  }
+
   // Handle routing based on approval status
   if (isApproved) {
     // If approved and trying to access pending approval page, redirect to dashboard

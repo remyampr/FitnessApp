@@ -13,12 +13,13 @@ const nutritionRoutes=require("./Routes/nutritionRoutes");
 const appointmentRoutes=require("./Routes/appointmentRoutes");
 const paymentRoutes =require("./Routes/paymentRoutes");
 const progressRoutes = require("./Routes/progressRoutes");
+const notificationRoutes = require("./Routes/notificationRoutes");
 
 const app = express();
 
 connectDB();
 
-app.use('/api/payment/webhook', express.raw({type: 'application/json'}));
+// app.use('/api/payment/webhook', express.raw({type: 'application/json'}));
 
 
 app.use(express.json());
@@ -32,7 +33,7 @@ app.get("/", (req, res) => {
 
 
 app.use(cors({
-  origin:['https://fitness-appfrontend.vercel.app', 'http://localhost:5174'],
+  origin:['https://fitness-appfrontend.vercel.app', 'http://localhost:5173'],
   credentials: true 
 }))
 
@@ -47,6 +48,7 @@ app.use("/api/nutrition",nutritionRoutes);
 app.use("/api/appointments",appointmentRoutes);
 app.use("/api/payment",paymentRoutes);
 app.use("/api/progress",progressRoutes)
+app.use("/api/notifications",notificationRoutes)
 
 const PORT = process.env.PORT || 5100;
 

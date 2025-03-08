@@ -2,13 +2,15 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { userLogin } from '../../services/userServices';
 import { toast } from 'react-toastify';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setProfileComplete, setUser } from '../../redux/features/userSlice';
 
 export const UserLoginPage = () => {
 
   const navigate=useNavigate();
   const dispatch=useDispatch();
+
+  const isProfileComplete=useSelector(state => state.user.isProfileComplete)
 
 const [values,setValues]=useState({
 
@@ -24,18 +26,29 @@ const onSubmit=(event)=>{
     toast.error("Please fill in all fields")
   }
  
-  console.log("values in state : ",values);
+  // console.log("values in state : ",values);
   userLogin(values).then((res)=>{
+    // console.log("values sending");
     
-    dispatch(setUser(res.data.user));
-    dispatch(setProfileComplete(res.data.user.isProfileComplete));
-    console.log("res : ",res);
-    toast.success("Login successful!");
-    console.log("isProfilecompleted : ",res.data.user.isProfileComplete);
+    
+    if (res.data && res.data.user) {
+      console.log("login time res got , : ",res);
+      
+      dispatch(setUser(res.data.user));
+      dispatch(setProfileComplete(res.data.user.isProfileComplete));
+      console.log("res : ",res);
+      toast.success("Login successful!");
+    console.log("isProfilecompleted ?: ",isProfileComplete);
      if(res.data.user.isProfileComplete){
-     
+
             navigate("/user/dashboard");
     }else  navigate("/user/complete-profile");
+    } else {
+      console.error("Login API response does not contain user data");
+      toast.error("Login failed. Please try again.");
+    }
+    
+
    
     
   }).catch((err)=>{

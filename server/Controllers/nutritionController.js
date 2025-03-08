@@ -113,7 +113,7 @@ try {
 
 }
 
-const deleteNutritionPlan = async (req, res,next) => {
+const deactivateNutritionPlan  = async (req, res,next) => {
     try {
 
         const { id } = req.params;
@@ -121,13 +121,15 @@ const deleteNutritionPlan = async (req, res,next) => {
             return res.status(403).json({ message: "You do not have permission to delete this nutrition plan" });
           }
 
-          const deletedPlan = await Nutrition.findByIdAndDelete(id);
-
-          if (!deletedPlan) {
+          const nutritionPlan = await Nutrition.findById(id);
+          if (!nutritionPlan) {
             return res.status(404).json({ message: "Nutrition plan not found" });
           }
 
-          return res.status(200).json({ message: "Nutrition plan deleted successfully" });
+          nutritionPlan.status = 'inactive';
+          await nutritionPlan.save();
+      
+          return res.status(200).json({ message: "Nutrition plan deactivated successfully" });
         
     } catch (error) {
         next(error)
@@ -187,7 +189,7 @@ const getUserNutritionPlans = async (req, res,next) => {
         { createdByType: "admin" },
       ],
       fitnessGoal: user.fitnessGoal,
-      "schedule.day": { $in: [todayName,todayName] },
+      "schedule.day": { $in: [todayName,tomorrowName] },
      })
 
 
@@ -208,6 +210,7 @@ module.exports = {
   getAllNutritionPlans,
   getNutritionPlanById,
   updateNutritionPlan,
-  deleteNutritionPlan,getNutritionPlansForTrainer,
+  deactivateNutritionPlan,
+  getNutritionPlansForTrainer,
   getUserNutritionPlans
 };

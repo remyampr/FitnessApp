@@ -1,65 +1,66 @@
 import React, { useState, useEffect } from "react";
 import { FiX, FiSave, FiTrash2, FiAlertTriangle } from "react-icons/fi";
-import { useDispatch, useSelector } from "react-redux";
-import { deleteUser, updateUser } from "../../services/adminServices";
-import { deleteUserFromStore, setUsers, updateUserInStore } from "../../redux/features/adminSlice";
+import { useDispatch } from "react-redux";
+import { deactivateTrainer, updateTrainer } from "../../services/adminServices";
+import { deleteTrainerFromStore, updateTrainerInStore } from "../../redux/features/adminSlice";
 
-export const TrainerModal = ({ user, isOpen, onClose }) => {
+
+export const TrainerModal = ({ trainer, isOpen, onClose }) => {
   const dispatch = useDispatch();
-  const { trainers } = useSelector((state) => state.admin);
 
-  const [userData, setUserData] = useState({});
+  const [trainerData, setTrainerData] = useState({});
   const [isDeleting, setIsDeleting] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (user) {
-      setUserData({ ...user });
+    if (trainer) {
+      setTrainerData({ ...trainer });
     }
-  }, [dispatch,user]);
+  }, [trainer]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setUserData((prev) => ({ ...prev, [name]: value }));
+    setTrainerData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSave = async () => {
+    console.log();
+    ("save")
     setLoading(true);
     try {
-      const { trainerId, status } = userData;
-      const updatedData = { trainerId, status };
+      const { isApproved, notes } = trainerData;
+      const updatedData = { isApproved, notes };
 
-      const res = await updateUser(userData._id, userData);
-      console.log("response after updating user : ",res.data.user);
+      console.log("trainer to update : ",trainerData._id, updatedData)
 
-      if(res && res.data.user){
-        dispatch(updateUserInStore(res.data.user));
-        console.log("state update",user);
-        
-      }
+      const res = await updateTrainer(trainerData._id, updatedData);
+
+      console.log("res after updating : ",res);
       
+
+      if (res && res.data.trainer) {
+        dispatch(updateTrainerInStore(res.data.trainer));
+      }
 
       onClose();
     } catch (error) {
-      console.error("Failed to update user:", error);
+      console.error("Failed to update trainer:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async () => {
+  const handleDeactivate = async () => {
     setLoading(true);
     try {
-      // await dispatch(deleteUser(userData._id));
-
-      const res=await deleteUser(userData._id);
+      const res = await deactivateTrainer(trainerData._id);
 
       if (res.status === 200) {
-        dispatch(deleteUserFromStore(userData._id)); 
+        dispatch(deleteTrainerFromStore(trainerData._id));
       }
       onClose();
     } catch (error) {
-      console.error("Failed to delete user:", error);
+      console.error("Failed to delete trainer:", error);
     } finally {
       setLoading(false);
       setIsDeleting(false);
@@ -70,10 +71,10 @@ export const TrainerModal = ({ user, isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
-      <div className="bg-base-100 rounded-lg shadow-xl w-full max-w-2xl">
+      <div className="bg-base-100 rounded-lg shadow-xl w-full max-w-4xl">
         {/* Modal Header */}
         <div className="flex justify-between items-center p-4 border-b">
-          <h3 className="text-xl font-bold">User Details</h3>
+          <h3 className="text-xl font-bold">Trainer Details</h3>
           <button onClick={onClose} className="btn btn-sm btn-circle">
             <FiX />
           </button>
@@ -85,21 +86,19 @@ export const TrainerModal = ({ user, isOpen, onClose }) => {
             <div className="p-6 text-center">
               <FiAlertTriangle className="mx-auto text-warning text-5xl mb-4" />
               <h3 className="text-lg font-bold mb-2">
-                Are you sure you want to delete this user?
+                Are you sure you want to suspend this trainer?
               </h3>
-              <p className="text-gray-500 mb-6">
-                This action cannot be undone.
-              </p>
+           
               <div className="flex justify-center space-x-4">
                 <button
                   className="btn btn-error"
-                  onClick={handleDelete}
+                  onClick={handleDeactivate}
                   disabled={loading}
                 >
                   {loading ? (
                     <span className="loading loading-spinner loading-sm"></span>
                   ) : (
-                    "Yes, Delete User"
+                    "Yes, Suspend Trainer"
                   )}
                 </button>
                 <button
@@ -112,118 +111,141 @@ export const TrainerModal = ({ user, isOpen, onClose }) => {
               </div>
             </div>
           ) : (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Basic Info Section */}
-                <div>
-                  <h4 className="font-semibold mb-3">Basic Information</h4>
-                  <div className="space-y-4">
-                    <div className="form-control">
-                      <label className="label">Name</label>
-                      <input
-                        type="text"
-                        name="name"
-                        value={userData.name || ""}
-                        className="input input-bordered w-full"
-                        readOnly
-                      />
-                    </div>
-
-                    <div className="form-control">
-                      <label className="label">Email</label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={userData.email || ""}
-                        className="input input-bordered w-full"
-                        readOnly
-                      />
-                    </div>
-
-                    <div className="form-control">
-                      <label className="label">Status</label>
-                      <select
-                        name="status"
-                        value={userData.status || "active"}
-                        onChange={handleChange}
-                        className="select select-bordered w-full"
-                      >
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                        <option value="suspended">Suspended</option>
-                      </select>
-                    </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Profile Image */}
+              <div className="md:col-span-1 flex flex-col items-center">
+                <div className="avatar mb-4">
+                  <div className="w-48 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                    <img 
+                      src={trainerData.image || "/default-avatar.png"} 
+                      alt={`${trainerData.name}'s profile`} 
+                    />
                   </div>
                 </div>
-
-                {/* Fitness Details Section */}
-                <div>
-                  <h4 className="font-semibold mb-3">Fitness Details</h4>
-                  <div className="space-y-4">
-                    <div className="form-control">
-                      <label className="label">Fitness Goal</label>
-                      <input
-                        type="text"
-                        value={userData.fitnessGoal || ""}
-                        className="input input-bordered w-full"
-                        readOnly
-                      />
-                    </div>
-
-                    <div className="form-control">
-                      <label className="label">Assigned Trainer</label>
-                      <select
-                        name="trainerId"
-                        value={userData.trainerId || ""}
-                        onChange={(e) => {
-                          const trainerId = e.target.value;
-                         setUserData((prev) => ({
-                            ...prev,
-                            trainerId,
-                          }));
-                        }}
-                        className="select select-bordered w-full"
-                      >
-                        <option value="">{user.trainerId ?.name || 'No trainer assigned'}</option>
-                        {trainers.map((trainer) => (
-                          <option key={trainer._id} value={trainer._id}>
-                            {trainer.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="form-control">
-                      <label className="label">Member Since</label>
-                      <input
-                        type="text"
-                        value={
-                          userData.createdAt
-                            ? new Date(userData.createdAt).toLocaleDateString()
-                            : ""
-                        }
-                        className="input input-bordered w-full"
-                        readOnly
-                      />
-                    </div>
-                  </div>
-                </div>
+                <h2 className="text-xl font-bold">{trainerData.name}</h2>
               </div>
 
-              {/* Additional Info Section */}
-              <div className="mt-6">
-                <h4 className="font-semibold mb-3">Additional Information</h4>
-                <div className="form-control">
-                  <label className="label">Notes</label>
+              {/* Trainer Details */}
+              <div className="md:col-span-2 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Basic Information */}
+                  <div className="form-control">
+                    <label className="label">Name</label>
+                    <input
+                      type="text"
+                      value={trainerData.name || ""}
+                      className="input input-bordered w-full"
+                      readOnly
+                    />
+                  </div>
+
+                  <div className="form-control">
+                    <label className="label">Email</label>
+                    <input
+                      type="email"
+                      value={trainerData.email || ""}
+                      className="input input-bordered w-full"
+                      readOnly
+                    />
+                  </div>
+
+                  <div className="form-control">
+                    <label className="label">Phone</label>
+                    <input
+                      type="text"
+                      value={trainerData.phone || ""}
+                      className="input input-bordered w-full"
+                      readOnly
+                    />
+                  </div>
+
+                  <div className="form-control">
+                    <label className="label">Approval Status</label>
+                    <select
+                      name="isApproved"
+                      value={trainerData.isApproved || false}
+                      onChange={handleChange}
+                      className="select select-bordered w-full"
+                    >
+                      <option value={false}>Not Approved</option>
+                      <option value={true}>Approved</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Professional Details */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  <div className="form-control">
+                    <label className="label">Specialization</label>
+                    <input
+                      type="text"
+                      value={trainerData.specialization || ""}
+                      className="input input-bordered w-full"
+                      readOnly
+                    />
+                  </div>
+
+                  <div className="form-control">
+                    <label className="label">Experience (Years)</label>
+                    <input
+                      type="text"
+                      value={trainerData.experience || ""}
+                      className="input input-bordered w-full"
+                      readOnly
+                    />
+                  </div>
+
+                  <div className="form-control">
+                    <label className="label">Availability</label>
+                    <input
+                      type="text"
+                      value={trainerData.availability || ""}
+                      className="input input-bordered w-full"
+                      readOnly
+                    />
+                  </div>
+
+                  <div className="form-control">
+                    <label className="label">Certifications</label>
+                    <input
+                      type="text"
+                      value={trainerData.certifications || ""}
+                      className="input input-bordered w-full"
+                      readOnly
+                    />
+                  </div>
+                </div>
+
+                {/* Social Links */}
+                <div className="form-control mt-4">
+                  <label className="label">Social Links</label>
+                  <div className="grid grid-cols-2 gap-4">
+                    {trainerData.socialLinks?.map((link, index) => (
+                      <div key={index} className="form-control">
+                        <input
+                          type="text"
+                          value={link}
+                          className="input input-bordered w-full"
+                          readOnly
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Notes */}
+                <div className="form-control mt-4">
+                  <label className="label">Admin Notes</label>
                   <textarea
                     name="notes"
-                    value={userData.notes || ""}
+                    value={trainerData.notes || ""}
                     onChange={handleChange}
                     className="textarea textarea-bordered w-full h-24"
+                    placeholder="Additional notes or comments"
                   ></textarea>
                 </div>
               </div>
-            </>
+            </div>
           )}
         </div>
 
@@ -234,7 +256,7 @@ export const TrainerModal = ({ user, isOpen, onClose }) => {
               onClick={() => setIsDeleting(true)}
               className="btn btn-outline btn-error"
             >
-              <FiTrash2 className="mr-2" /> Delete User
+              <FiTrash2 className="mr-2" /> Suspend Trainer
             </button>
             <div className="space-x-2">
               <button onClick={onClose} className="btn btn-outline">

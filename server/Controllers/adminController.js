@@ -42,116 +42,20 @@ const createAdmin = async (req, res, next) => {
     next(err);
   }
 };
-// const loginAdmin = async (req, res, next) => {
-//   try {
-//     const {email,password}=req.body;
-//     if ( !email || !password) {
-//         return res.json({ Error: "All fields are required !" });
-//       }
-//     const admin=await Admin.findOne({email});
-//     if(!admin){
-//         return res.json({ Error: "admin not found" });
-//     }
-//     const passwordMatch=await comparePassword(password,admin.password);
-//     console.log(passwordMatch);
-//     if(!passwordMatch){
-//         return res.status(400).json({error:"Password not match"})
-//     }
-//     const token=createToken(admin._id,admin.role);
-//     res.cookie("token",token)
-//     console.log("Admin login")
-//     res.status(200).json({msg:"Admin Login",token:token})
 
-//   } catch (err) {
-//     next(err);
-//   }
-// };
-
-// const logout=async(req,res,next)=>{
-//   try {
-//     res.clearCookie("token")
-//     res.status(200).json({msg:"logout"})
-//   } catch (error) {
-//     next(error)
-//   }
-// }
-
-// const forgotPassword =async(req,res,next)=>{
-//   try {
-//     const {email}=req.body;
-//     if (!email) {
-//       return res.status(400).json({ error: "Email is required" });
-//     }
-
-//     const admin=await Admin.findOne({email})
-//     if (!admin) {
-//       return res.status(404).json({ error: "admin not found" });
-//     }
-
-//     const otp=generateOTP();
-//     const otpExpires = Date.now() + 10 * 60 * 1000;
-
-//     admin.otp=otp;
-//     admin.otpExpires=otpExpires;
-//     await admin.save();
-
-//     console.log(`Reset OTP for ${email}: ${otp}`);
-//     const emailContent = `
-//     <h2>Email Verification</h2>
-//     <p>Use this OTP reset your Password <strong>${otp}</strong></p>
-//     <p>This OTP will expire in 10 minutes.</p>
-//   `;
-//   await sendEmail(email, "Verify Your Email", emailContent);
-
-//     res.status(201).json({ msg: "OTP sent to your email", });
-
-//   } catch (error) {
-//     next(error)
-//   }
-// }
-
-// const resetPassword=async(req,res,next)=>{
-//   try {
-
-//       const {email,otp,newPassword}=req.body;
-//       if (!email || !otp || !newPassword) {
-//         return res.status(400).json({ error: "Email, OTP, and new password are required" });
-//       }
-
-//       const admin = await admin.findOne({ email });
-//       if (!admin) {
-//         return res.status(404).json({ error: "admin not found" });
-//       }
-
-//       if(admin.otp !== otp || admin.otpExpires < Date.now()){
-//         return res.status(400).json({ error: "Invalid or expired OTP" });
-//       }
-
-//       admin.password=await hashPassword(newPassword);
-//       admin.otp = undefined;
-//       admin.otpExpires = undefined;
-//       await admin.save();
-
-//       res.json({ msg: "Password reset successful!" });
-
-//   } catch (error) {
-//     next(error)
-//   }
-// }
 
 // Trainer mangement
 
 const getAllTrainers = async (req, res, next) => {
   try {
-   
     const trainers = await Trainer.find({})
-  .select("-password")
-  .populate("clients", "name");
+      .select("-password")
+      .populate("clients", "name");
 
     if (!trainers) {
       return res.status(401).json({ error: "Empty!" });
     }
-    res.status(200).json({ success: true, users:trainers });
+    res.status(200).json({ success: true, users: trainers });
   } catch (error) {
     next(error);
   }
@@ -174,7 +78,12 @@ const updateTrainer = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const updatedTrainer = await Trainer.findByIdAndUpdate(id, req.body, {
+    const updateFields = {
+      isApproved: req.body.isApproved,
+      adminNotes: req.body.notes,
+    };
+
+    const updatedTrainer = await Trainer.findByIdAndUpdate(id, updateFields, {
       new: true,
       runValidators: true,
     }).select("-password");
@@ -185,20 +94,31 @@ const updateTrainer = async (req, res, next) => {
 
     res
       .status(200)
-      .json({ msg: "Trainer updated successfully", Trainer: updatedTrainer });
+      .json({ msg: "Trainer updated successfully", trainer: updatedTrainer });
   } catch (error) {
     next(error);
   }
 };
-const deleteTrainer = async (req, res, next) => {
+const deactivateTrainer = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const deletedTrainer = await Trainer.findByIdAndDelete(id);
+    const trainer = await Trainer.findById(id);
 
-    if (!deletedTrainer) {
+    if (!trainer) {
       return res.status(404).json({ error: "Trainer not found" });
     }
+
+    trainer.status = 'inactive';
+    await trainer.save();
+
+      // update  users' trainerId to null
+      await User.updateMany(
+        { trainerId: id }, 
+        { $set: { trainerId: null } } 
+      );
+
+    res.status(200).json({ msg: "Trainer deactivated successfully" });
 
     res.status(200).json({ msg: "Trainer deleted successfully" });
   } catch (error) {
@@ -250,7 +170,7 @@ const approveTrainer = async (req, res, next) => {
 
 const getAllUsers = async (req, res, next) => {
   try {
-    const users = await User.find().populate("trainerId","name");
+    const users = await User.find().populate("trainerId", "name");
     if (!users) {
       return res.status(401).json({ error: "Empty!" });
     }
@@ -281,8 +201,7 @@ const updateUser = async (req, res, next) => {
 
     const { trainerId } = req.body;
 
-    console.log("user id",userId);
-    
+    console.log("user id", userId);
 
     const existingUser = await User.findById(userId);
     if (!existingUser) {
@@ -290,26 +209,24 @@ const updateUser = async (req, res, next) => {
     }
 
     if (trainerId && trainerId !== existingUser.trainerId) {
-   
       if (existingUser.trainerId) {
         await Trainer.findByIdAndUpdate(existingUser.trainerId, {
           $pull: { clients: userId },
         });
       }
 
-           // Add user to the new trainer
-           await Trainer.findByIdAndUpdate(trainerId, {
-            $push: { clients: userId },
-          });
-          
-     
+      // Add user to the new trainer
+      await Trainer.findByIdAndUpdate(trainerId, {
+        $push: { clients: userId },
+      });
     }
-
 
     const updatedUser = await User.findByIdAndUpdate(userId, req.body, {
       new: true,
       runValidators: true,
-    }).populate("trainerId","name").select("-password");
+    })
+      .populate("trainerId", "name")
+      .select("-password");
 
     if (!updatedUser) {
       return res.status(404).json({ error: "User not found !!" });
@@ -323,22 +240,26 @@ const updateUser = async (req, res, next) => {
   }
 };
 
-const deleteUser = async (req, res, next) => {
+const deactivateUser = async (req, res, next) => {
   try {
     const { userId } = req.params;
 
-    const deletedUser = await User.findByIdAndDelete(userId);
-
-    await Trainer.updateMany(
-      { clients: userId },
-      { $pull: { clients: userId } }  
-    );
-
-    if (!deletedUser) {
+    const user = await User.findById(userId);
+    if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    res.status(200).json({ msg: "User deleted successfully" });
+    user.isActive = false; // Suspend the user
+    await user.save();
+
+    await Trainer.updateMany(
+      { clients: userId },
+      { $pull: { clients: userId } }
+    );
+
+   
+
+    res.status(200).json({ message: "User suspended successfully" });
   } catch (error) {
     next(error);
   }
@@ -359,13 +280,18 @@ const getDashboard = async (req, res, next) => {
     const pendingApproval = await Trainer.countDocuments({ isApproved: false });
 
     const totalAppointments = await Appointment.countDocuments();
-    const completedAppointments = await Appointment.countDocuments({ status: "Completed" });
-    const cancelledAppointments = await Appointment.countDocuments({ status: "Cancelled" });
-    const upcomingAppointments = await Appointment.countDocuments({ date: { $gte: new Date() } });
+    const completedAppointments = await Appointment.countDocuments({
+      status: "Completed",
+    });
+    const cancelledAppointments = await Appointment.countDocuments({
+      status: "Cancelled",
+    });
+    const upcomingAppointments = await Appointment.countDocuments({
+      date: { $gte: new Date() },
+    });
 
     const totalWorkouts = await Workout.countDocuments();
     const totalNutritionPlans = await Nutrition.countDocuments();
-
 
     const payments = await Payment.find();
     const totalTransactions = await Payment.countDocuments();
@@ -375,64 +301,239 @@ const getDashboard = async (req, res, next) => {
     );
     const last30DaysRevenue = await Payment.aggregate([
       { $match: { createdAt: { $gte: thirtyDaysAgo } } },
-      { $group: { _id: null, total: { $sum: "$amount" } } }
+      { $group: { _id: null, total: { $sum: "$amount" } } },
     ]);
-
 
     const oneWeekAgo = new Date();
     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-    const lastUsers = await Activity.find({ 
-      activityType: "NEW_USER", 
-      timestamp: { $gte: oneWeekAgo } 
-    }).sort({ timestamp: -1 })
-    .limit(10);
-  
-    const lastTrainers = await Activity.find({ 
-      activityType: "NEW_TRAINER", 
-      timestamp: { $gte: oneWeekAgo }
-    }).sort({ timestamp: -1 }).limit(10);
+    const lastUsers = await Activity.find({
+      activityType: "NEW_USER",
+      timestamp: { $gte: oneWeekAgo },
+    })
+      .sort({ timestamp: -1 })
+      .limit(10);
+
+    const lastTrainers = await Activity.find({
+      activityType: "NEW_TRAINER",
+      timestamp: { $gte: oneWeekAgo },
+    })
+      .sort({ timestamp: -1 })
+      .limit(10);
 
     const recentPayments = await Activity.find({
       activityType: "PAYMENT_RECEIVED",
-      timestamp: { $gte: oneWeekAgo } 
-    }).sort({ timestamp: -1 }).sort({ timestamp: -1 }).limit(10);
+      timestamp: { $gte: oneWeekAgo },
+    })
+      .sort({ timestamp: -1 })
+      .sort({ timestamp: -1 })
+      .limit(10);
 
-    const lastAppointments = await Activity.find({ activityType: "NEW_APPOINTMENT",timestamp: { $gte: oneWeekAgo }, }).sort({ timestamp: -1 }).limit(10);
+    const lastAppointments = await Activity.find({
+      activityType: "NEW_APPOINTMENT",
+      timestamp: { $gte: oneWeekAgo },
+    })
+      .sort({ timestamp: -1 })
+      .limit(10);
 
-    const lastWorkouts = await Activity.find({ activityType: "NEW_WORKOUT",timestamp: { $gte: oneWeekAgo }}).sort({ timestamp: -1 }).limit(10);
+    const lastWorkouts = await Activity.find({
+      activityType: "NEW_WORKOUT",
+      timestamp: { $gte: oneWeekAgo },
+    })
+      .sort({ timestamp: -1 })
+      .limit(10);
 
-    const lastNutritionPlans = await Activity.find({ activityType:"NEW_NUTRITION_PLAN",timestamp: { $gte: oneWeekAgo } }).sort({ timestamp: -1 }).limit(10);
+    const lastNutritionPlans = await Activity.find({
+      activityType: "NEW_NUTRITION_PLAN",
+      timestamp: { $gte: oneWeekAgo },
+    })
+      .sort({ timestamp: -1 })
+      .limit(10);
 
     // const recentActivity =await getRecentActivities(10, 1);
 
-    res
-      .status(200)
-      .json({
-        totalUsers,
-        activeUsers,
-        totalTrainers,
-       pendingApproval,
-       totalRevenue,
-       totalAppointments,
-       upcomingAppointments ,
-       totalWorkouts ,
-       totalNutritionPlans,
-       recentActivity: {
+    res.status(200).json({
+      totalUsers,
+      activeUsers,
+      totalTrainers,
+      pendingApproval,
+      totalRevenue,
+      totalAppointments,
+      upcomingAppointments,
+      totalWorkouts,
+      totalNutritionPlans,
+      recentActivity: {
         last30DaysRevenue,
         lastUsers,
         lastTrainers,
         recentPayments,
         lastAppointments,
         lastWorkouts,
-        lastNutritionPlans
-      }
-        
-      });
+        lastNutritionPlans,
+      },
+    });
   } catch (error) {
     next(error);
   }
 };
+
+const getRevenue=async (req,res,next) => {
+  try {
+
+    const { period } = req.query;
+    let query = {};
+
+       // Date filtering logic
+       switch (period) {
+        case 'thisMonth':
+          query.date = {
+            $gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+            $lt: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1)
+          };
+          break;
+        case 'lastMonth':
+          const lastMonth = new Date();
+          lastMonth.setMonth(lastMonth.getMonth() - 1);
+          query.date = {
+            $gte: new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 1),
+            $lt: new Date(lastMonth.getFullYear(), lastMonth.getMonth() + 1, 1)
+          };
+          break;
+        case 'thisYear':
+          query.date = {
+            $gte: new Date(new Date().getFullYear(), 0, 1),
+            $lt: new Date(new Date().getFullYear() + 1, 0, 1)
+          };
+          break;
+        default:
+          // All time, no filter 
+      }
+
+
+     console.log( "User :  ",await User.findById("67ae41fc55681d6d80c7afbf") )
+// console.log("Trainer : ",await Trainer.find({ _id: ObjectId("67b4640c47b6f73de4e3617f") }))
+
+      // const payments = await Payment.find(query).populate('userId', 'name email')
+      // .populate('trainerId', 'name')
+      // .sort({ date: -1 })
+
+      const payments = await Payment.find(query)
+  .populate({ path: 'userId', select: 'name email' })
+  .populate({ path: 'trainerId', select: 'name email' }) 
+  .sort({ date: -1 });
+
+   
+      const totalRevenue = payments.reduce((sum, payment) => sum + payment.amount, 0);
+      const adminRevenue = payments.reduce((sum, payment) => sum + payment.adminRevenue, 0);
+      const trainerRevenue = payments.reduce((sum, payment) => sum + payment.trainerRevenue, 0);
+
+      res.json({
+        totalRevenue,
+        adminRevenue,
+        trainerRevenue,
+        payments
+      });
+
+
+    
+  } catch (error) {
+    next(error);
+  }
+}
+
+const getRevenueBreakdown=async (req,res,next)=>{
+  try {
+
+    // Monthly revenue calculation
+    const monthlyRevenue = await Payment.aggregate([
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m", date: "$date" } },
+          totalRevenue: { $sum: "$amount" },
+          adminRevenue: { $sum: "$adminRevenue" },
+          trainerRevenue: { $sum: "$trainerRevenue" }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+
+    // Top trainers by revenue
+    const topTrainers = await Payment.aggregate([
+      {
+        $group: {
+          _id: "$trainerId",
+          totalRevenue: { $sum: "$trainerRevenue" }
+        }
+      },
+      { $sort: { totalRevenue: -1 } },
+      { $limit: 5 }
+    ]);
+
+      // Plan distribution
+      const planDistribution = await Payment.aggregate([
+        {
+          $group: {
+            _id: "$plan",
+            count: { $sum: 1 },
+            totalRevenue: { $sum: "$amount" }
+          }
+        }
+      ]);
+  
+      res.json({
+        monthlyRevenue,
+        topTrainers,
+        planDistribution
+      });
+
+
+    
+  } catch (error) {
+    next(error)
+  }
+}
+const getPayments=async (req,res,next)=>{
+try {
+  
+  const { 
+    page = 1, 
+    limit = 10, 
+    startDate, 
+    endDate, 
+    status 
+  } = req.query;
+
+  let query = {};
+  if (startDate && endDate) {
+    query.date = {
+      $gte: new Date(startDate),
+      $lte: new Date(endDate)
+    };
+  }
+  if (status) {
+    query.status = status;
+  }
+
+  const payments = await Payment.find(query)
+  .populate('userId', 'name email')
+  .populate('trainerId', 'name')
+  .sort({ date: -1 })
+  .skip((page - 1) * limit)
+  .limit(Number(limit));
+
+  const total = await Payment.countDocuments(query);
+
+  res.json({
+    payments,
+    totalPages: Math.ceil(total / limit),
+    currentPage: page
+  });
+
+
+} catch (error) {
+  next(error);
+}
+}
 
 module.exports = {
   createAdmin,
@@ -441,10 +542,12 @@ module.exports = {
   getAllUsers,
   getUser,
   updateUser,
-  deleteUser,
+  deactivateUser,
   getAllTrainers,
   getTrainer,
   updateTrainer,
-  deleteTrainer,
+  deactivateTrainer,
   getDashboard,
+  getRevenue,getRevenueBreakdown,
+  getPayments
 };

@@ -1,24 +1,33 @@
 const express=require("express");
 const router=express.Router();
 const {protect,authorize}=require("../middleware/authMiddleware");
-const { bookAppointment, getUserAppointments, updateUserAppointment, cancelUserAppointment, getTrainerAppointments, updateTrainerAppointment, getAppointmentById, getAllAppointments, updateAppointmentByAdmin, deleteAppointmentByAdmin } = require("../Controllers/appointmentController");
+const { bookAppointment, getUserAppointments, updateAppointmentByUser, cancelUserAppointment,
+     getTrainerAppointments, updateAppointmentByTrainer, 
+     getAppointmentById,
+     getAllAppointments,
+     forceUpdateAppointment,
+     forceDeleteAppointment} = require("../Controllers/appointmentController");
 
 // uer routes
 router.post("/book",protect,authorize(["user"]),bookAppointment);
 router.get("/user",protect,authorize(["user"]),getUserAppointments);
-router.put("/user/:id",protect,authorize(["user"]),updateUserAppointment);
+router.put("/user/:id",protect,authorize(["user"]),updateAppointmentByUser);
 router.delete("/user/:id",protect,authorize(["user"]),cancelUserAppointment);
 
 // Trainer routes
-router.get("/trainer",protect,authorize(["trainer"]),getTrainerAppointments);
-router.put("/trainer/:id",protect,authorize(["trainer"]),updateTrainerAppointment);
+router.get("/trainer/:trainerId'",protect,authorize(["trainer"]),getTrainerAppointments);
+router.put("/trainer/:id",protect,authorize(["trainer"]),updateAppointmentByTrainer);
+
+// all
+router.get("/:id",protect,authorize(["user","trainer","admin"]),getAppointmentById);
 
 // Admin routes
-router.get('/all', protect, authorize(["admin"]), getAllAppointments);
+router.get('/admin/all', protect, authorize(["admin"]), getAllAppointments);
+ router.put('/override/:id', protect, authorize(["admin"]), forceUpdateAppointment);
+ router.delete('/override/:id', protect, authorize(["admin"]), forceDeleteAppointment);
 
-router.get("/:id",protect,authorize(["user","trainer","admin"]),getAppointmentById);
- router.put('/admin/:id', protect, authorize(["admin"]), updateAppointmentByAdmin);
- router.delete('/admin/:id', protect, authorize(["admin"]),deleteAppointmentByAdmin);
+
+// router.get('/appointments/statistics', adminAppointmentController.getAppointmentStatistics);
 
 
 

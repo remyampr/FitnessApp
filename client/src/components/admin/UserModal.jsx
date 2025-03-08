@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { FiX, FiSave, FiTrash2, FiAlertTriangle } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteUser, updateUser } from "../../services/adminServices";
+import { deactivateUser,  updateUser } from "../../services/adminServices";
 import { deleteUserFromStore, setUsers, updateUserInStore } from "../../redux/features/adminSlice";
+import { setIsActive } from "../../redux/features/userSlice";
 
 export const UserModal = ({ user, isOpen, onClose }) => {
   const dispatch = useDispatch();
@@ -47,19 +48,18 @@ export const UserModal = ({ user, isOpen, onClose }) => {
     }
   };
 
-  const handleDelete = async () => {
+  const handleSuspend = async () => {
     setLoading(true);
     try {
-      // await dispatch(deleteUser(userData._id));
-
-      const res=await deleteUser(userData._id);
+     
+      const res=await deactivateUser(userData._id);
 
       if (res.status === 200) {
-        dispatch(deleteUserFromStore(userData._id)); 
+       dispatch(setIsActive(false))
       }
       onClose();
     } catch (error) {
-      console.error("Failed to delete user:", error);
+      console.error("Failed to suspend user:", error);
     } finally {
       setLoading(false);
       setIsDeleting(false);
@@ -85,21 +85,19 @@ export const UserModal = ({ user, isOpen, onClose }) => {
             <div className="p-6 text-center">
               <FiAlertTriangle className="mx-auto text-warning text-5xl mb-4" />
               <h3 className="text-lg font-bold mb-2">
-                Are you sure you want to delete this user?
+                Are you sure you want to suspend this user?
               </h3>
-              <p className="text-gray-500 mb-6">
-                This action cannot be undone.
-              </p>
+              
               <div className="flex justify-center space-x-4">
                 <button
                   className="btn btn-error"
-                  onClick={handleDelete}
+                  onClick={handleSuspend}
                   disabled={loading}
                 >
                   {loading ? (
                     <span className="loading loading-spinner loading-sm"></span>
                   ) : (
-                    "Yes, Delete User"
+                    "Yes, Suspend User"
                   )}
                 </button>
                 <button
@@ -234,7 +232,7 @@ export const UserModal = ({ user, isOpen, onClose }) => {
               onClick={() => setIsDeleting(true)}
               className="btn btn-outline btn-error"
             >
-              <FiTrash2 className="mr-2" /> Delete User
+              <FiTrash2 className="mr-2" /> Suspend User
             </button>
             <div className="space-x-2">
               <button onClick={onClose} className="btn btn-outline">

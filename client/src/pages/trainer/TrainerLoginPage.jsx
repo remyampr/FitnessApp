@@ -43,8 +43,8 @@ export const TrainerLoginPage = () => {
           navigate("/trainer/pending-approval");
         }
       }, 100);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
       if (err.response?.data?.error) {
         toast.error(err.response.data.error);
       } else {

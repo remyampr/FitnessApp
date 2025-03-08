@@ -2,99 +2,16 @@ const Activity = require("../Models/Activity");
 const Appointment = require("../Models/Appointment");
 const Trainer = require("../Models/Trainer");
 const User = require("../Models/User");
+const mongoose=require("mongoose")
 
+const { 
+  isTimeSlotAvailable, 
+  updateTrainerAvailability 
+} = require("../Utilities/trainerAppointment")
 const { logActivity } = require("../Utilities/activityServices");
+const notificationService = require("../Utilities/notificationServices");
+const AppointmentDeletionLog = require("../Models/AppointmentDeletionLog");
 
-const isTimeSlotAvailable = async (trainerId, date, startTime, endTime) => {
-  const appointmentDate = new Date(date);
-  const dayOfWeek = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ][appointmentDate.getDay()];
-
-  const trainer = await Trainer.findById(trainerId);
-  if (!trainer) {
-    return { available: false, message: "Trainer not found" };
-  }
-
-  const dayAvailability = trainer.availability.find((a) => a.day === dayOfWeek);
-  if (!dayAvailability) {
-    return {
-      available: false,
-      message: `Trainer does not work on ${dayOfWeek}s`,
-    };
-  }
-
-  const availableSlot = dayAvailability.slots.find(
-    (slot) =>
-      slot.startTime === startTime && slot.endTime === endTime && !slot.isBooked
-  );
-
-  if (!availableSlot) {
-    return { available: false, message: "Time slot is not available" };
-  }
-
-  const existingBooking = await Appointment.findOne({
-    trainerId,
-    date: {
-      $gte: new Date(date).setHours(0, 0, 0, 0),
-      $lt: new Date(date).setHours(23, 59, 59, 999),
-    },
-    startTime,
-    endTime,
-    status: { $ne: "Cancelled" },
-  });
-
-  if (existingBooking) {
-    return { available: false, message: "This time slot is already booked" };
-  }
-
-  return { available: true };
-};
-
-const updateTrainerAvailability = async (
-  trainerId,
-  date,
-  startTime,
-  endTime,
-  book = true
-) => {
-  const appointmentDate = new Date(date);
-  const dayOfWeek = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ][appointmentDate.getDay()];
-
-  await Trainer.updateOne(
-    {
-      _id: trainerId,
-      "availability.day": dayOfWeek,
-      "availability.slots.startTime": startTime,
-      "availability.slots.endTime": endTime,
-    },
-    {
-      $set: {
-        "availability.$[day].slots.$[slot].isBooked": book,
-      },
-    },
-    {
-      arrayFilters: [
-        { "day.day": dayOfWeek },
-        { "slot.startTime": startTime, "slot.endTime": endTime },
-      ],
-    }
-  );
-};
 
 // user Book appointment
 const bookAppointment = async (req, res, next) => {
@@ -138,15 +55,18 @@ const bookAppointment = async (req, res, next) => {
       notes: notes || "",
     });
 
-    const savedAppointment = await appointment.save();
+    const newAppointment = await appointment.save();
 
     await updateTrainerAvailability(trainerId, date, startTime, endTime, true);
+
+    // Trigger notification to trainer about new appointment request
+    await notificationService.notifyTrainerNewAppointmentRequest(newAppointment);
 
     if (!user.trainerId) {
       await User.findByIdAndUpdate(userId, { trainerId });
     }
 
-    await logActivity("NEW_APPOINTMENT", savedAppointment._id, "appointment", {
+    await logActivity("NEW_APPOINTMENT", newAppointment._id, "appointment", {
       userId,
       trainerId,
       date,
@@ -155,7 +75,7 @@ const bookAppointment = async (req, res, next) => {
 
     res.status(201).json({
       success: true,
-      data: savedAppointment,
+      data: newAppointment,
     });
   } catch (error) {
     console.error(error);
@@ -168,9 +88,11 @@ const getUserAppointments = async (req, res, next) => {
   try {
     const userId = req.user._id;
 
-    const appointments = (await Appointment.find({ userId }))
-      .populate("trainerId", "name email phone specialization image")
-      .sort({ date: 1, startTime: 1 });
+
+    const appointments = await Appointment.find({ userId })
+      .populate("trainer", "name email phone specialization image")
+      .sort({ date: 1, startTime: 1 })
+      .exec();
 
     res.status(200).json({
       success: true,
@@ -182,116 +104,89 @@ const getUserAppointments = async (req, res, next) => {
   }
 };
 
-// user Update it
-const updateUserAppointment = async (req, res, next) => {
+// User Appointment Status Update Controller
+const updateAppointmentByUser = async (req, res, next) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
+    const { status, cancellationReason } = req.body;
     const appointmentId = req.params.id;
     const userId = req.user._id;
-    const { date, startTime, endTime, type, notes } = req.body;
 
-    // Find the appointment
+    // Users can only cancel appointments
+    if (status !== "Cancelled") {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(400).json({ 
+        success: false, 
+        message: "Users can only cancel appointments" 
+      });
+    }
+
+    // Find the appointment with populated details
     const appointment = await Appointment.findOne({
       _id: appointmentId,
-      userId,
-    });
+      user: userId
+    })
+    .populate('trainer', 'name email')
+    .session(session);
+
     if (!appointment) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message: "Appointment not found or not owned by this user",
-        });
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({
+        success: false,
+        message: "Appointment not found or not owned by this user"
+      });
     }
 
-    if (appointment.status === "Completed") {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Cannot update a completed appointment",
-        });
+    // Prevent cancelling already cancelled or completed appointments
+    if (["Cancelled", "Completed"].includes(appointment.status)) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(400).json({
+        success: false,
+        message: `Cannot cancel an appointment with status: ${appointment.status}`
+      });
     }
 
-    if (appointment.status === "Cancelled") {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Cannot update a cancelled appointment",
-        });
-    }
+    // Free up the time slot when cancelling
+    await updateTrainerAvailability(
+      appointment.trainer._id, 
+      appointment.date, 
+      appointment.startTime, 
+      appointment.endTime, 
+      false
+    );
 
-    // If changing date or time, check availability
-    if (
-      (date && date !== appointment.date.toISOString().split("T")[0]) ||
-      (startTime && startTime !== appointment.startTime) ||
-      (endTime && endTime !== appointment.endTime)
-    ) {
-      // Free up the old slot
-      await updateTrainerAvailability(
-        appointment.trainerId,
-        appointment.date,
-        appointment.startTime,
-        appointment.endTime,
-        false
-      );
+    // Prepare update data
+    const updateData = { 
+      status: "Cancelled",
+      cancellationReason: cancellationReason || "User requested cancellation",
+      cancelledAt: new Date()
+    };
 
-      // Check if new slot is available
-      const newDate = date || appointment.date;
-      const newStartTime = startTime || appointment.startTime;
-      const newEndTime = endTime || appointment.endTime;
-
-      const timeSlotCheck = await isTimeSlotAvailable(
-        appointment.trainerId,
-        newDate,
-        newStartTime,
-        newEndTime
-      );
-
-      if (!timeSlotCheck.available) {
-        // Restore the old slot booking
-        await updateTrainerAvailability(
-          appointment.trainerId,
-          appointment.date,
-          appointment.startTime,
-          appointment.endTime,
-          true
-        );
-
-        return res
-          .status(400)
-          .json({ success: false, message: timeSlotCheck.message });
-      }
-
-      // Book the new slot
-      await updateTrainerAvailability(
-        appointment.trainerId,
-        newDate,
-        newStartTime,
-        newEndTime,
-        true
-      );
-    }
-
-    // Update the appointment
+    // Perform the update
     const updatedAppointment = await Appointment.findByIdAndUpdate(
       appointmentId,
-      {
-        date: date || appointment.date,
-        startTime: startTime || appointment.startTime,
-        endTime: endTime || appointment.endTime,
-        type: type || appointment.type,
-        notes: notes !== undefined ? notes : appointment.notes,
-      },
-      { new: true }
-    ).populate("trainerId", "name email phone");
+      updateData,
+      { new: true, session }
+    ).populate('trainer', 'name email');
+
+    // Commit transaction
+    await session.commitTransaction();
+    session.endSession();
 
     res.status(200).json({
       success: true,
-      data: updatedAppointment,
+      data: updatedAppointment
     });
+
   } catch (error) {
-    console.error(error);
+    // Abort transaction in case of error
+    await session.abortTransaction();
+    session.endSession();
     next(error);
   }
 };
@@ -343,6 +238,8 @@ const cancelUserAppointment = async (req, res, next) => {
       { new: true }
     );
 
+    await notificationService.handleAppointmentCancellation(cancelledAppointment);
+
     res.status(200).json({
       success: true,
       data: cancelledAppointment,
@@ -356,11 +253,13 @@ const cancelUserAppointment = async (req, res, next) => {
 // trainer
 const getTrainerAppointments = async (req, res, next) => {
   try {
+
+    // const trainerId = req.params.trainerId;
     const trainerId = req.user._id;
 
-    const appointments = await Appointment.find({ trainerId })
-      .populate("userId", "name email phone image")
-      .sort({ date: 1, startTime: 1 });
+    const appointments = await Appointment.find({ trainer: trainerId })
+    .populate('user', 'name email');
+
 
     res.status(200).json({
       success: true,
@@ -372,64 +271,125 @@ const getTrainerAppointments = async (req, res, next) => {
   }
 };
 
-const updateTrainerAppointment = async (req, res, next) => {
+
+// Trainer Appointment Status Update Controller
+const updateAppointmentByTrainer = async (req, res, next) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
+    const { status, notes } = req.body;
     const appointmentId = req.params.id;
     const trainerId = req.user._id;
-    const { status, notes } = req.body;
 
-    const appointment = await Appointment.findOne({
-      _id: appointmentId,
-      trainerId,
-    });
-    if (!appointment) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message: "Appointment not found or not owned by this trainer",
-        });
-    }
-
-    if (appointment.status === "Cancelled") {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Cannot update a cancelled appointment",
-        });
-    }
-
-    // Trainers can only update status to Completed or add notes
-    const updateData = {};
-
-    if (status === "Completed") {
-      updateData.status = status;
-    }
-
-    if (notes !== undefined) {
-      updateData.notes = notes;
-    }
-
-    if (Object.keys(updateData).length === 0) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "No valid update fields provided. Trainers can only mark as completed or update notes.",
+    // Validate allowed status updates for trainers
+    const validTrainerStatuses = ["Confirmed", "Completed", "Cancelled"];
+    if (!validTrainerStatuses.includes(status)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Invalid status update for trainer" 
       });
     }
 
+    // Find the appointment with populated details
+    const appointment = await Appointment.findOne({
+      _id: appointmentId,
+      trainer: trainerId
+    })
+    .populate('user', 'name email')
+    .session(session);
+
+    if (!appointment) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({
+        success: false,
+        message: "Appointment not found or not owned by this trainer"
+      });
+    }
+
+    // Prevent updates to already cancelled appointments
+    if (appointment.status === "Cancelled") {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(400).json({
+        success: false,
+        message: "Cannot modify a cancelled appointment"
+      });
+    }
+
+    // Prepare update data
+    const updateData = { status };
+
+    // Handle specific status changes
+    if (status === "Cancelled") {
+      // Free up the time slot when cancelling
+      await updateTrainerAvailability(
+        trainerId, 
+        appointment.date, 
+        appointment.startTime, 
+        appointment.endTime, 
+        false
+      );
+      updateData.cancellationReason = "Trainer initiated cancellation";
+    } else if (status === "Completed") {
+      updateData.completedAt = new Date();
+    } else if (status === "Confirmed") {
+      // Verify slot is still available before confirming
+      const availabilityCheck = await isTimeSlotAvailable(
+        trainerId, 
+        appointment.date, 
+        appointment.startTime, 
+        appointment.endTime
+      );
+
+      if (!availabilityCheck.available) {
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(400).json({
+          success: false,
+          message: "Time slot is no longer available"
+        });
+      }
+
+      // Mark slot as booked when confirming
+      await updateTrainerAvailability(
+        trainerId, 
+        appointment.date, 
+        appointment.startTime, 
+        appointment.endTime, 
+        true
+      );
+    }
+
+    // Add notes if provided
+    if (notes) {
+      updateData.notes = notes;
+    }
+
+    // Perform the update
     const updatedAppointment = await Appointment.findByIdAndUpdate(
       appointmentId,
       updateData,
-      { new: true }
-    ).populate("userId", "name email phone");
+      { new: true, session }
+    ).populate('user', 'name email');
+
+    // Commit transaction
+    await session.commitTransaction();
+    session.endSession();
+
+    
+    await notificationService.handleAppointmentCancellation(updatedAppointment);
 
     res.status(200).json({
       success: true,
-      data: updatedAppointment,
+      data: updatedAppointment
     });
+
   } catch (error) {
+    // Abort transaction in case of error
+    await session.abortTransaction();
+    session.endSession();
     next(error);
   }
 };
@@ -443,8 +403,8 @@ const getAppointmentById=async(req,res,next)=>{
     const userRole = req.user.role;
 
     const appointment = await Appointment.findById(appointmentId)
-    .populate('userId', 'name email phone image')
-    .populate('trainerId', 'name email phone specialization image');
+    .populate('user', 'name email phone image')
+    .populate('trainer', 'name email phone specialization image');
 
     if (!appointment) {
       return res.status(404).json({ success: false, message: 'Appointment not found' });
@@ -472,358 +432,277 @@ const getAppointmentById=async(req,res,next)=>{
 }
 
 // admin
-const getAllAppointments=async (req,res,next)=>{
-  try {
+ const getAllAppointments = async (req, res, next) => {
 
-    const { status, trainerId, userId, startDate, endDate } = req.query;
-    
-    // Build query
-    const query = {};
-    
+  console.log("get all");
+  
+  try {
+    // Destructure query parameters with defaults
+    const { 
+      page = 1, 
+      limit = 10, 
+      status, 
+      trainerId, 
+      userId, 
+      startDate, 
+      endDate, 
+      sortBy = 'createdAt', 
+      sortOrder = 'desc' 
+    } = req.query;
+
+    // Build filter object
+    const filter = {};
+
+    // Add status filter if provided
     if (status) {
-      query.status = status;
+      filter.status = status;
     }
-    
+
+    // Add trainer filter if provided
     if (trainerId) {
-      query.trainerId = trainerId;
+      filter.trainer = trainerId;
     }
-    
+
+    // Add user filter if provided
     if (userId) {
-      query.userId = userId;
+      filter.user = userId;
     }
-    
-    if (startDate || endDate) {
-      query.date = {};
-      
-      if (startDate) {
-        query.date.$gte = new Date(startDate);
-      }
-      
-      if (endDate) {
-        query.date.$lte = new Date(endDate);
-      }
+
+    // Add date range filter if both start and end dates are provided
+    if (startDate && endDate) {
+      filter.date = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate)
+      };
     }
-    
-    const appointments = await Appointment.find(query)
-      .populate('userId', 'name email phone image')
-      .populate('trainerId', 'name email phone specialization image')
-      .sort({ date: -1, startTime: 1 });
-    
+
+    // Create sort object
+    const sort = { [sortBy]: sortOrder === 'desc' ? -1 : 1 };
+
+    // Calculate skip for pagination
+    const skip = (page - 1) * limit;
+
+    // Fetch appointments with pagination and population
+    const appointments = await Appointment.find(filter)
+      .sort(sort)
+      .skip(skip)
+      .limit(Number(limit))
+      .populate('trainer', 'name email phone')
+      .populate('user', 'name email phone');
+
+    // Count total matching documents
+    const total = await Appointment.countDocuments(filter);
+
     res.status(200).json({
       success: true,
       count: appointments.length,
+      total,
+      page: Number(page),
+      totalPages: Math.ceil(total / limit),
       data: appointments
     });
-    
   } catch (error) {
     next(error);
   }
-}
+};
 
-const updateAppointmentByAdmin=async(req,res,next)=>{
+
+const forceUpdateAppointment = async (req, res, next) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
+    const { id } = req.params;
+    const { 
+      status, 
+      notes, 
+      cancellationReason, 
+      date, 
+      startTime, 
+      endTime,
+      trainer,
+      user
+    } = req.body;
 
-    const appointmentId = req.params.id;
-    const { trainerId, userId, date, startTime, endTime, status, type, notes } = req.body;
-
-    const appointment = await Appointment.findById(appointmentId);
-    if (!appointment) {
-      return res.status(404).json({ success: false, message: 'Appointment not found' });
+    // Validate input
+    const validStatuses = ["Pending", "Confirmed", "Completed", "Cancelled"];
+    if (status && !validStatuses.includes(status)) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status"
+      });
     }
 
-    const updateData = {};
-    
-    if (trainerId) updateData.trainerId = trainerId;
-    if (userId) updateData.userId = userId;
-    if (date) updateData.date = date;
-    if (startTime) updateData.startTime = startTime;
-    if (endTime) updateData.endTime = endTime;
-    if (status) updateData.status = status;
-    if (type) updateData.type = type;
-    if (notes !== undefined) updateData.notes = notes;
+    // Find existing appointment
+    const existingAppointment = await Appointment.findById(id)
+      .populate('trainer', '_id')
+      .populate('user', '_id')
+      .session(session);
 
-    if (trainerId || date || startTime || endTime) {
-      // Free up the old slot if not cancelled
-      if (appointment.status !== 'Cancelled') {
-        await updateTrainerAvailability(
-          appointment.trainerId, 
-          appointment.date, 
-          appointment.startTime, 
-          appointment.endTime,
-          false
-        );
-      }
+    if (!existingAppointment) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({
+        success: false,
+        message: "Appointment not found"
+      });
+    }
 
-      if (status !== 'Cancelled') {
-        const newTrainerId = trainerId || appointment.trainerId;
-        const newDate = date || appointment.date;
-        const newStartTime = startTime || appointment.startTime;
-        const newEndTime = endTime || appointment.endTime;
-        
-        const timeSlotCheck = await isTimeSlotAvailable(
-          newTrainerId, 
-          newDate, 
-          newStartTime, 
-          newEndTime
-        );
-        
-        if (!timeSlotCheck.available) {
-          // Restore the old slot booking if not cancelled
-          if (appointment.status !== 'Cancelled') {
-            await updateTrainerAvailability(
-              appointment.trainerId, 
-              appointment.date, 
-              appointment.startTime, 
-              appointment.endTime,
-              true
-            );
-          }
-           
-          return res.status(400).json({ success: false, message: timeSlotCheck.message });
-        }
+    // Prepare update data
+    const updateData = {
+      ...(status && { status }),
+      ...(notes && { notes }),
+      ...(cancellationReason && { cancellationReason }),
+      ...(date && { date }),
+      ...(startTime && { startTime }),
+      ...(endTime && { endTime }),
+      ...(trainer && { trainer }),
+      ...(user && { user }),
+      adminOverrideAt: new Date(),
+      adminOverrideBy: req.user._id
+    };
+
+    // Handle trainer availability if status or time slot changes
+    if (status === "Cancelled" || 
+        (startTime !== existingAppointment.startTime || 
+         endTime !== existingAppointment.endTime ||
+         date !== existingAppointment.date)) {
+      // Free up existing slot
+      await updateTrainerAvailability(
+        existingAppointment.trainer._id, 
+        existingAppointment.date, 
+        existingAppointment.startTime, 
+        existingAppointment.endTime, 
+        false
+      );
+
+      // If not cancelled, mark new slot as booked
+      if (status !== "Cancelled") {
         await updateTrainerAvailability(
-          newTrainerId, 
-          newDate, 
-          newStartTime, 
-          newEndTime,
+          trainer || existingAppointment.trainer._id, 
+          date || existingAppointment.date, 
+          startTime || existingAppointment.startTime, 
+          endTime || existingAppointment.endTime, 
           true
         );
       }
-    } 
-    else if (status === 'Cancelled' && appointment.status !== 'Cancelled') {
-      // If only changing status to cancelled, free up the slot
-      await updateTrainerAvailability(
-        appointment.trainerId, 
-        appointment.date, 
-        appointment.startTime, 
-        appointment.endTime,
-        false
-      );
     }
-    
+
+    // Perform the update
     const updatedAppointment = await Appointment.findByIdAndUpdate(
-      appointmentId,
-      updateData,
-      { new: true }
+      id, 
+      updateData, 
+      { new: true, session }
     )
-    .populate('userId', 'name email phone')
-    .populate('trainerId', 'name email phone specialization');
-    
+    .populate('trainer', 'name email phone')
+    .populate('user', 'name email phone');
+
+    // Commit transaction
+    await session.commitTransaction();
+    session.endSession();
+
     res.status(200).json({
       success: true,
+      message: "Appointment forcefully updated",
       data: updatedAppointment
     });
-          
-    
   } catch (error) {
+    // Abort transaction in case of error
+    await session.abortTransaction();
+    session.endSession();
     next(error);
   }
-}
+};
 
-const deleteAppointmentByAdmin=async (req,res,next)=>{
+
+const forceDeleteAppointment = async (req, res, next) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-
-    const appointmentId = req.params.id;
-
-    const appointment = await Appointment.findById(appointmentId);
-    if (!appointment) {
-      return res.status(404).json({ success: false, message: 'Appointment not found' });
-    }
-
-    if (appointment.status !== 'Cancelled') {
-      await updateTrainerAvailability(
-        appointment.trainerId, 
-        appointment.date, 
-        appointment.startTime, 
-        appointment.endTime,
-        false
-      );
-    }
-
-    await Appointment.findByIdAndDelete(appointmentId);
+    const { id } = req.params;
+    console.log("admin deleting appointment : ");
     
+
+
+    // Find the appointment to be deleted
+    const appointment = await Appointment.findById(id)
+      .populate('trainer', '_id')
+      .session(session);
+
+      console.log("appointment: ",appointment);
+      
+
+    if (!appointment) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({
+        success: false,
+        message: "Appointment not found"
+      });
+    }
+
+    // Free up trainer's time slot
+    await updateTrainerAvailability(
+      appointment.trainer, 
+      appointment.date, 
+      appointment.startTime, 
+      appointment.endTime, 
+      false
+    );
+
+  
+
+    // Delete the appointment
+    await Appointment.findByIdAndDelete(id, { session });
+
+    const deletedByModel = req.user.role === 'admin' ? 'Admin' : 'User';
+
+    // Create a deletion log
+    await AppointmentDeletionLog.create([{
+      appointmentId: id,
+      deletedBy: req.user._id,
+      deletedByModel,
+      deletedByRole : req.user.role,
+      deletedAt: new Date(),
+      appointmentDetails: appointment.toObject()
+    }], { session });
+
+    // Commit transaction
+    await session.commitTransaction();
+    session.endSession();
+
     res.status(200).json({
       success: true,
-      message: 'Appointment deleted successfully'
+      message: "Appointment forcefully deleted"
     });
-    
-
   } catch (error) {
-    next(error)
+    // Abort transaction in case of error
+    await session.abortTransaction();
+    session.endSession();
+    next(error);
   }
-}
+};
+
 
 module.exports = {
   bookAppointment,
   getUserAppointments,
-  updateUserAppointment,
+  updateAppointmentByUser,
   cancelUserAppointment,
+
   getTrainerAppointments,
-  updateTrainerAppointment,
+  updateAppointmentByTrainer,
+
   getAppointmentById,
+
   getAllAppointments,
-  updateAppointmentByAdmin,
-  deleteAppointmentByAdmin
+  forceUpdateAppointment,
+  forceDeleteAppointment
+
 };
 
-//  creating an appointment (user books with trainer)
-// const createAppointment = async (req, res, next) => {
-//   try {
-//     const { date, startTime, endTime, type, notes } = req.body;
 
-//     const user = await User.findById(req.user.id);
 
-//     if (!user || !user.trainerId) {
-//       return res
-//         .status(400)
-//         .json({ error: "User does not have an assigned trainer." });
-//     }
-//     const newAppointment = new Appointment({
-//       trainerId: user.trainerId,
-//       userId: req.user.id,
-//       date,
-//       startTime,
-//       endTime,
-//       type,
-//       notes,
-//     });
-//     await newAppointment.save();
-
-//     await logActivity("NEW_APPOINTMENT", newAppointment._id, "appointment", {
-//       userId: newAppointment.userId,
-//       trainerId: newAppointment.trainerId,
-//     });
-
-//     res.status(201).json({ msg: "New appointment created", newAppointment });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
-// getting all appointments (Admin only)
-// const getAllAppointments = async (req, res, next) => {
-//   try {
-//     const appointments = await Appointment.find();
-//     if (!appointments) {
-//       return res.status(401).json({ msg: "No Apponitments avilable" });
-//     }
-//     res.status(200).json(appointments);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
-//  getting a single appointment by ID
-// const getAppointmentById = async (req, res, next) => {
-//   try {
-//     const appointment = await Appointment.findById(req.params.id);
-//     if (!appointment) {
-//       return res.status(404).json({ error: "Appointment not found." });
-//     }
-//     res.status(200).json(appointment);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
-//  updating an appointment (admin only)
-// const updateAppointment = async (req, res, next) => {
-//   try {
-//     const appointment = await Appointment.findById(req.params.id);
-//     if (!appointment) {
-//       return res.status(404).json({ error: "Appointment not found." });
-//     }
-
-//     if (req.user.role !== "admin") {
-//       return res
-//         .status(403)
-//         .json({ error: "You are not authorized to update this appointment." });
-//     }
-
-//     appointment.date = req.body.date || appointment.date;
-//     appointment.time = req.body.time || appointment.time;
-//     appointment.description = req.body.description || appointment.description;
-//     appointment.status = req.body.status || appointment.status;
-
-//     await appointment.save();
-//     res.status(200).json(appointment);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
-// delte appointment admin only
-// const deleteAppointment = async (req, res, next) => {
-//   try {
-//     const appointment = await Appointment.findById(req.params.id);
-//     if (!appointment) {
-//       return res.status(404).json({ error: "Appointment not found." });
-//     }
-
-//     if (req.user.role !== "admin") {
-//       return res
-//         .status(403)
-//         .json({ error: "You are not authorized to delete this appointment." });
-//     }
-
-//     await appointment.deleteOne();
-//     res.status(200).json({ message: "Appointment deleted successfully." });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
-// getting all appointments of a trainer in trainers dashboard
-// const getAppointmentsForTrainer = async (req, res, next) => {
-//   console.log("Trainer ID received:", req.user.id);
-//   try {
-//     console.log("Trainer ID received:", req.user.id);
-//     console.log(
-//       "Is valid ObjectId:",
-//       mongoose.Types.ObjectId.isValid(req.user.id)
-//     );
-//     if (req.user.role !== "trainer") {
-//       return res
-//         .status(403)
-//         .json({
-//           error: "Access denied. Only trainers can view their appointments.",
-//         });
-//     }
-//     const trainerObjectId = new mongoose.Types.ObjectId(req.user.id);
-//     const appointments = await Appointment.find({ trainerId: trainerObjectId });
-
-//     if (!appointments || appointments.length === 0) {
-//       return res
-//         .status(404)
-//         .json({ error: "No appointments found for this trainer." });
-//     }
-
-//     res.status(200).json(appointments);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-
-// getting all appointments for the logged-in user in user dashboard
-// const getAppointmentsForUser = async (req, res, next) => {
-//   try {
-//     const appointments = await Appointment.find({ user: req.user.id });
-//     if (!appointments) {
-//       return res
-//         .status(404)
-//         .json({ error: "No appointments found for this user." });
-//     }
-//     res.status(200).json(appointments);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
-// module.exports = {
-//   createAppointment,
-//   getAllAppointments,
-//   getAppointmentById,
-//   updateAppointment,
-//   deleteAppointment,
-//   getAppointmentsForTrainer,
-//   getAppointmentsForUser,
-// };

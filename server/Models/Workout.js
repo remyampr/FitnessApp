@@ -26,7 +26,9 @@ const workoutSchema = new mongoose.Schema({
   }],
 image: { type: String, default: "" }, // Store image URL
   createdBy: { type: mongoose.Schema.Types.ObjectId, required: true }, // Can be Trainer or Admin
-  createdByType: { type: String, enum: ['trainer', 'admin'], required: true } // Distinguish creator type
+  createdByType: { type: String, enum: ['trainer', 'admin'], required: true }, // Distinguish creator type
+status:{type:String,default:"active", enum:["active","inactive"]}
+
 }, { timestamps: true });
 
 

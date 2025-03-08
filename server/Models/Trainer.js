@@ -29,6 +29,11 @@ const trainerSchema = new mongoose.Schema({
 
 
   isApproved: { type: Boolean, default: false }, // Whether the trainer is approved by an admin
+  adminNotes: {
+    type: String,
+    default: ''
+  },
+  status:{type:String,default:"active", enum:["active","inactive"]},
   role:{type:String,default:"trainer",enum: ["trainer"]},
     // Ratings from clients
     reviews: [{

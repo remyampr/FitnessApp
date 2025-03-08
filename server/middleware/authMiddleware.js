@@ -8,7 +8,7 @@ const Admin = require("../Models/Admin");
 const protect = async (req, res, next) => {
   try {
     const token = req.cookies.token;
-    console.log("inside protect cookie recived :", token);
+    // console.log("inside protect cookie recived :", token);
 
     if (!token) {
       return res
@@ -25,11 +25,19 @@ const protect = async (req, res, next) => {
 // console.log("Is valid ObjectId:", mongoose.Types.ObjectId.isValid(decoded.id));
 
 
-    // Find user based on decoded token
-    const user =
-      (await User.findById(decoded.id)) ||
-      (await Trainer.findById(decoded.id)) ||
-      (await Admin.findById(decoded.id));
+let user = null;
+let userModel = null;
+   
+if (await User.exists({ _id: decoded.id, role: 'user' })) {
+  user = await User.findById(decoded.id);
+  userModel = 'User';
+} else if (await Trainer.exists({ _id: decoded.id, role: 'trainer' })) {
+  user = await Trainer.findById(decoded.id);
+  userModel = 'Trainer';
+} else if (await Admin.exists({ _id: decoded.id, role: 'admin' })) {
+  user = await Admin.findById(decoded.id);
+  userModel = 'Admin';
+}
 
 
       if (!user) {
@@ -39,11 +47,19 @@ const protect = async (req, res, next) => {
         });
       }
 
+      console.log(`Authenticated ${userModel} with role: ${user.role}`);
+
+    // req.user = {
+    //   ...user.toObject(), // Convert to plain object
+    //   userModel // Add which model the user came from
+    // };
+
    // Attach full user object to request
    req.user = user;
     next(); // Proceed to the next middleware
 
   } catch (err) {
+    console.error("Authentication error:", err);
     res.status(401).json({ isAuthenticated: false,error: "Invalid token" });
   }
 };
@@ -51,7 +67,7 @@ const protect = async (req, res, next) => {
 // Middleware for Authorization (authorize)
 const authorize = (roles = []) => {
   return async (req, res, next) => {
-    console.log("1.autherization role :", roles);
+    // console.log("1.autherization role :", roles);
     try {
       const user = req.user;
 
@@ -59,11 +75,11 @@ const authorize = (roles = []) => {
         return res.status(403).json({ error: "Unauthorized access." });
       }
 
-          console.log("2.User role:", user.role);
+          // console.log("2.User role:", user.role);
 
       // Check if user's role matches one of the required roles
       if (roles.length && !roles.includes(user.role.toLocaleLowerCase())) {
-        console.log("3.authorization role mismatch:", roles, user.role);
+        // console.log("3.authorization role mismatch:", roles, user.role);
         return res
           .status(403)
           .json({

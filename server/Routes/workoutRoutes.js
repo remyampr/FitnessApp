@@ -10,7 +10,8 @@ const {
     updateWorkoutPlan,
     deleteWorkoutPlan,
     getWorkoutsForTrainer,
-    getUserWorkouts
+    getUserWorkouts,
+    deactivateWorkoutPlan
   } = require("../Controllers/workoutController");
 
 
@@ -18,10 +19,15 @@ const {
 router.get("/user", protect, authorize(["user"]), getUserWorkouts);
 
 router.post("/create",protect,authorize(["admin","trainer"]),upload.single("image"),createWorkout);
+
 router.get("/all", protect, authorize(["admin"]), getAllWorkouts);
+
 router.get("workout/:id", protect, authorize(["admin","trainer"]), getWorkoutById);
-router.put("/:id", protect, authorize(["admin"]), updateWorkoutPlan);
-router.delete("/:id", protect, authorize(["admin"]), deleteWorkoutPlan);
+
+// router.put("/:id", protect, authorize(["admin"]), updateWorkoutPlan);
+router.put("/:id", protect, authorize(["admin"]), upload.single("image"), updateWorkoutPlan);
+
+router.patch("/:id", protect, authorize(["admin"]), deactivateWorkoutPlan);
 
 router.get("/trainer", protect, authorize(["trainer"]), getWorkoutsForTrainer);
 

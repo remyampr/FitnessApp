@@ -70,6 +70,9 @@ return <Navigate to={redirectTo} replace />;
         location.pathname !== '/user/complete-profile') {
       return <Navigate to="/user/complete-profile" replace />;
     }
+    if ( user.isActive === false) {
+      return <Navigate to="/user/suspended" replace />;
+    }
 
     if (user.isProfileComplete && location.pathname === '/user/complete-profile') {
       return <Navigate to="/user/dashboard" replace />;

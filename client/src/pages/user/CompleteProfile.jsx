@@ -193,6 +193,11 @@ export const CompleteProfile = () => {
       toast.error("Please select a plan");
     }
 
+    const totalAmount = calculatePrice();
+    const trainerRevenue = totalAmount * 0.3; 
+    const adminRevenue = totalAmount * 0.7; 
+
+
     setLoading(true);
   
     try {
@@ -207,7 +212,9 @@ export const CompleteProfile = () => {
       const subscriptionData = {
         trainerId: formData.trainerId,
         plan: formData.plan,
-        amount: calculatePrice(),
+        amount: totalAmount,
+        trainerRevenue,
+        adminRevenue,
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString(),
         duration: formData.duration === "3month" ? 3 : 6

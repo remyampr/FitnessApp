@@ -10,6 +10,7 @@ const initialState = {
   workouts:null,
   nutritionPlans:null,
   isAuthenticated: false,
+  isActive:true,
   loading: false,
   error: null,
   trainerDashboardStats: {

@@ -42,7 +42,7 @@ export const AdminSidebar = () => {
           </Link>
         </li>
         <li className={`p-2 rounded-md ${isActive("/admin/trainers/unapproved")}`}>
-          <Link to="/admin/trainers/unapproved">
+          <Link to="/admin/approvals">
           <i className="fas fa-user-check text-lg"></i>
             Approvals
           </Link>
@@ -65,8 +65,8 @@ export const AdminSidebar = () => {
           Workouts
           </Link>
         </li>
-        <li className={`p-2 rounded-md ${isActive("/admin/nutritionplans")}`}>
-          <Link to="/admin/nutritionplans">
+        <li className={`p-2 rounded-md ${isActive("/admin/nutrition")}`}>
+          <Link to="/admin/nutrition">
           <i className="fas fa-utensils text-lg"></i>
           Nutrition Plans
           </Link>

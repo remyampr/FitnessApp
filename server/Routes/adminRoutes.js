@@ -2,11 +2,14 @@ const express=require("express");
 const router=express.Router();
 const {protect,authorize}=require("../middleware/authMiddleware");
 const {createAdmin,
-      getAllTrainers,getTrainer,updateTrainer,deleteTrainer,
+      getAllTrainers,getTrainer,updateTrainer,deactivateTrainer,
      getUnapprovedTrainers,
      approveTrainer,
-     getAllUsers,getUser,updateUser,deleteUser,
-     getDashboard
+     getAllUsers,getUser,updateUser,deactivateUser,
+     getDashboard,
+     getRevenue,
+     getRevenueBreakdown,
+     getPayments
     }=require("../Controllers/adminController");
 
     const { forgotPassword, resetPassword ,
@@ -24,7 +27,7 @@ router.post("/reset-password", resetPassword);
 router.get("/trainers", protect, authorize(["admin"]), getAllTrainers);
 router.get("/trainer/:id", protect, authorize(["admin"]), getTrainer);
 router.patch("/trainer/:id", protect, authorize(["admin"]), updateTrainer);
-router.delete("/trainer/:id", protect, authorize(["admin"]), deleteTrainer);
+router.patch("/trainer/:id", protect, authorize(["admin"]), deactivateTrainer);
 // router.post("/trainer", protect, authorize(["admin"]), addTrainer);
 router.get('/trainers/unapproved',protect,authorize(["admin"]), getUnapprovedTrainers);
 router.patch('/trainers/approve',protect,authorize(["admin"]), approveTrainer);
@@ -33,15 +36,16 @@ router.patch('/trainers/approve',protect,authorize(["admin"]), approveTrainer);
 router.get('/users', protect,authorize(["admin"]), getAllUsers);
 router.get("/user/:id", protect, authorize(["admin"]), getUser);
 router.patch('/user/:userId', protect,authorize(["admin"]),updateUser);
-router.delete('/user/:userId',protect,authorize(["admin"]), deleteUser);
+router.patch('/user/:userId',protect,authorize(["admin"]), deactivateUser);
 
 // Admin Dashboard
 router.get("/dashboard", protect, authorize(["admin"]), getDashboard);
 
 
 // Payments & Revenue
-// router.get("/payments", protect, authorize(["admin"]), getPayments);
-// router.get("/revenue", protect, authorize(["admin"]), getRevenue);
+router.get("/payments", protect, authorize(["admin"]), getPayments);
+router.get("/revenue", protect, authorize(["admin"]), getRevenue);
+router.get("/revenue/breakdown", protect, authorize(["admin"]), getRevenueBreakdown);
 // router.get("/subscriptions", protect, authorize(["admin"]), getSubscriptions);
 
 

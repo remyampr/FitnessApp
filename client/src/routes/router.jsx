@@ -1,7 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import { MainLayout } from "../layout/MainLayout";
 
-
 import { HomePage } from "../pages/shared/HomePage";
 import { UserLoginPage } from "../pages/user/UserLoginPage";
 import { UserSignupPage } from "../pages/user/UserSignupPage";
@@ -23,142 +22,201 @@ import { AdminTrainersUsersPage } from "../pages/admin/AdminTrainersUsersPage";
 import { TrainerProtectedRoute } from "../components/ProtectedRoute/TrainerProtectedRoute";
 import { ForgotPassword } from "../pages/shared/ForgotPassword";
 import { PaymentSuccess } from "../pages/user/PaymentSuccess";
+import { PendingTrainers } from "../pages/admin/PendingTrainers";
+import { AppointmentsPage } from "../pages/admin/AppointmentsPage";
+import { RevenuePage } from "../pages/admin/RevenuePage";
+import { WorkoutPage } from "../pages/admin/WorkoutPage";
+import { NutritionPage } from "../pages/admin/NutritionPage";
+import { WorkoutStartPage } from "../pages/user/WorkoutPage";
+import { UserProgressPage } from "../pages/user/UserProgressPage";
+import { NutritionPlanPage } from "../pages/user/NutritionPlanPage";
 
 
 export const router = createBrowserRouter([
-    {
-      path: "/",
-      element:<MainLayout/> ,
-      errorElement:<h1>Error page</h1>,
-      children:[
-    
-        {
-            path:"/",
-            element:<HomePage/>
-        },
-        {
-            path:"/user/signup",
-            element:<UserSignupPage/>
-        },
-        {
-            path:"/user/login",
-            element:<UserLoginPage/>
-        },
-        {
-            path:"/trainer/login",
-            element:<TrainerLoginPage/>
-        },
-        {
-            path:"/trainer/signup",
-            element:<TrainerSignupPage/>
-        },
-        {
-          path: "/forgot-password",
-          element: <ForgotPassword/>,
-        },
+  {
+    path: "/",
+    element: <MainLayout />,
+    errorElement: <h1>Error page</h1>,
+    children: [
+      {
+        path: "/",
+        element: <HomePage />,
+      },
+      {
+        path: "/user/signup",
+        element: <UserSignupPage />,
+      },
+      {
+        path: "/user/login",
+        element: <UserLoginPage />,
+      },
+      {
+        path: "/trainer/login",
+        element: <TrainerLoginPage />,
+      },
+      {
+        path: "/trainer/signup",
+        element: <TrainerSignupPage />,
+      },
+      {
+        path: "/forgot-password",
+        element: <ForgotPassword />,
+      },
+    ],
+  },
+  {
+    path: "/user",
+    element: <UserLayout />,
+    errorElement: <h1>Error page</h1>,
+    children: [
+      {
+        path: "complete-profile",
+        element: (
+          <ProtectedRoute requiredRole="user" allowIncomplete={true}>
+            <CompleteProfile />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: "payment-success",
+        element: <PaymentSuccess />,
+      },
+      {
+        path: "dashboard",
+        element: (
+         <UserDashboard/>
+        ),
+      },
+      {
+        path: "workout/start",
+              element: (
+         <WorkoutStartPage/>
+        ),
+      },
+      {
+        path: "nutrition/plan",
+              element: (
+         <NutritionPlanPage/>
+        ),
+      },
+      {
+        path: "progress",
+              element: (
+         <UserProgressPage/>
+        ),
+      },
+    ],
+  },
+  {
+    path: "/trainer",
+    element: <TrainerLayout />,
+    errorElement: <h1>Error page</h1>,
+    children: [
+      {
+        path: "pending-approval",
+        element: (
+          <TrainerProtectedRoute requiredRole="trainer">
+            <PendingApproval />
+          </TrainerProtectedRoute>
+        ),
+      },
+      {
+        path: "dashboard",
+        element: (
+          <TrainerProtectedRoute requiredRole="trainer">
+            <TrainerDashboard />
+          </TrainerProtectedRoute>
+        ),
+      },
+      // {
+      //     path:"dashboard",
+      //     element:(
+      //       <TrainerProtectedRoute requiredRole="trainer">
+      //       <TrainerDashboard />
+      //     </TrainerProtectedRoute>
+      //     )
+      // },
+    ],
+  },
+  {
+    path: "/admin",
+    element: <AdminLayout />,
+    errorElement: <h1>Error page</h1>,
+    children: [
+      {
+        path: "login",
+        element: <AdminLoginPage />,
+      },
+      {
+        path: "forgot-password",
+        element: <AdminForgotPassword />,
+      },
+      {
+        path: "dashboard",
+        element: (
+          <AdminProtectedRoute>
+            <AdminDashboard />
+          </AdminProtectedRoute>
+        ),
+      },
+      {
+        path: "users",
+        element: (
+          <AdminProtectedRoute>
+            <AdminTrainersUsersPage />
+          </AdminProtectedRoute>
+        ),
+      },
+      {
+        path: "trainers",
+        element: (
+          <AdminProtectedRoute>
+            <AdminTrainersUsersPage />
+          </AdminProtectedRoute>
+        ),
+      },
+      {
+        path: "approvals",
+        element: (
+          <AdminProtectedRoute>
+            <PendingTrainers />
+          </AdminProtectedRoute>
+        ),
+      },
+      {
+        path: "appointments",
+        element: (
+          <AdminProtectedRoute>
+            <AppointmentsPage />
+          </AdminProtectedRoute>
+        ),
+      },
+      {
+        path: "revenue",
+        element: (
+          <AdminProtectedRoute>
+            <RevenuePage />
+          </AdminProtectedRoute>
+        ),
+      },
+      {
+        path: "workouts",
+        element: (
+          <AdminProtectedRoute>
+            <WorkoutPage />
+          </AdminProtectedRoute>
+        ),
+      },
+      {
+        path: "nutrition",
+        element: (
+          <AdminProtectedRoute>
+            <NutritionPage />
+          </AdminProtectedRoute>
+        ),
+      },
 
-      ]
-    },
-    {
-      path: "/user",
-      element:<UserLayout/> ,
-      errorElement:<h1>Error page</h1>,
-      children:[
-        {
-          path: "complete-profile",
-          element:(
-            <ProtectedRoute requiredRole="user" allowIncomplete={true}>
-                <CompleteProfile/>
-            </ProtectedRoute>
-          )
-           
-        },    
-        {
-          path: "payment-success",
-          element:(
-           
-                <PaymentSuccess/>
-         
-          )
-           
-        },    
-        {
-            path:"dashboard",
-            element:(
-              <ProtectedRoute requiredRole="user">
-              <UserDashboard />
-            </ProtectedRoute>
-            )
-        },
-        
-      ]
-    },
-    {
-      path: "/trainer",
-      element:<TrainerLayout/> ,
-      errorElement:<h1>Error page</h1>,
-      children:[
-        {
-          path: "pending-approval",
-          element:(
-            <TrainerProtectedRoute requiredRole="trainer">
-                <PendingApproval/>
-            </TrainerProtectedRoute>
-          )
-           
-        },    
-        {
-            path:"dashboard",
-            element:(
-              <TrainerProtectedRoute requiredRole="trainer">
-            <TrainerDashboard/>
-            </TrainerProtectedRoute>
-            )
-        },
-        // {
-        //     path:"dashboard",
-        //     element:(
-        //       <TrainerProtectedRoute requiredRole="trainer">
-        //       <TrainerDashboard />
-        //     </TrainerProtectedRoute>
-        //     )
-        // },
-        
-      ]
-    },
-    {
-      path: "/admin",
-      element: <AdminLayout />,
-      errorElement: <h1>Error page</h1>,
-      children: [
-        {
-          path: "login",
-          element: <AdminLoginPage />
-        },
-        {
-          path: "forgot-password",
-          element: <AdminForgotPassword />
-        },
-        {
-          path: "dashboard",
-          element: (
-           <AdminProtectedRoute>
-              <AdminDashboard />
-              </AdminProtectedRoute>
-            
-          )
-        },
-        {
-          path: "users",
-          element: (
-           <AdminProtectedRoute>
-              <AdminTrainersUsersPage />
-              </AdminProtectedRoute>
-            
-          )
-        },
-      
-        // admin routes 
-      ]
-    },
-  ]);
+      // admin routes
+    ],
+  },
+]);

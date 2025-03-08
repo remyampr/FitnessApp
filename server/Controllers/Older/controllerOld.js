@@ -1,167 +1,282 @@
-// const createPaymentOrder = async (req, res, next) => {
-//   try {
-//     const { userId, plan, trainerId, duration } = req.body;
+const mongoose = require('mongoose');
+const Appointment = require('../models/Appointment');
+const Trainer = require('../models/Trainer');
+const User = require('../models/User');
 
-//     const user = await User.findById(userId);
-//     if (!user) {
-//       return res.status(404).json({ error: "User not found" });
-//     }
+// Admin Appointment Management Controller
+const adminAppointmentController = {
+  // Get all appointments with advanced filtering and pagination
+  getAllAppointments: async (req, res, next) => {
+    try {
+      // Destructure query parameters with defaults
+      const { 
+        page = 1, 
+        limit = 10, 
+        status, 
+        trainerId, 
+        userId, 
+        startDate, 
+        endDate, 
+        sortBy = 'date', 
+        sortOrder = 'desc' 
+      } = req.query;
 
-//     // Determine amount based on plan and duration
-//     let amount;
-//     if (plan === "Premium") {
-//       amount = duration === "3month" ? 4999 : 8999; // 3-month or 6-month premium
-//     } else {
-//       amount = duration === "3month" ? 1999 : 3599; // 3-month or 6-month basic
-//     }
+      // Build filter object
+      const filter = {};
 
-//     // Dummy
-//     const orderId = `order_${userId}_${Date.now()}_${Math.floor(
-//       Math.random() * 1000
-//     )}`;
-//     const transactionId = `txn_${userId}_${Date.now()}_${Math.floor(
-//       Math.random() * 1000
-//     )}`;
+      // Add status filter if provided
+      if (status) {
+        filter.status = status;
+      }
 
-//     const payment = new Payment({
-//       userId,
-//       trainerId,
-//       amount,
-//       plan: `${plan}_${duration}`,
-//       status: "Pending", // Mark as pending until confirmed
-//       transactionId,
-//     });
+      // Add trainer filter if provided
+      if (trainerId) {
+        filter.trainer = trainerId;
+      }
 
-//     await payment.save();
+      // Add user filter if provided
+      if (userId) {
+        filter.user = userId;
+      }
 
-//     res.status(200).json({
-//       message: " Order created successfully",
-//       orderId,
-//       transactionId,
-//       amount,
-//       currency: "INR",
-//     });
+      // Add date range filter if both start and end dates are provided
+      if (startDate && endDate) {
+        filter.date = {
+          $gte: new Date(startDate),
+          $lte: new Date(endDate)
+        };
+      }
 
-//     // will change to stripe or razorpay later
-//     // const order = {
-//     //     id: `order_${userId}_${Date.now()}`,
-//     //     amount,
-//     //     currency: "INR",
-//     //     status: "created",
-//     //   };
-//     //   res.status(200).json({
-//     //     msg: "Order created successfully",
-//     //     orderId: order.id,
-//     //     amount,
-//     //     currency: "INR",
-//     //   });
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+      // Create sort object
+      const sort = { [sortBy]: sortOrder === 'desc' ? -1 : 1 };
 
-// const confirmPayment = async (req, res, next) => {
-//   try {
-//     const { userId, transactionId, paymentStatus } = req.body;
+      // Calculate skip for pagination
+      const skip = (page - 1) * limit;
 
-//     const user = await User.findById(userId);
-//     if (!user) {
-//       return res.status(404).json({ error: "User not found" });
-//     }
+      // Fetch appointments with pagination and population
+      const appointments = await Appointment.find(filter)
+        .sort(sort)
+        .skip(skip)
+        .limit(Number(limit))
+        .populate('trainer', 'name email')
+        .populate('user', 'name email');
 
-//     // Find the payment record by transactionId
-//     const payment = await Payment.findOne({ transactionId });
-//     if (!payment) {
-//       return res.status(404).json({ error: "Payment record not found" });
-//     }
-//     const amount = payment.amount;
-//     const trainerId = payment.trainerId;
+      // Count total matching documents
+      const total = await Appointment.countDocuments(filter);
 
-//     const planParts = payment.plan.split("_");
-//     const planType = planParts[0]; // "Premium" or "Basic"
-//     const duration = planParts[1]; // "3month" or "6month"
+      res.status(200).json({
+        success: true,
+        count: appointments.length,
+        total,
+        page: Number(page),
+        totalPages: Math.ceil(total / limit),
+        data: appointments
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
 
-//     const months = duration === "3month" ? 3 : 6;
+  // Admin can update any appointment status
+  updateAppointmentStatus: async (req, res, next) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-//     if (paymentStatus === "Success") {
-//       payment.status = "Completed";
-//       await payment.save();
+    try {
+      const { appointmentId } = req.params;
+      const { status, notes, cancellationReason } = req.body;
 
-//       // Activate user subscription
-//       const startDate = new Date();
-//       const endDate = new Date(startDate);
-//       endDate.setMonth(startDate.getMonth() + months);
+      // Validate status
+      const validStatuses = ["Pending", "Confirmed", "Completed", "Cancelled"];
+      if (!validStatuses.includes(status)) {
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(400).json({
+          success: false,
+          message: "Invalid status"
+        });
+      }
 
-//       user.subscription.status = "Active";
-//       user.subscription.amount = amount;
-//       user.subscription.plan = payment.plan;
-//       user.subscription.startDate = startDate;
-//       user.subscription.endDate = endDate;
-//       user.isProfileComplete = true;
+      // Find the existing appointment
+      const appointment = await Appointment.findById(appointmentId)
+        .populate('trainer', '_id')
+        .populate('user', '_id')
+        .session(session);
 
-//       await user.save();
+      if (!appointment) {
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(404).json({
+          success: false,
+          message: "Appointment not found"
+        });
+      }
 
-//       // Update trainer's revenue with monthly breakdown
-//       const trainer = await Trainer.findById(trainerId);
-//       if (trainer) {
-//         const trainerShare = (trainer.trainerSharePercentage / 100) * amount;
-//         trainer.totalRevenue += trainerShare;
+      // Prevent updating completed or cancelled appointments
+      if (["Completed", "Cancelled"].includes(appointment.status)) {
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(400).json({
+          success: false,
+          message: `Cannot update an appointment with status: ${appointment.status}`
+        });
+      }
 
-//         const monthlyShare = trainerShare / months; // Divide across months
+      // Prepare update data
+      const updateData = { 
+        status,
+        adminUpdatedAt: new Date(),
+        adminUpdateReason: notes || "Admin initiated update"
+      };
 
-//         if (!trainer.revenueHistory) {
-//           trainer.revenueHistory = [];
-//         }
+      // Add cancellation details if cancelled
+      if (status === "Cancelled") {
+        updateData.cancellationReason = cancellationReason || "Admin cancellation";
+        
+        // Free up trainer's time slot if cancelling
+        await updateTrainerAvailability(
+          appointment.trainer._id, 
+          appointment.date, 
+          appointment.startTime, 
+          appointment.endTime, 
+          false
+        );
+      }
 
-//         // Add entries for each month of the subscription
-//         for (let i = 0; i < months; i++) {
-//           const entryDate = new Date(startDate);
-//           entryDate.setMonth(startDate.getMonth() + i);
+      // Perform the update
+      const updatedAppointment = await Appointment.findByIdAndUpdate(
+        appointmentId,
+        updateData,
+        { new: true, session }
+      )
+      .populate('trainer', 'name email')
+      .populate('user', 'name email');
 
-//           const year = entryDate.getFullYear();
-//           const month = entryDate.getMonth();
+      // Commit transaction
+      await session.commitTransaction();
+      session.endSession();
 
-//           // Find existing entry or create new one
-//           let monthEntry = trainer.revenueHistory.find(
-//             (entry) => entry.year === year && entry.month === month
-//           );
-//           if (monthEntry) {
-//             monthEntry.revenue += monthlyShare;
-//             if (i === 0)
-//               monthEntry.clientCount = (monthEntry.clientCount || 0) + 1;
-//           } else {
-//             trainer.revenueHistory.push({
-//               year,
-//               month,
-//               revenue: monthlyShare,
-//               clientCount: i === 0 ? 1 : 0, // Only count client in the first month
-//             });
-//           }
-//         }
+      res.status(200).json({
+        success: true,
+        data: updatedAppointment,
+        message: "Appointment updated successfully"
+      });
+    } catch (error) {
+      // Abort transaction in case of error
+      await session.abortTransaction();
+      session.endSession();
+      next(error);
+    }
+  },
 
-//         if (!trainer.clients.includes(userId)) {
-//           trainer.clients.push(userId);
-//         }
-//         await trainer.save();
-//       }
+  // Admin can delete an appointment
+  deleteAppointment: async (req, res, next) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-//       const logedActivity = await logActivity(
-//         "PAYMENT_RECEIVED",
-//         payment._id,
-//         "Payment",
-//         { user: user._id, trainer: trainer._id }
-//       );
+    try {
+      const { appointmentId } = req.params;
 
-//       res.status(200).json({
-//         message: `Payment successful, ${months}-month subscription activated`,
-//         user,
-//       });
-//     } else {
-//       payment.status = "Failed";
-//       await payment.save();
-//       res.status(400).json({ error: "Payment failed. Please try again." });
-//     }
-//   } catch (error) {
-//     next(error);
-//   }
-// };
+      // Find the appointment to be deleted
+      const appointment = await Appointment.findById(appointmentId)
+        .populate('trainer', '_id')
+        .session(session);
+
+      if (!appointment) {
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(404).json({
+          success: false,
+          message: "Appointment not found"
+        });
+      }
+
+      // Free up trainer's time slot
+      await updateTrainerAvailability(
+        appointment.trainer._id, 
+        appointment.date, 
+        appointment.startTime, 
+        appointment.endTime, 
+        false
+      );
+
+      // Delete the appointment
+      await Appointment.findByIdAndDelete(appointmentId, { session });
+
+      // Commit transaction
+      await session.commitTransaction();
+      session.endSession();
+
+      res.status(200).json({
+        success: true,
+        message: "Appointment deleted successfully"
+      });
+    } catch (error) {
+      // Abort transaction in case of error
+      await session.abortTransaction();
+      session.endSession();
+      next(error);
+    }
+  },
+
+  // Get appointment statistics
+  getAppointmentStatistics: async (req, res, next) => {
+    try {
+      const { 
+        startDate, 
+        endDate, 
+        trainerId, 
+        userId 
+      } = req.query;
+
+      // Build filter
+      const filter = {};
+      if (startDate && endDate) {
+        filter.date = {
+          $gte: new Date(startDate),
+          $lte: new Date(endDate)
+        };
+      }
+      if (trainerId) filter.trainer = trainerId;
+      if (userId) filter.user = userId;
+
+      // Aggregate statistics
+      const statistics = await Appointment.aggregate([
+        { $match: filter },
+        {
+          $group: {
+            _id: null,
+            total: { $sum: 1 },
+            pending: { 
+              $sum: { $cond: [{ $eq: ["$status", "Pending"] }, 1, 0] } 
+            },
+            confirmed: { 
+              $sum: { $cond: [{ $eq: ["$status", "Confirmed"] }, 1, 0] } 
+            },
+            completed: { 
+              $sum: { $cond: [{ $eq: ["$status", "Completed"] }, 1, 0] } 
+            },
+            cancelled: { 
+              $sum: { $cond: [{ $eq: ["$status", "Cancelled"] }, 1, 0] } 
+            }
+          }
+        }
+      ]);
+
+      res.status(200).json({
+        success: true,
+        data: statistics[0] || {
+          total: 0,
+          pending: 0,
+          confirmed: 0,
+          completed: 0,
+          cancelled: 0
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+};
+
+module.exports = adminAppointmentController;

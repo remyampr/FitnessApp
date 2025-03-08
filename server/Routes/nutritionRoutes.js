@@ -7,16 +7,20 @@ const {
   getAllNutritionPlans,
   getNutritionPlanById,
   updateNutritionPlan,
-  deleteNutritionPlan,
   getNutritionPlansForTrainer,
-  getUserNutritionPlans
+  getUserNutritionPlans,
+  deactivateNutritionPlan
 } = require("../Controllers/nutritionController");
 
 router.post("/create",protect,authorize(["trainer", "admin"]),upload.single("image"),createNutrition);
+
 router.get("/all", protect, authorize(["admin"]), getAllNutritionPlans);
 router.get("nutrition/:id", protect, authorize(["trainer,admin"]), getNutritionPlanById);
-router.put("/:id", protect, authorize(["admin"]), updateNutritionPlan);
-router.delete("/:id", protect, authorize(["admin"]), deleteNutritionPlan);
+
+// router.put("/:id", protect, authorize(["admin"]), updateNutritionPlan);
+router.put("/:id", protect, authorize(["admin"]), upload.single("image"),updateNutritionPlan);
+
+router.patch("/:id", protect, authorize(["admin"]), deactivateNutritionPlan);
 router.get("/trainer", protect, authorize(["trainer"]), getNutritionPlansForTrainer);
 
 
