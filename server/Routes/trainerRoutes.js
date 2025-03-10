@@ -10,6 +10,7 @@ const {
   getTrainerProfile,
   getTrainerClients,
   getClientById,
+  getMyReviews,
 
 } = require("../Controllers/trainerController");
 
@@ -28,6 +29,8 @@ router.get("/revenue",protect, authorize(["trainer"]), getTrainerRevenue)
  router.get("/profile", protect, authorize(["trainer"]), getTrainerProfile);
  router.get("/clients", protect, authorize(["trainer"]), getTrainerClients);
  router.get("/clients/:clientId", protect, authorize(["trainer"]), getClientById);
+
+router.get('/my-reviews',  protect, authorize(["trainer"]),getMyReviews);
 
 
 

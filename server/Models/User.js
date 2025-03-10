@@ -9,7 +9,6 @@ const userSchema = new mongoose.Schema({
     ref: 'Trainer'
   },
 
-
   password: { type: String, required: true },
   phone: { type: Number }, 
   height: { type: Number, min: 1 }, 
@@ -42,7 +41,7 @@ const userSchema = new mongoose.Schema({
   role:{type:String,default:"user"},
   image: {
     type: String,
-    default: 'uploads/user.jpg' 
+    default: 'Uploads/user.jpg' 
   },
   isProfileComplete:{type: Boolean, default: false},
   lastLogin: { type: Date, default: null },

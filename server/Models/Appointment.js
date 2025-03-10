@@ -26,6 +26,10 @@ const appointmentSchema = new mongoose.Schema({
     type: String,
     default: ""
   },
+  cancellationReason: { 
+    type: String, 
+    default: "" 
+  },
   bookingSource: {
     type: String,
     enum: ["User", "Trainer"],

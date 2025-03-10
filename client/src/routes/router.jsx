@@ -30,6 +30,10 @@ import { NutritionPage } from "../pages/admin/NutritionPage";
 import { WorkoutStartPage } from "../pages/user/WorkoutPage";
 import { UserProgressPage } from "../pages/user/UserProgressPage";
 import { NutritionPlanPage } from "../pages/user/NutritionPlanPage";
+import { UserProfilePage } from "../pages/user/UserProfilePage";
+import { UserTrainerPage } from "../pages/user/UserTrainerPage";
+import { UserAppointmentPage } from "../pages/user/UserAppointmentPage";
+
 
 
 export const router = createBrowserRouter([
@@ -88,6 +92,18 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: "profile",
+        element: (
+         <UserProfilePage/>
+        ),
+      },
+      {
+        path: "mytrainer",
+        element: (
+         <UserTrainerPage/>
+        ),
+      },
+      {
         path: "workout/start",
               element: (
          <WorkoutStartPage/>
@@ -103,6 +119,12 @@ export const router = createBrowserRouter([
         path: "progress",
               element: (
          <UserProgressPage/>
+        ),
+      },
+      {
+        path: "appointments",
+              element: (
+         <UserAppointmentPage/>
         ),
       },
     ],

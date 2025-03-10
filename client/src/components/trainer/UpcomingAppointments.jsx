@@ -95,8 +95,8 @@ export const UpcomingAppointments = ({ appointments }) => {
               </tr>
             </thead>
             <tbody>
-              {appointments.map((appointment) => (
-                <tr key={appointment.id}>
+              {appointments?.map((appointment,index) => (
+                <tr key={appointment?._id|| index}>
                   <td>
                     <div className="flex items-center space-x-3">
                       <div className="avatar">

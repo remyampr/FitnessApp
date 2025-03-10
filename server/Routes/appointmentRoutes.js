@@ -6,16 +6,19 @@ const { bookAppointment, getUserAppointments, updateAppointmentByUser, cancelUse
      getAppointmentById,
      getAllAppointments,
      forceUpdateAppointment,
+     getTrainerAvilability,
      forceDeleteAppointment} = require("../Controllers/appointmentController");
 
 // uer routes
+router.get('/trainer-availability/:trainerId',protect,authorize(["user"]),getTrainerAvilability);
 router.post("/book",protect,authorize(["user"]),bookAppointment);
 router.get("/user",protect,authorize(["user"]),getUserAppointments);
 router.put("/user/:id",protect,authorize(["user"]),updateAppointmentByUser);
 router.delete("/user/:id",protect,authorize(["user"]),cancelUserAppointment);
 
+
 // Trainer routes
-router.get("/trainer/:trainerId'",protect,authorize(["trainer"]),getTrainerAppointments);
+router.get("/trainer",protect,authorize(["trainer"]),getTrainerAppointments);
 router.put("/trainer/:id",protect,authorize(["trainer"]),updateAppointmentByTrainer);
 
 // all

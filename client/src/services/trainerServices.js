@@ -23,12 +23,16 @@ export const getProfile=( )=>{
 export const getClients=( )=>{
         return axiosInstance.get("/trainer/clients");
 }
+
+
 export const getAppointmentForTrainer=( )=>{
         return axiosInstance.get("/appointments/trainer");
 }
 export const updateAppointment=( )=>{
         return axiosInstance.put("/appointments/trainer/:id");
 }
+
+
 export const  getTrainerRevenue=( )=>{
     return axiosInstance.get("/trainer/revenue");
 }

@@ -15,7 +15,6 @@ export const userResetPassword=(email, otp, newPassword , role="user" )=>{
 }
 
 
-
 export const userSignup=(data)=>{
     console.log("in axios User Signup : ",data);
     
@@ -27,15 +26,15 @@ export const userVerify=(email,otp, role = "user")=>{
 export const userLogout=()=>{
     return axiosInstance.post("/user/logout")
 }
-
-export const updateProfile =(formDataToSend)=>{
-    return axiosInstance.put("/user/profile/update",formDataToSend),{
-        headers:{
+export const updateProfile = (formDataToSend) => {
+    return axiosInstance.put("/user/profile/update", formDataToSend, {
+        headers: {
             "Content-Type": "multipart/form-data",
-        }
-    }
-    
-}
+        },
+    });
+};
+
+
 export const getApprovedTrainers=()=>{
     return axiosInstance.get("/user/trainers/approved")
 }
@@ -75,9 +74,7 @@ export const getUserWorkouts=()=>{
 export const getUserNutritionPlans=()=>{
     return axiosInstance.get("/nutrition/user")
 }
-export const getUserAppointments=()=>{
-    return axiosInstance.get("/appointments/user")
-}
+
 export const getUserNotifications=()=>{
     return axiosInstance.get("/notifications/notification")
 }
@@ -96,4 +93,45 @@ export const getProgressHistory=()=>{
 export const getProgressSummary = ()=>{
     return axiosInstance.get("/progress/summary")
 }
+
+
+// Appoinments
+
+export const getTrainerAvailability = (trainerId)=>{
+    console.log("trainerid type :",typeof(trainerId));
+    console.log("trainerid :",trainerId);
+    
+    return axiosInstance.get(`/appointments/trainer-availability/${trainerId}`)
+}
+
+export const bookAppointment = (appointmentData) => {
+    console.log("in axios ,Booking Appointmentdata :",appointmentData);
+    
+    return axiosInstance.post("/appointments/book", appointmentData);
+};
+
+export const getUserAppointments=()=>{
+    return axiosInstance.get("/appointments/user")
+}
+export const updateAppointment = ()=>{
+    return axiosInstance.put(`/appointments/user/${id}`)
+}
+export const cancelAppointment = (id,data)=>{
+    return axiosInstance.delete(`/appointments/user/${id}`,{data})
+}
+
+// Trainer
+export const getMyTrainer=()=>{
+    return axiosInstance.get("/user/my-trainer")
+}
+export const postReview=(data)=>{
+    console.log("sending data in axios : ",data);
+    
+    return axiosInstance.post("/user/my-trainer/review",data)
+}
+export const deleteMyReview=()=>{
+    return axiosInstance.delete("/user/my-trainer/review")
+}
+
+
 

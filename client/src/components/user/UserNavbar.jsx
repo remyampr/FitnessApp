@@ -13,7 +13,7 @@ export const UserNavbar = () => {
 
   const user = useSelector((state) => state.user.user);
 
-  console.log("navbar USer :",user);
+  // console.log("navbar USer :",user);
   
 
   const name = user?.user?.name;
@@ -25,7 +25,7 @@ export const UserNavbar = () => {
       persistor.purge();
       sessionStorage.clear();
       localStorage.clear();
-      console.log("navigating to userlogin");
+      // console.log("navigating to userlogin");
       
 
       navigate("/user/login");
@@ -57,7 +57,7 @@ export const UserNavbar = () => {
           <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
             <div className="w-10 rounded-full">
               <img
-                src={user?.profileImage || "/default-avatar.png"}
+                src= "/userr7.png"
                 alt="Profile"
               />
             </div>

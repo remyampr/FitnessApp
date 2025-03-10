@@ -9,7 +9,7 @@ import {
   getUserWorkouts,
 } from "../../services/userServices";
 import {
-  setAppointment,
+  setAppointmentR,
   setError,
   setLoading,
   setNutritions,
@@ -46,7 +46,10 @@ export const UserDashboard = () => {
   // Process workouts to separate today and tomorrow
   const [todayWorkout, setTodayWorkout] = useState(null);
   const [tomorrowWorkout, setTomorrowWorkout] = useState(null);
+
   const [todayNutritionPlan, setTodayNutritionPlan] = useState(null);
+  const [todayNutritionData, setTodayNutritionData] = useState(null);
+
   const [tomorrowNutritionPlan, setTomorrowNutritionPlan] = useState(null);
   const userId=user?._id;
   // console.log("USERR ID : ",userId);
@@ -71,7 +74,7 @@ export const UserDashboard = () => {
 
         // console.log(" Profile : ", profileResponse.data.user);
         // console.log("workout response", workoutsResponse.data.data);
-        // console.log("nutritionresponse", nutritionPlansResponse.data.data);
+        console.log("nutritionresponse", nutritionPlansResponse.data.data);
         // console.log("appointment response", appointmentResponse.data.data);
         // console.log("progress response", progresstResponse.data.data);
         // console.log("notification response", notificationsRespoanse.data.data);
@@ -80,7 +83,7 @@ export const UserDashboard = () => {
         dispatch(setUser(profileResponse.data));
         dispatch(setWorkouts(workoutsResponse.data.data));
         dispatch(setNutritions(nutritionPlansResponse.data.data));
-        dispatch(setAppointment(appointmentResponse.data.data));
+        dispatch(setAppointmentR(appointmentResponse.data.data));
         if (workoutStatusResp.data.completedWorkouts.length > 0) {
           dispatch(updateWorkoutStatus({
             workoutId: workoutStatusResp.data.completedWorkouts[0],  // Get the workout ID
@@ -191,8 +194,9 @@ export const UserDashboard = () => {
         nutrition.schedule.some((schedule) => schedule.day === tomorrowDay)
       );
 
-      console.log("TODAYS Nutrition : ", todayNutritionData);
-      console.log("TOMORROW Nutrition : ", tomorrowNutritionData);
+      // console.log("TODAYS Nutrition : ", todayNutritionData);
+      // console.log("TOMORROW Nutrition : ", tomorrowNutritionData);
+
 
       // Process today's Nutrition data
       if (todayNutritionData) {
@@ -207,6 +211,8 @@ export const UserDashboard = () => {
           waterIntake: todayNutritionData.waterIntake,
           completed: false, //  set the completion status based on user progress 
         });
+
+        setTodayNutritionData(todayNutritionData);
       }
 
       // Process tomorrow's nutrition data
@@ -253,17 +259,17 @@ export const UserDashboard = () => {
           <WorkoutCard todayWorkout={todayWorkout} />
 
           {/* Today's Nutrition */}
- <NutritionCard todayNutritionPlan={todayNutritionPlan}/>
+ <NutritionCard todayNutritionPlan={todayNutritionPlan} todayNutritionData={todayNutritionData} />
 
           {/* Upcoming Appointments */}
           <div className="card bg-blue-600 text-white shadow-xl">
             <div className="card-body">
               <h2 className="card-title">Upcoming Appointments</h2>
-              {appointments && appointments.length > 0 ? (
+              {/* {appointments && appointments.length > 0 ? (
                 <>
-                  <p>📅 {appointments[0].title}</p>
+                  <p>📅 {appointments?.[0]?.title}</p>
                   <p className="text-sm">
-                    {appointments[0].date} with {appointments[0].trainer}
+                    {appointments?.[0]?.date} with {appointments?.[0]?.trainer}
                   </p>
                   <button
                     onClick={() => (window.location.href = "/appointments")}
@@ -274,7 +280,7 @@ export const UserDashboard = () => {
                 </>
               ) : (
                 <p>No upcoming appointments</p>
-              )}
+              )} */}
             </div>
           </div>
         </div>

@@ -13,11 +13,82 @@ const notificationService = require("../Utilities/notificationServices");
 const AppointmentDeletionLog = require("../Models/AppointmentDeletionLog");
 
 
+
+// User get trainer avilablity 
+const getTrainerAvilability=async (req,res,next)=>{
+try {
+
+  const { trainerId } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(trainerId)) {
+    return res.status(400).json({ error: "Invalid trainer ID" });
+  }
+  const trainer=await Trainer.findById(trainerId).lean();
+
+  if (!trainer) {
+    return res.status(404).json({ message: "Trainer not found" });
+  }
+
+  // Get upcoming appointments to cross-check
+  const bookedAppointments=await Appointment.find({
+    trainer:trainerId,
+    status:{$ne:"Cancelled"},
+    date:{$gte:new Date()}
+  })
+
+     // Map booked appointments to a date and timeslot string for easier matching
+     const bookedSlots = bookedAppointments.map((apt) => ({
+      date: apt.date.toISOString().split("T")[0], // Format date to "YYYY-MM-DD"
+      startTime: apt.startTime,
+      endTime: apt.endTime,
+    }));
+
+
+  const availabilityData = {
+    weeklySchedule: trainer.availability.map((day) => {
+      const updatedSlots = day.slots.map((slot) => {
+        const slotDate = new Date();
+        slotDate.setHours(parseInt(slot.startTime.split(":")[0]) + (slot.startTime.includes("PM") ? 12 : 0));
+        slotDate.setMinutes(0); 
+        const bookedSlot = bookedSlots.find(
+          (booked) =>
+            booked.date === slotDate.toISOString().split("T")[0] &&
+            booked.startTime === slot.startTime &&
+            booked.endTime === slot.endTime
+        );
+
+        // Mark the slot as booked if it has a matching booked appointment
+        return { ...slot, isBooked: !!bookedSlot };
+      });
+
+      return { ...day, slots: updatedSlots };
+    }),
+    bookedSlots,
+  };
+
+
+  // console.log("trainer Avilability : ",availabilityData);
+  
+  return res.status(200).json({
+    success: true,
+    data: availabilityData
+  });
+  
+} catch (error) {
+  next(error);
+}
+}
+
 // user Book appointment
 const bookAppointment = async (req, res, next) => {
   try {
     const { trainerId, date, startTime, endTime, type, notes } = req.body;
     const userId = req.user._id;
+
+    if (!req.body || Object.keys(req.body).length === 0) { 
+      return res.status(400).json({ success: false, message: "Empty data" });
+    }
+    console.log("Req.body : " ,req.body);
+    
 
     const user = await User.findById(userId);
     if (!user) {
@@ -46,13 +117,14 @@ const bookAppointment = async (req, res, next) => {
     }
 
     const appointment = new Appointment({
-      trainerId,
-      userId,
+      trainer:trainerId,
+      user:userId,
       date,
       startTime,
       endTime,
       type,
       notes: notes || "",
+      bookingSource: "User",
     });
 
     const newAppointment = await appointment.save();
@@ -88,8 +160,11 @@ const getUserAppointments = async (req, res, next) => {
   try {
     const userId = req.user._id;
 
+    // console.log("User ID from request:", userId);
 
-    const appointments = await Appointment.find({ userId })
+
+
+    const appointments = await Appointment.find({user:userId })
       .populate("trainer", "name email phone specialization image")
       .sort({ date: 1, startTime: 1 })
       .exec();
@@ -195,6 +270,7 @@ const cancelUserAppointment = async (req, res, next) => {
   try {
     const appointmentId = req.params.id;
     const userId = req.user._id;
+    const { cancellationReason } = req.body;
 
     const appointment = await Appointment.findOne({
       _id: appointmentId,
@@ -224,6 +300,8 @@ const cancelUserAppointment = async (req, res, next) => {
         .json({ success: false, message: "Appointment is already cancelled" });
     }
 
+    const trainerId = appointment.trainer;
+
     await updateTrainerAvailability(
       appointment.trainerId,
       appointment.date,
@@ -232,9 +310,10 @@ const cancelUserAppointment = async (req, res, next) => {
       false
     );
 
+
     const cancelledAppointment = await Appointment.findByIdAndUpdate(
       appointmentId,
-      { status: "Cancelled" },
+     { status: "Cancelled", cancellationReason: cancellationReason || "No reason provided" },
       { new: true }
     );
 
@@ -250,15 +329,24 @@ const cancelUserAppointment = async (req, res, next) => {
   }
 };
 
+
+
 // trainer
 const getTrainerAppointments = async (req, res, next) => {
+  
   try {
 
-    // const trainerId = req.params.trainerId;
     const trainerId = req.user._id;
 
-    const appointments = await Appointment.find({ trainer: trainerId })
-    .populate('user', 'name email');
+
+    
+    if (!mongoose.Types.ObjectId.isValid(trainerId)) {
+      return res.status(400).json({ error: "Invalid trainer ID format" });
+    }
+
+     // Convert trainerId to ObjectId
+     const appointments = await Appointment.find({ trainer: new mongoose.Types.ObjectId(trainerId) })
+     .populate('user', 'name email finessGoal');
 
 
     res.status(200).json({
@@ -398,6 +486,8 @@ const updateAppointmentByTrainer = async (req, res, next) => {
 const getAppointmentById=async(req,res,next)=>{
   try {
 
+    console.log("getAppointmentById controller :");
+    
     const appointmentId = req.params.id;
     const userId = req.user._id;
     const userRole = req.user.role;
@@ -688,6 +778,7 @@ const forceDeleteAppointment = async (req, res, next) => {
 
 
 module.exports = {
+  getTrainerAvilability,
   bookAppointment,
   getUserAppointments,
   updateAppointmentByUser,

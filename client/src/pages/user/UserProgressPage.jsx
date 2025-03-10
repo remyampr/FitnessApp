@@ -3,8 +3,12 @@ import { useSelector, useDispatch } from "react-redux";
 
 import { setProgress } from "../../redux/features/userSlice";
 import { AlertError } from "../../components/shared/AlertError";
-import { getProgressHistory, getProgressSummary } from "../../services/userServices";
+import {
+  getProgressHistory,
+  getProgressSummary,
+} from "../../services/userServices";
 import { LoadingSpinner } from "../../components/shared/LoadingSpinner";
+import { UserSidebar } from "../../components/user/UserSidebar";
 
 export const UserProgressPage = () => {
   const dispatch = useDispatch();
@@ -24,47 +28,48 @@ export const UserProgressPage = () => {
 
   // Fetch progress data when component mounts
   useEffect(() => {
-    const fetchProgressData=async()=>{
+    const fetchProgressData = async () => {
       if (userId) {
         setLoading(true);
         try {
-  
-          const summaryResponse=await getProgressSummary();
-          const historyResponse=await getProgressHistory();
+          const summaryResponse = await getProgressSummary();
+          const historyResponse = await getProgressHistory();
 
-          console.log("Summary response:", summaryResponse);
-          console.log("History response:", historyResponse);
+          // console.log("Summary response:", summaryResponse);
+          // console.log("History response:", historyResponse);
 
           const progressData = {
             summary: summaryResponse.data,
             history: historyResponse.data,
             currentProgress: progress?.currentProgress || null,
             workoutStatus: progress?.workoutStatus || {},
-            activeDays : progress?.summary?.data?.totalWorkoutsCompleted || 0
+            activeDays: progress?.summary?.data?.totalWorkoutsCompleted || 0,
           };
 
           dispatch(setProgress(progressData));
-  
-          
         } catch (error) {
           console.error("Error fetching progress data:", err);
           setError("Failed to load progress data. Please try again.");
-        }finally{
+        } finally {
           setLoading(false);
         }
-  
       }
-
-    }
+    };
     fetchProgressData();
   }, [userId, dispatch]);
 
   useEffect(() => {
-      
-    console.log("inside ProgressPage (in redux form progress )History Data:", progress?.history?.data);
-    console.log("inside ProgressPage (in redux form progress )summary Data:", progress?.summary?.data);
-    console.log("inside ProgressPage (in redux form progress )progress:", progress);
+    // console.log("inside ProgressPage (in redux form progress )History Data:", progress?.history?.data);
+    // console.log("inside ProgressPage (in redux form progress )summary Data:", progress?.summary?.data);
+    console.log(
+      "inside ProgressPage (in redux form progress )progress:",
+      progress
+    );
 
+    console.log(
+      "inside ProgressPage (in redux form progress )nutritionDetails:",
+      progress.history.data.map((item) => item.nutritionDetails)
+    );
   }, [progress]);
 
   if (loading) {
@@ -76,7 +81,11 @@ export const UserProgressPage = () => {
   }
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto  p-4 flex">
+      <UserSidebar className="w-1/5 mr-10 "/>
+
+
+ <div className="w-4/5">
       <h1 className="text-2xl font-bold mb-6">Your Progress</h1>
 
       {/* Navigation Tabs */}
@@ -122,83 +131,79 @@ export const UserProgressPage = () => {
             <div className="bg-base-200 p-4 rounded-lg shadow">
               <h3 className="font-bold mb-2">Nutrition Adherence</h3>
               <p className="text-3xl font-bold">
-                {progress?.summary?.nutritionAdherence || "0%"}
+                {progress?.summary?.data?.nutritionAdherence || "0"} %
               </p>
-              <p className="text-sm opacity-70">Last 7 days</p>
+              {/* <p className="text-sm opacity-70">Last 7 days</p> */}
             </div>
 
             <div className="bg-base-200 p-4 rounded-lg shadow">
               <h3 className="font-bold mb-2">Active Days</h3>
-            
+
               <p className="text-3xl font-bold">{progress?.activeDays || 0}</p>
               <p className="text-sm opacity-70">This month</p>
             </div>
           </div>
 
           <div className="bg-base-200 p-4 rounded-lg shadow mb-6">
-  <h3 className="font-bold mb-2">Recent Activity</h3>
+            <h3 className="font-bold mb-2">Recent Activity</h3>
 
-  {(() => {
-    // Collect all nutrition and workout activities
-    const combinedActivities = (progress?.history?.data || []).reduce(
-      (acc, item) => {
-        // Extract nutritionFollowed and workoutCompleted from each progress record
-        if (Array.isArray(item?.nutritionFollowed)) {
-          item.nutritionFollowed.forEach((activity) => {
-            acc.push({
-              activityType: "Nutrition",
-              name: activity.name,
-              date: item.date, // Use the date from the parent data
-            });
-          });
-        }
+            {(() => {
+              // Collect all nutrition and workout activities
+              const combinedActivities = (progress?.history?.data || []).reduce(
+                (acc, item) => {
+                  // Extract nutritionFollowed and workoutCompleted from each progress record
+                  if (Array.isArray(item?.nutritionFollowed)) {
+                    item.nutritionFollowed.forEach((activity) => {
+                      acc.push({
+                        activityType: "Nutrition",
+                        name: activity.name,
+                        date: item.date, // Use the date from the parent data
+                      });
+                    });
+                  }
 
-        if (Array.isArray(item?.workoutCompleted)) {
-          item.workoutCompleted.forEach((activity) => {
-            acc.push({
-              activityType: "Workout",
-              name: activity.name,
-              date: item.date, // Use the date from the parent data
-            });
-          });
-        }
+                  if (Array.isArray(item?.workoutCompleted)) {
+                    item.workoutCompleted.forEach((activity) => {
+                      acc.push({
+                        activityType: "Workout",
+                        name: activity.name,
+                        date: item.date, // Use the date from the parent data
+                      });
+                    });
+                  }
 
-        return acc;
-      },
-      []
-    );
+                  return acc;
+                },
+                []
+              );
 
-    // Sort all activities by date, most recent first
-    const sortedActivities = combinedActivities.sort(
-      (a, b) => new Date(b.date) - new Date(a.date)
-    );
+              // Sort all activities by date, most recent first
+              const sortedActivities = combinedActivities.sort(
+                (a, b) => new Date(b.date) - new Date(a.date)
+              );
 
-    // Show the most recent 3 activities
-    return sortedActivities.length > 0 ? (
-      sortedActivities.slice(0, 3).map((item, index) => (
-        <div
-          key={index}
-          className="mb-3 border-b border-base-300 pb-3 last:border-b-0"
-        >
-          <p className="font-bold">
-            {item.activityType}: {item.name}
-          </p>
-          <p className="text-sm opacity-70">
-            {new Date(item.date).toLocaleDateString()}
-          </p>
-        </div>
-      ))
-    ) : (
-      <p>No recent activity to display</p>
-    );
-  })()}
-</div>
+              // Show the most recent 3 activities
+              return sortedActivities.length > 0 ? (
+                sortedActivities.slice(0, 3).map((item, index) => (
+                  <div
+                    key={index}
+                    className="mb-3 border-b border-base-300 pb-3 last:border-b-0"
+                  >
+                    <p className="font-bold">
+                      {item.activityType}: {item.name}
+                    </p>
+                    <p className="text-sm opacity-70">
+                      {new Date(item.date).toLocaleDateString()}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <p>No recent activity to display</p>
+              );
+            })()}
+          </div>
 
-
-
-
-
-
+          {/* 
           <div className="bg-base-200 p-4 rounded-lg shadow">
             <h3 className="font-bold mb-2">Next Goals</h3>
             <ul className="list-disc pl-5">
@@ -206,178 +211,65 @@ export const UserProgressPage = () => {
               <li className="mb-2">Follow nutrition plan for 5 days</li>
               <li className="mb-2">Log measurements on Sunday</li>
             </ul>
-          </div>
+          </div> */}
         </div>
       )}
 
       {/* Workouts Tab */}
       {activeTab === "workouts" && (
-       <div>
-       <h2 className="text-xl font-bold mb-4">Workout History</h2>
-     
-       <div className="overflow-x-auto">
-         <table className="table table-zebra w-full">
-           <thead>
-             <tr>
-               <th>Date</th>
-               <th>Workout</th>
-               <th>Duration</th>
-               <th>Completed</th>
-             </tr>
-           </thead>
-           <tbody>
-             {progress?.history?.data?.length > 0 ? (
-               progress.history.data.map((historyItem, index) => {
-                 // Iterate over each workoutDetails array inside the data
-                 return historyItem.workoutDetails.map((workout, workoutIndex) => (
-                   <tr key={`${index}-${workoutIndex}`}>
-                     <td>
-                       {new Date(workout.completedAt).toLocaleDateString()}
-                     </td>
-                     <td>
-                       {/* Display all exercises */}
-                       {workout.exercises &&
-                         workout.exercises.length > 0 &&
-                         workout.exercises.map((exercise, exerciseIndex) => (
-                           <div key={exerciseIndex}>{exercise.name}</div>
-                         ))}
-                     </td>
-                     <td>{workout.duration}</td>
-                     <td>
-                       {workout.completed ? (
-                         <span className="badge badge-success">Completed</span>
-                       ) : (
-                         <span className="badge badge-warning">Partial</span>
-                       )}
-                     </td>
-                   </tr>
-                 ));
-               })
-             ) : (
-               <tr>
-                 <td colSpan="4" className="text-center">
-                   No workout history available
-                 </td>
-               </tr>
-             )}
-           </tbody>
-         </table>
-       </div>
-     
-       {/* <h2 className="text-xl font-bold mt-6 mb-4">Performance Trends</h2> */}
-       <div className="bg-base-200 p-4 rounded-lg shadow">
-         {/* Add chart components here */}
-         {/* Example: Weekly workout completion, exercise performance over time, etc. */}
-       </div>
-     </div>
-     
-      )}
-
-      {/* Nutrition Tab */}
-      {activeTab === "nutrition" && (
         <div>
-          <h2 className="text-xl font-bold mb-4">Nutrition Tracking</h2>
+          <h2 className="text-xl font-bold mb-4">Workout History</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div className="bg-base-200 p-4 rounded-lg shadow">
-              <h3 className="font-bold mb-2">Daily Calories</h3>
-              <div className="flex justify-between items-center mb-2">
-                <span>
-                  Target:{" "}
-                  {history.data.nutritionFollowed?.[0]?.dailyCalories || 2000}{" "}
-                  cal
-                </span>
-                <span>
-                  Average: {progress?.summary?.averageCalories || 0} cal
-                </span>
-              </div>
-              <progress
-                className="progress progress-accent w-full"
-                value={progress?.summary?.calorieAdherence || 0}
-                max="100"
-              ></progress>
-              <p className="text-right text-sm">
-                {progress?.summary?.calorieAdherence || 0}% adherence
-              </p>
-            </div>
-
-            <div className="bg-base-200 p-4 rounded-lg shadow">
-              <h3 className="font-bold mb-2">Macronutrients</h3>
-              <div className="grid grid-cols-3 gap-2">
-                <div>
-                  <p className="text-sm">Protein</p>
-                  <p className="font-bold">
-                    {progress?.summary?.averageProtein || 0}g
-                  </p>
-                  <progress
-                    className="progress progress-success w-full"
-                    value={progress?.summary?.proteinAdherence || 0}
-                    max="100"
-                  ></progress>
-                </div>
-                <div>
-                  <p className="text-sm">Carbs</p>
-                  <p className="font-bold">
-                    {progress?.summary?.averageCarbs || 0}g
-                  </p>
-                  <progress
-                    className="progress progress-warning w-full"
-                    value={progress?.summary?.carbsAdherence || 0}
-                    max="100"
-                  ></progress>
-                </div>
-                <div>
-                  <p className="text-sm">Fats</p>
-                  <p className="font-bold">
-                    {progress?.summary?.averageFat || 0}g
-                  </p>
-                  <progress
-                    className="progress progress-error w-full"
-                    value={progress?.summary?.fatAdherence || 0}
-                    max="100"
-                  ></progress>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <h3 className="font-bold mb-2">Meal Plan Adherence</h3>
-          <div className="overflow-x-auto mb-6">
+          <div className="overflow-x-auto">
             <table className="table table-zebra w-full">
               <thead>
                 <tr>
                   <th>Date</th>
-                  <th>Plan Followed</th>
-                  <th>Calories</th>
-                  <th>Water Intake</th>
+                  <th>Workout</th>
+                  <th>Duration</th>
+                  <th>Completed</th>
                 </tr>
               </thead>
               <tbody>
-                {(
-                  progress?.history?.filter(
-                    (item) => item.activityType === "nutrition"
-                  ) || []
-                ).map((entry, index) => (
-                  <tr key={index}>
-                    <td>{new Date(entry.date).toLocaleDateString()}</td>
-                    <td>
-                      {entry.planFollowed ? (
-                        <span className="badge badge-success">Yes</span>
-                      ) : (
-                        <span className="badge badge-error">No</span>
-                      )}
-                    </td>
-                    <td>{entry.calories} cal</td>
-                    <td>{entry.waterIntake || 0} oz</td>
-                  </tr>
-                ))}
-                {(!progress?.history ||
-                  progress.history.filter(
-                    (item) => item.activityType === "nutrition"
-                  ).length === 0) && (
+                {progress?.history?.data?.length > 0 ? (
+                  progress.history.data.map((historyItem, index) => {
+                    // Iterate over each workoutDetails array inside the data
+                    return historyItem.workoutDetails.map(
+                      (workout, workoutIndex) => (
+                        <tr key={`${index}-${workoutIndex}`}>
+                          <td>
+                            {new Date(workout.completedAt).toLocaleDateString()}
+                          </td>
+                          <td>
+                            {/* Display all exercises */}
+                            {workout.exercises &&
+                              workout.exercises.length > 0 &&
+                              workout.exercises.map(
+                                (exercise, exerciseIndex) => (
+                                  <div key={exerciseIndex}>{exercise.name}</div>
+                                )
+                              )}
+                          </td>
+                          <td>{workout.duration}</td>
+                          <td>
+                            {workout.completed ? (
+                              <span className="badge badge-success">
+                                Completed
+                              </span>
+                            ) : (
+                              <span className="badge badge-warning">
+                                Partial
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      )
+                    );
+                  })
+                ) : (
                   <tr>
                     <td colSpan="4" className="text-center">
-                      No nutrition data available
+                      No workout history available
                     </td>
                   </tr>
                 )}
@@ -385,32 +277,62 @@ export const UserProgressPage = () => {
             </table>
           </div>
 
+          {/* <h2 className="text-xl font-bold mt-6 mb-4">Performance Trends</h2> */}
           <div className="bg-base-200 p-4 rounded-lg shadow">
-            <h3 className="font-bold mb-2">Current Nutrition Plan</h3>
-            {nutritionPlans && nutritionPlans.length > 0 ? (
-              <div>
-                <p className="mb-2">{nutritionPlans[0].name}</p>
-                <p className="mb-2">
-                  Daily target: {nutritionPlans[0].dailyCalories} calories
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                  <div>
-                    <p className="text-sm">
-                      Protein: {nutritionPlans[0].protein}g
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm">Carbs: {nutritionPlans[0].carbs}g</p>
-                  </div>
-                  <div>
-                    <p className="text-sm">Fats: {nutritionPlans[0].fats}g</p>
-                  </div>
+            {/* Add chart components here */}
+            {/* Example: Weekly workout completion, exercise performance over time, etc. */}
+          </div>
+        </div>
+      )}
+
+      {/* Nutrition Tab */}
+      {activeTab === "nutrition" && (
+        <div>
+          <h2 className="text-xl font-bold mb-4">Nutrition Tracking</h2>
+
+          {progress.history.data.map((entry, index) =>
+            entry.nutritionDetails?.map((detail, detailIndex) => (
+              <div
+                key={`${index}-${detailIndex}`}
+                className="bg-base-200 p-4 rounded-lg shadow mb-4"
+              >
+                <h3 className="font-bold mb-2">
+                  Nutrition Entry {index + 1} -{" "}
+                  {new Date(detail.completedAt).toLocaleDateString()}
+                </h3>
+                <p>Water Intake: {detail.details?.waterIntake || 0} oz</p>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {detail.details?.meals?.map((meal, mealIndex) => (
+                    <div
+                      key={`${index}-${detailIndex}-${mealIndex}`}
+                      className="p-2 border rounded-lg"
+                    >
+                      <h4 className="font-bold text-lg">{meal.type}</h4>
+
+                      {meal.foods.length > 0 ? (
+                        <ul className="list-disc pl-4">
+                          {meal.foods.map((food, foodIndex) => (
+                            <li
+                              key={`${index}-${detailIndex}-${mealIndex}-${foodIndex}`}
+                              className="text-sm"
+                            >
+                              {food.name} - {food.calories} cal, {food.protein}g
+                              Protein, {food.carbs}g Carbs, {food.fats}g Fats
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-gray-500">
+                          No nutrition data available
+                        </p>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
-            ) : (
-              <p>No active nutrition plan found</p>
-            )}
-          </div>
+            ))
+          )}
         </div>
       )}
 
@@ -545,6 +467,7 @@ export const UserProgressPage = () => {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 };

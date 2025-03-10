@@ -3,7 +3,8 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   trainer: {},
   profile: null,
-  clients: null,
+  clients:[],
+  selectedClient: null,
   revenue: 0,
   revenueHistory: [],
   appointments:null,
@@ -45,6 +46,13 @@ const trainerSlice = createSlice({
     },
     setClients: (state, action) => {
       state.clients = action.payload;
+    },
+    setSelectedClient:(state, action) => {
+      state.selectedClient = action.payload;
+      // state.selectedClient = action.payload.client;
+    },
+    resetSelectedClient: (state) => {
+      state.selectedClient = null;
     },
     setRevenue: (state, action) => {
       state.revenue = action.payload;
@@ -95,6 +103,8 @@ export const {
   setTrainer,
   setTrainerProfile,
   setClients,
+  setSelectedClient,
+  resetSelectedClient,
   setRevenue,
   setRevenueHistory,
   setAppointments,

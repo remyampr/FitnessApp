@@ -211,7 +211,42 @@ const checkAvailabilityMiddleware = async (req, res, next) => {
   }
 };
 
+
+const generateTimeSlots = (start, end) => {
+  let slots = [];
+  let currentHour = start;
+
+  while (currentHour < end) {
+    let nextHour = currentHour + 1;
+
+    const formatTime = (hour) => {
+      let period = hour >= 12 ? "PM" : "AM";
+      let formattedHour = hour % 12 || 12; // Convert 0 to 12 for AM and 12 to 12 for PM
+      return `${String(formattedHour).padStart(2, "0")}:00 ${period}`;
+    };
+
+    slots.push({
+      startTime: formatTime(currentHour),
+      endTime: formatTime(nextHour),     
+      isBooked: false
+    });
+    currentHour++;
+  }
+  return slots;
+};
+
+
+
+
+
+
+
+
+
+
+
 module.exports = {
+  generateTimeSlots,
   isTimeSlotAvailable,
   updateTrainerAvailability,
   checkMultipleTimeSlots,

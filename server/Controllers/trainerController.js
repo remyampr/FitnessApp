@@ -9,11 +9,12 @@ const uploadToCloudinary = require("../Utilities/imageUpload");
 const { generateOTP } = require("../Utilities/generateOTP");
 const sendEmail = require("../Config/emailService");
 const { logActivity } = require("../Utilities/activityServices");
+const { generateTimeSlots } = require("../Utilities/trainerAppointment");
 
 const registerTrainer = async (req, res, next) => {
   try {
-    console.log("Request Body:", req.body);
-    console.log("Uploaded File:", req.file);
+    // console.log("Request Body:", req.body);
+    // console.log("Uploaded File:", req.file);
 
     const {
       name,
@@ -27,7 +28,6 @@ const registerTrainer = async (req, res, next) => {
     } = req.body;
 
     let image = req.file ? req.file.path : "Uploads/user.jpg";
-
 
     if (
       !name ||
@@ -43,13 +43,11 @@ const registerTrainer = async (req, res, next) => {
       return res.status(400).json({ error: "All fields are required !" });
     }
 
-    if (image !== "uploads/user.jpg") {
+    if (image !== "Uploads/user.jpg") {
       const cloudinaryRes = await uploadToCloudinary(image);
-      console.log("image in cloudinary : ", cloudinaryRes);
+      // console.log("image in cloudinary : ", cloudinaryRes);
       image = cloudinaryRes;
     }
-
-   
 
     const trainerExist = await Trainer.findOne({ email });
     if (trainerExist) {
@@ -61,6 +59,13 @@ const registerTrainer = async (req, res, next) => {
 
     const hashedPassword = await hashPassword(password);
 
+    const defaultDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+    const defaultAvailability = defaultDays.map(day => ({
+      day,
+      slots: generateTimeSlots(9, 18) // 9 AM to 6 PM
+    }));
+
     const newTrainer = new Trainer({
       name,
       email,
@@ -71,6 +76,7 @@ const registerTrainer = async (req, res, next) => {
       specialization,
       experience,
       bio,
+      availability:defaultAvailability,
       isApproved: false,
       otp,
       otpExpires,
@@ -78,7 +84,16 @@ const registerTrainer = async (req, res, next) => {
 
     await newTrainer.save();
 
-    const logedActivity=await logActivity("NEW_TRAINER",newTrainer._id,'trainer',{name:newTrainer.name,email:newTrainer.email,approved:newTrainer.isApproved})
+    const logedActivity = await logActivity(
+      "NEW_TRAINER",
+      newTrainer._id,
+      "trainer",
+      {
+        name: newTrainer.name,
+        email: newTrainer.email,
+        approved: newTrainer.isApproved,
+      }
+    );
 
     const emailContent = `
         <h2>Email Verification</h2>
@@ -94,127 +109,6 @@ const registerTrainer = async (req, res, next) => {
     next(err);
   }
 };
-
-// const verifyEmail = async (req, res) => {
-//   const { email, otp } = req.body;
-
-//   if (!email || !otp) {
-//     return res.status(400).json({ error: "Email and OTP are required" });
-//   }
-
-//   const trainer = await Trainer.findOne({ email });
-
-//   if (!trainer) {
-//     return res.status(404).json({ error: "trainer not found" });
-//   }
-
-//   if (trainer.otp !== otp || trainer.otpExpires < Date.now()) {
-//     return res.status(400).json({ error: "Invalid or expired OTP" });
-//   }
-
-//   trainer.isVerified = true;
-//   // trainer.otp = undefined;
-//   // trainer.otpExpires = undefined;
-
-//   trainer.set({ otp: undefined, otpExpires: undefined });
-//   await trainer.save();
-
-//   const token=createToken(trainer._id,trainer.role);
-//   res.cookie("token",token);
-//   console.log("trainerlogin");
-
-//   return res.json({ msg: "Email verified successfully!" });
-// };
-
-// const forgotPassword =async(req,res,next)=>{
-//   try {
-//     const {email}=req.body;
-//     if (!email) {
-//       return res.status(400).json({ error: "Email is required" });
-//     }
-
-//     const trainer=await Trainer.findOne({email})
-//     if (!trainer) {
-//       return res.status(404).json({ error: "trainer not found" });
-//     }
-
-//     const otp=generateOTP();
-//     const otpExpires = Date.now() + 10 * 60 * 1000;
-
-//     trainer.otp=otp;
-//     trainer.otpExpires=otpExpires;
-//     await trainer.save();
-
-//     console.log(`Reset OTP for ${email}: ${otp}`);
-//     const emailContent = `
-//     <h2>Email Verification</h2>
-//     <p>Use this OTP reset your Password <strong>${otp}</strong></p>
-//     <p>This OTP will expire in 10 minutes.</p>
-//   `;
-//   await sendEmail(email, "Verify Your Email", emailContent);
-
-//     res.status(201).json({ msg: "OTP sent to your email", });
-
-//   } catch (error) {
-//     next(error)
-//   }
-// }
-
-// const resetPassword=async(req,res,next)=>{
-//   try {
-
-//       const {email,otp,newPassword}=req.body;
-//       if (!email || !otp || !newPassword) {
-//         return res.status(400).json({ error: "Email, OTP, and new password are required" });
-//       }
-
-//       const trainer = await Trainer.findOne({ email });
-//       if (!trainer) {
-//         return res.status(404).json({ error: "trainer not found" });
-//       }
-
-//       if(trainer.otp !== otp || trainer.otpExpires < Date.now()){
-//         return res.status(400).json({ error: "Invalid or expired OTP" });
-//       }
-
-//       trainer.password=await hashPassword(newPassword);
-//       trainer.otp = undefined;
-//       trainer.otpExpires = undefined;
-//       await trainer.save();
-
-//       res.json({ msg: "Password reset successful!" });
-
-//   } catch (error) {
-//     next(error)
-//   }
-// }
-
-// const loginTrainer=async (req,res,next)=>{
-//     try{
-
-//         const {email,password}=req.body;
-//         if(!email || !password){
-//             return res.status(400).json({ error: "All fields are required !" });
-//         }
-//         const trainer=await Trainer.findOne({email});
-//         if(!trainer){
-//             return res.status(400).json({ error: "trainer not Found !" });
-//         }
-
-//         const passwordMatch=await comparePassword(password,trainer.password);
-//         if(!passwordMatch){
-//             return res.status(401).json({ error: "Password not match !" });
-//         }
-
-//         const token=createToken(trainer._id,trainer.role);
-//         res.cookie("token",token);
-//         return res.json({ msg: "trainer Login",trainer:{name:trainer.name,email:trainer.email,isCertified: trainer.isCertified,Role:trainer.role},token:token});
-
-//     }catch(err){
-//         next(err);
-//     }
-
-// }
 
 const getTrainerRevenue = async (req, res, next) => {
   try {
@@ -280,7 +174,9 @@ const updateTrainerProfile = async (req, res, next) => {
 
 const getTrainerProfile = async (req, res, next) => {
   try {
-    const trainer = await Trainer.findById(req.user.id).select("-password").populate("clients", "name");
+    const trainer = await Trainer.findById(req.user.id)
+      .select("-password")
+      .populate("clients", "name");
 
     if (!trainer) {
       return res
@@ -290,7 +186,7 @@ const getTrainerProfile = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      trainer
+      trainer,
     });
   } catch (error) {
     next(error);
@@ -301,7 +197,7 @@ const getTrainerProfile = async (req, res, next) => {
 const getTrainerClients = async (req, res, next) => {
   try {
     const trainer = await Trainer.findById(req.user.id).populate("clients");
-    console.log("Trainer", trainer);
+    // console.log("Trainer", trainer);
 
     if (!trainer) {
       return res
@@ -312,7 +208,7 @@ const getTrainerClients = async (req, res, next) => {
     res.status(200).json({
       success: true,
       clients: trainer.clients,
-      count:trainer.clients.length,
+      count: trainer.clients.length,
     });
   } catch (error) {
     next(error);
@@ -337,12 +233,10 @@ const getClientById = async (req, res, next) => {
     );
 
     if (!client) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message: "Client not found or not assigned to this trainer",
-        });
+      return res.status(404).json({
+        success: false,
+        message: "Client not found or not assigned to this trainer",
+      });
     }
 
     // Return the specific client data
@@ -355,14 +249,28 @@ const getClientById = async (req, res, next) => {
   }
 };
 
-// const logout=async(req,res,next)=>{
-//     try {
-//       res.clearCookie("token")
-//       res.status(200).json({msg:"logout"})
-//     } catch (error) {
-//       next(error)
-//     }
-//   }
+const getMyReviews = async (req, res, next) => {
+  try {
+    const trainerId = req.user.id;
+    const trainer = await Trainer.findById(trainerId).populate(
+      "reviews.userId",
+      "name profileImage"
+    );
+
+    if (!trainer) {
+      return res.status(404).json({ message: "Trainer not found" });
+    }
+
+    res.status(200).json({ 
+      reviews: trainer.reviews,
+      averageRating: trainer.averageRating,
+      totalReviews: trainer.reviews.length});
+
+
+  } catch (error) {
+    next(error);
+  }
+};
 
 module.exports = {
   registerTrainer,
@@ -371,4 +279,5 @@ module.exports = {
   getTrainerProfile,
   getTrainerClients,
   getClientById,
+  getMyReviews,
 };

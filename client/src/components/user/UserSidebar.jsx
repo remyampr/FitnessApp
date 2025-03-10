@@ -1,27 +1,36 @@
 import React from 'react'
+import { useSelector } from 'react-redux';
 import { Link, useLocation } from 'react-router-dom';
 
 export const UserSidebar = () => {
 
   const location=useLocation();
+  const user = useSelector((state) => state.user.user);
 
   const navItems = [
     { path: '/user/dashboard', label: 'Dashboard', icon: 'fas fa-tachometer-alt' },
-    { path: '/user/trainer', label: 'Clients', icon: 'fas fa-users' },
+    { path: '/user/mytrainer', label: 'My Trainer', icon: 'fas fa-running' },
+    // { path: '/user/trainer', label: 'My Trainer', icon: 'fas fa-user-tie' },
     { path: '/user/appointments', label: 'Appointments', icon: 'fas fa-calendar-alt' },
     { path: '/user/workouts', label: 'Workouts', icon: 'fas fa-dumbbell' },
     { path: '/user/nutrition', label: 'Nutrition Plans', icon: 'fas fa-utensils' },
     { path: '/user/progress', label: 'Progress', icon: 'fas fa-chart-line' } ,
  
-    { path: '/user/profile', label: 'Profile', icon: 'fas fa-user' },
+    { path: '/user/profile', label: 'My Profile', icon: 'fas fa-user' },
   ];
 
   return (
     <div className="hidden md:flex flex-col w-64 bg-base-200 text-base-content">
-    <div className="p-4 border-b border-base-300">
-      <h1 className="text-2xl font-bold"> Your Fitness Journey</h1>
-      
-    </div>
+    <div className="p-4 border-b border-base-300 flex flex-col items-center">
+        {user?.image && (
+          <img
+            src={user.image}
+            alt="User Profile"
+            className="w-30 h-26  shadow-md"
+          />
+        )}
+        <h1 className="text-2xl font-bold mt-2">Your Fitness Journey</h1>
+      </div>
     <nav className="flex-1 overflow-y-auto py-4">
       <ul className="menu menu-compact p-2 space-y-1">
         {navItems.map((item) => (

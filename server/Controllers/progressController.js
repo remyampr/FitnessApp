@@ -4,25 +4,29 @@ const Nutrition = require("../Models/Nutrition");
 const Progress = require("../Models/Progress");
 const uploadToCloudinary = require("../Utilities/imageUpload");
 const mongoose = require("mongoose");
+const Trainer = require("../Models/Trainer");
 
 // user
 
 const saveProgress = async (req, res, next) => {
   try {
-    // const {
-    //   weight,
-    //   measurements,
-    //   workoutCompleted,
-    //   nutritionFollowed,
-    //   trainerNotes,
-    // } = req.body;
-    const { userId, workoutId, completed, exercises, date, duration,nutritionFollowed,  nutritionId,
+    const {
+      userId,
+      workoutId,
+      completed,
+      exercises,
+      date,
+      duration,
+      nutritionFollowed,
+      nutritionId,
       nutritionCompleted,
       nutritionDetails,
-      waterIntake } =
-      req.body;
+      waterIntake,
+    } = req.body;
 
     console.log("req.body : ", req.body);
+
+    console.log("nutritionDetails:", nutritionDetails);
 
     const user = await User.findById(userId);
 
@@ -87,69 +91,72 @@ const saveProgress = async (req, res, next) => {
 
       if (!progress.workoutDetails) progress.workoutDetails = [];
 
-         // Add workout details if not already present
-         const workoutExists = progress.workoutDetails.some(
-          detail => detail.workoutId && detail.workoutId.toString() === workoutId
-        );
-
-        if (!workoutExists && workoutId) {
-          progress.workoutDetails.push({
-            workoutId,
-            completed,
-            duration,
-            exercises,
-            completedAt: new Date()
-          });
-        }
-
-     // Handle nutrition data if provided
-     if (nutritionId) {
-
-      const nutritionEntry = {
-        nutritionId,
-        completed: nutritionCompleted || false,
-        details: nutritionDetails || {},
-        waterIntake: waterIntake || 0,
-        completedAt: new Date()
-      };
-
-      // Check if this nutrition plan is already recorded
-      const existingNutritionIndex = progress.nutritionDetails.findIndex(
-        detail => detail.nutritionId.toString() === nutritionId
+      // Add workout details if not already present
+      const workoutExists = progress.workoutDetails.some(
+        (detail) =>
+          detail.workoutId && detail.workoutId.toString() === workoutId
       );
-      if (existingNutritionIndex >= 0) {
-        // Update existing nutrition record
-        progress.nutritionDetails[existingNutritionIndex] = nutritionEntry;
-      } else {
-        // Add new nutrition record
-        progress.nutritionDetails.push(nutritionEntry);
+
+      if (!workoutExists && workoutId) {
+        progress.workoutDetails.push({
+          workoutId,
+          completed,
+          duration,
+          exercises,
+          completedAt: new Date(),
+        });
       }
 
-     }
+      // Handle nutrition data if provided
+      if (nutritionId) {
+        const nutritionEntry = {
+          nutritionId,
+          completed: nutritionCompleted || false,
+          details: nutritionDetails || {},
+          waterIntake: waterIntake || 0,
+          completedAt: new Date(),
+        };
 
-        
-
-   
+        // Check if this nutrition plan is already recorded
+        const existingNutritionIndex = progress.nutritionDetails.findIndex(
+          (detail) => detail.nutritionId.toString() === nutritionId
+        );
+        if (existingNutritionIndex >= 0) {
+          // Update existing nutrition record
+          progress.nutritionDetails[existingNutritionIndex] = nutritionEntry;
+        } else {
+          // Add new nutrition record
+          progress.nutritionDetails.push(nutritionEntry);
+        }
+      }
 
       await progress.save();
     } else {
       const workoutCompleted = workoutId && completed ? [workoutId] : [];
 
-      const workoutDetails = workoutId ? [{
-        workoutId,
-        completed,
-        duration,
-        exercises,
-        completedAt: new Date()
-      }] : [];
+      const workoutDetails = workoutId
+        ? [
+            {
+              workoutId,
+              completed,
+              duration,
+              exercises,
+              completedAt: new Date(),
+            },
+          ]
+        : [];
 
-      const nutritionDetails = nutritionId ? [{
-        nutritionId,
-        completed: nutritionCompleted || false,
-        details: nutritionDetails || {},
-        waterIntake: waterIntake || 0,
-        completedAt: new Date()
-      }] : [];
+      const nutritionEntries = nutritionId
+        ? [
+            {
+              nutritionId,
+              completed: nutritionCompleted || false,
+              details: nutritionDetails || {},
+              waterIntake: waterIntake || 0,
+              completedAt: new Date(),
+            },
+          ]
+        : [];
 
       progress = new Progress({
         userId: userIdToUse,
@@ -158,8 +165,8 @@ const saveProgress = async (req, res, next) => {
         measurements: Object.keys(measurements).length > 0 ? measurements : {},
         workoutCompleted,
         workoutDetails,
-        nutritionDetails,
-        trainerNotes: ""
+        nutritionDetails:nutritionEntries,
+        trainerNotes: "",
       });
 
       // progress = new Progress({
@@ -178,9 +185,6 @@ const saveProgress = async (req, res, next) => {
       //     completedAt: new Date()
       //   }] : []
       // });
-
-
-
 
       await progress.save();
     }
@@ -255,30 +259,30 @@ const checkWorkoutCompletion = async (req, res, next) => {
 const getProgressHistory = async (req, res, next) => {
   try {
     const userId = req.user.id;
-    console.log("inside getProgress history userId ",userId);
-      
+    console.log("inside getProgress history userId ", userId);
 
-    const progress = await Progress.find({userId})
-  .populate({
-    path: "workoutCompleted",
-    select: "name duration difficulty image" // specify fields you want
-  })
-  .populate({
-    path: "nutritionFollowed",
-    select: "name type calories image" // specify fields you want
-  });
+    const progress = await Progress.find({ userId })
+      .populate({
+        path: "workoutCompleted",
+        select: "name duration difficulty image", // specify fields you want
+      })
+      .populate({
+        path: "nutritionFollowed",
+        select: "name type calories image", // specify fields you want
+      });
 
-console.log("inside get-progress-history controller progress  : ", progress);
+    console.log(
+      "inside get-progress-history controller progress  : ",
+      progress
+    );
 
-console.log(`Found ${progress.length} progress entries for user ${userId}`);
-
+    console.log(`Found ${progress.length} progress entries for user ${userId}`);
 
     // const total = await Progress.countDocuments(query);
 
     res.json({
       success: true,
       data: progress,
-      
     });
   } catch (error) {
     next(error);
@@ -308,6 +312,8 @@ const getProgressSummary = async (req, res, next) => {
             arms: 0,
             legs: 0,
           },
+          nutritionAdherence: 0,
+          
         },
       });
     }
@@ -327,6 +333,24 @@ const getProgressSummary = async (req, res, next) => {
       legs: (latest.measurements.legs || 0) - (first.measurements.legs || 0),
     };
 
+     // Calculate nutrition adherence
+     const nutritionData = await Progress.aggregate([
+      { $match: { userId: new mongoose.Types.ObjectId(userId) } },
+      { $unwind: { path: "$nutritionDetails", preserveNullAndEmptyArrays: true } },
+      { 
+        $group: { 
+          _id: null, 
+          totalPlanned: { $sum: { $cond: [{ $ifNull: ["$nutritionDetails", false] }, 1, 0] } },
+          totalCompleted: { $sum: { $cond: [{ $eq: ["$nutritionDetails.completed", true] }, 1, 0] } }
+        } 
+      }
+    ]);
+
+    const nutritionAdherence = nutritionData.length > 0 && nutritionData[0].totalPlanned > 0 
+    ? (nutritionData[0].totalCompleted / nutritionData[0].totalPlanned) * 100 
+    : 0;
+    
+
     res.json({
       success: true,
       data: {
@@ -338,6 +362,7 @@ const getProgressSummary = async (req, res, next) => {
         latestDate: latest.date,
         measurementsChange,
         currentMeasurements: latest.measurements,
+        nutritionAdherence: parseFloat(nutritionAdherence.toFixed(2)),
       },
     });
   } catch (error) {
@@ -485,9 +510,8 @@ const markNutritionFollowed = async (req, res, next) => {
 };
 const getUserProgress = async (req, res, next) => {
   try {
-
     console.log("user progress : ");
-    
+
     const progress = await Progress.find({ userId: req.user.id })
       .populate("workoutCompleted")
       .populate("nutritionFollowed")
@@ -532,7 +556,27 @@ const addProgressNote = async (req, res, next) => {
 
 const getAllUserProgress = async (req, res, next) => {
   try {
-    //  req.user.assignedUsers contains array of user IDs assigned to trainer
+
+    const trainer = await Trainer.findById(req.user.id);
+
+    if (!trainer) {
+      return res.status(404).json({
+        success: false,
+        message: "Trainer not found"
+      });
+    }
+
+       // No clients
+       if (!trainer.clients || trainer.clients.length === 0) {
+        return res.status(200).json({
+          success: true,
+          progress: [],
+          count: 0
+        });
+      }
+
+    
+   
     const progress = await Progress.find({
       userId: { $in: req.user.clients },
     })
@@ -541,7 +585,47 @@ const getAllUserProgress = async (req, res, next) => {
       .populate("nutritionFollowed")
       .sort("-date");
 
-    res.status(200).json({ status: "success", data: progress });
+    res.status(200).json({ status: "success", data: progress,count:progress.length });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+const getClientProgress = async (req, res, next) => {
+  try {
+    const trainer = await Trainer.findById(req.user.id);
+    
+    if (!trainer) {
+      return res.status(404).json({ 
+        success: false, 
+        message: "Trainer not found" 
+      });
+    }
+    
+    // Check if this client belongs to the trainer
+    if (!trainer.clients.includes(req.params.clientId)) {
+      return res.status(403).json({
+        success: false,
+        message: "This client is not associated with your account"
+      });
+    }
+    
+    const progress = await Progress.findOne({ userId: req.params.clientId })
+      .sort({ date: -1 }) // Get the most recent progress entry
+      .limit(1);
+    
+    if (!progress) {
+      return res.status(404).json({
+        success: false,
+        message: "No progress data found for this client"
+      });
+    }
+    
+    res.status(200).json({
+      success: true,
+      progress
+    });
   } catch (error) {
     next(error);
   }

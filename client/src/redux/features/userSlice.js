@@ -3,10 +3,11 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   user: null,
   userId: null,
-  userName:null,
+  userName: null,
   selectedTrainer: null,
+  trainerInfo: null,
   isActive: null,
-  isProfileComplete:false,
+  isProfileComplete: false,
   appointments: null,
 
   notifications: null,
@@ -15,10 +16,11 @@ const initialState = {
 
   progress: {
     currentProgress: null,
-    workoutStatus:{} , // workout statuses are stored
+    workoutStatus: {},
+    nutritionProgress: {}, // statuses are stored
     history: [],
     summary: null,
-    activeDays:null,
+    activeDays: null,
   },
 
   loading: false,
@@ -31,20 +33,21 @@ const userSlice = createSlice({
   reducers: {
     setUser: (state, action) => {
       if (action.payload) {
-        state.user = action.payload;
+        state.user = { ...state.user, ...action.payload };
         state.userId = action.payload._id;
         state.user.isAuthenticated = true;
         // state.user.userName=
-        
       } else {
         console.error("Error: User data is missing in setUser");
       }
     },
-     setProfileComplete: (state, action) => {
+    setProfileComplete: (state, action) => {
       if (state.user) {
         state.user.isProfileComplete = action.payload;
       } else {
-        console.error("Error: User is not defined when setting isProfileComplete");
+        console.error(
+          "Error: User is not defined when setting isProfileComplete"
+        );
       }
     },
     setSelectedTrainer: (state, action) => {
@@ -53,63 +56,96 @@ const userSlice = createSlice({
     setIsActive: (state, action) => {
       state.isActive = action.payload;
     },
+    updateUserProfilePic: (state, action) => {
+      if (state.user) {
+        console.log(
+          "inside Reducer updateUserProfilePic : action.payload : ",
+          action.payload
+        );
 
-    setAppointment: (state, action) => {
-      state.appointments = action.payload;
+        state.user = { ...state.user, image: action.payload };
+        console.log("image after updatereducer :", state.user.image);
+      } else {
+        console.error(
+          "Error: User is not defined when updating profile picture"
+        );
+      }
     },
+
+    setTrainerInfo: (state, action) => {
+      state.trainerInfo = action.payload;
+    },
+    updateTrainerReview: (state, action) => {
+      if (state.trainerInfo) {
+        state.trainerInfo = action.payload;
+      }
+    },
+
+
+    setNutritions: (state, action) => {
+      state.nutritionPlans = action.payload;
+    },
+
+    updateNutritionProgress: (state, action) => {
+      const { nutritionId, progress } = action.payload;
+      // Store progress by nutritionId for easy lookup
+      state.progress.nutritionProgress = {
+        ...state.progress.nutritionProgress,
+        [nutritionId]: progress,
+      };
+    },
+
     setWorkouts: (state, action) => {
       state.workouts = action.payload;
     },
-    setNutritions: (state, action) => {
-      state.nutritionPlans = action.payload;
+
+    setProgress: (state, action) => {
+      state.progress = action.payload;
+    },
+
+    setWorkoutInProgress: (state, action) => {
+      const { workoutId } = action.payload;
+      if (!state.progress) {
+        state.progress = { workoutStatus: {} };
+      }
+      if (!state.progress.workoutStatus) {
+        state.progress.workoutStatus = {};
+      }
+      state.progress.workoutStatus[workoutId] = "inProgress";
+    },
+    // resetWorkoutStatus: (state, action) => {
+    //   const { workoutId } = action.payload;
+    //   state.progress.workoutStatus[workoutId] = 'pending';
+    // },
+    updateWorkoutStatus: (state, action) => {
+      const { workoutId, status } = action.payload;
+      state.progress.workoutStatus[workoutId] = status;
+      // console.log(" update workout status in redux action.payload :",action.payload);
+
+      // console.log(" inside redux updateWorkoutststus Wrokout : status",workoutId ,":",status);
+      // console.log(" inside redux updateWorkoutststus status",state.progress.workoutStatus[workoutId]);
+      // console.log(" inside redux updateWorkoutststus workooutid",state.workouts[workoutId]);
+    },
+    // updateWorkoutStatuses: (state, action) => {
+    //       const { statuses } = action.payload;
+    //       // Update multiple workout statuses at once
+    //       Object.keys(statuses).forEach(workoutId => {
+    //         state.progress.workoutStatus[workoutId] = statuses[workoutId];
+    //       });
+
+    //     },
+
+    setAppointmentR: (state, action) => {
+      state.appointments = action.payload;
     },
     setNotifications: (state, action) => {
       state.notifications = action.payload;
     },
-    setProgress: (state, action) => {
-      state.progress = action.payload;
-    },
-    
-    setWorkoutInProgress: (state, action) => {
-        const { workoutId } = action.payload;
-              if (!state.progress) {
-          state.progress = { workoutStatus: {} };
-        }
-        if (!state.progress.workoutStatus) {
-          state.progress.workoutStatus = {};
-        }
-        state.progress.workoutStatus[workoutId] = 'inProgress';
-      },
-      // resetWorkoutStatus: (state, action) => {
-      //   const { workoutId } = action.payload;
-      //   state.progress.workoutStatus[workoutId] = 'pending';
-      // },
-      updateWorkoutStatus: (state, action) => {
-        const { workoutId, status } = action.payload;
-        state.progress.workoutStatus[workoutId] = status;
-        // console.log(" update workout status in redux action.payload :",action.payload);
-        
-        // console.log(" inside redux updateWorkoutststus Wrokout : status",workoutId ,":",status);
-        // console.log(" inside redux updateWorkoutststus status",state.progress.workoutStatus[workoutId]);
-        // console.log(" inside redux updateWorkoutststus workooutid",state.workouts[workoutId]);
-      },
-      // updateWorkoutStatuses: (state, action) => {
-      //       const { statuses } = action.payload;
-      //       // Update multiple workout statuses at once
-      //       Object.keys(statuses).forEach(workoutId => {
-      //         state.progress.workoutStatus[workoutId] = statuses[workoutId];
-      //       });
-
-                     
-      //     },
-
-
 
     clearUser: (state) => {
       state.user = initialState;
       state.isAuthenticated = false;
       state.isProfileComplete = false;
-      
     },
     setLoading: (state, action) => {
       state.loading = action.payload;
@@ -118,7 +154,7 @@ const userSlice = createSlice({
       state.error = action.payload;
     },
     logout: (state) => {
-        return initialState; 
+      return initialState;
     },
   },
 });
@@ -130,9 +166,15 @@ export const {
   setError,
   setProfileComplete,
   setIsActive,
+  updateUserProfilePic,
   setSelectedTrainer,
-  setAppointment,
+  setTrainerInfo,
+  updateTrainerReview,
+
+
+  setAppointmentR,
   setNutritions,
+  updateNutritionProgress,
   setWorkouts,
   setNotifications,
   setProgress,
