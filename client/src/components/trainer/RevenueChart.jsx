@@ -44,7 +44,7 @@ export const RevenueChart = ({ monthlyRevenue }) => {
              legend: { display: false },
              tooltip: {
                callbacks: {
-                 label: (context) => `$${context.raw}`,
+                 label: (context) => `₹${context.raw}`,
                }
              }
            },
@@ -52,7 +52,7 @@ export const RevenueChart = ({ monthlyRevenue }) => {
              y: {
                beginAtZero: true,
                ticks: {
-                 callback: (value) => `$${value}`,
+                 callback: (value) => `₹${value}`,
                }
              }
            }

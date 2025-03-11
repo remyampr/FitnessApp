@@ -129,7 +129,7 @@ const bookAppointment = async (req, res, next) => {
 
     const newAppointment = await appointment.save();
 
-    await updateTrainerAvailability(trainerId, date, startTime, endTime, true);
+    // await updateTrainerAvailability(trainerId, date, startTime, endTime, true);
 
     // Trigger notification to trainer about new appointment request
     await notificationService.notifyTrainerNewAppointmentRequest(newAppointment);
@@ -187,7 +187,7 @@ const updateAppointmentByUser = async (req, res, next) => {
   try {
     const { status, cancellationReason } = req.body;
     const appointmentId = req.params.id;
-    const userId = req.user._id;
+    const userId = req.user.id;
 
     // Users can only cancel appointments
     if (status !== "Cancelled") {
@@ -268,16 +268,30 @@ const updateAppointmentByUser = async (req, res, next) => {
 
 const cancelUserAppointment = async (req, res, next) => {
   try {
-    const appointmentId = req.params.id;
-    const userId = req.user._id;
+    // const appointmentId = req.params.id;
+    // const userId = req.user.id;
+
+    const appointmentId = new mongoose.Types.ObjectId(req.params.id); 
+    const userId = new mongoose.Types.ObjectId(req.user.id); 
     const { cancellationReason } = req.body;
+
+    console.log("User cancelling appointment : ");
+    console.log("appointment id: ",appointmentId);
+  
+    console.log("user id: ",userId);
+    console.log("typeof userid and appointment id: ",typeof(userId),typeof(appointmentId));
+    
 
     const appointment = await Appointment.findOne({
       _id: appointmentId,
-      userId,
+      user:userId,
     });
+
+    console.log("The appointment  : ",appointment);
+    
     if (!appointment) {
-      return res
+      console.log("no appointment");
+            return res
         .status(404)
         .json({
           success: false,
@@ -286,6 +300,8 @@ const cancelUserAppointment = async (req, res, next) => {
     }
 
     if (appointment.status === "Completed") {
+      console.log("Already complete");
+      
       return res
         .status(400)
         .json({
@@ -295,6 +311,7 @@ const cancelUserAppointment = async (req, res, next) => {
     }
 
     if (appointment.status === "Cancelled") {
+      console.log("Already cancel");
       return res
         .status(400)
         .json({ success: false, message: "Appointment is already cancelled" });
@@ -303,7 +320,7 @@ const cancelUserAppointment = async (req, res, next) => {
     const trainerId = appointment.trainer;
 
     await updateTrainerAvailability(
-      appointment.trainerId,
+     trainerId,
       appointment.date,
       appointment.startTime,
       appointment.endTime,
@@ -346,7 +363,7 @@ const getTrainerAppointments = async (req, res, next) => {
 
      // Convert trainerId to ObjectId
      const appointments = await Appointment.find({ trainer: new mongoose.Types.ObjectId(trainerId) })
-     .populate('user', 'name email finessGoal');
+     .populate('user', 'name email fitnessGoal image');
 
 
     res.status(200).json({
@@ -362,6 +379,8 @@ const getTrainerAppointments = async (req, res, next) => {
 
 // Trainer Appointment Status Update Controller
 const updateAppointmentByTrainer = async (req, res, next) => {
+
+ 
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -369,6 +388,10 @@ const updateAppointmentByTrainer = async (req, res, next) => {
     const { status, notes } = req.body;
     const appointmentId = req.params.id;
     const trainerId = req.user._id;
+
+    console.log("req.body ",req.body);
+    console.log("appointment Id" , appointmentId);
+    
 
     // Validate allowed status updates for trainers
     const validTrainerStatuses = ["Confirmed", "Completed", "Cancelled"];
@@ -386,6 +409,8 @@ const updateAppointmentByTrainer = async (req, res, next) => {
     })
     .populate('user', 'name email')
     .session(session);
+    console.log("Appointment : ",appointment);
+    
 
     if (!appointment) {
       await session.abortTransaction();
@@ -424,21 +449,21 @@ const updateAppointmentByTrainer = async (req, res, next) => {
       updateData.completedAt = new Date();
     } else if (status === "Confirmed") {
       // Verify slot is still available before confirming
-      const availabilityCheck = await isTimeSlotAvailable(
-        trainerId, 
-        appointment.date, 
-        appointment.startTime, 
-        appointment.endTime
-      );
+      // const availabilityCheck = await isTimeSlotAvailable(
+      //   trainerId, 
+      //   appointment.date, 
+      //   appointment.startTime, 
+      //   appointment.endTime
+      // );
 
-      if (!availabilityCheck.available) {
-        await session.abortTransaction();
-        session.endSession();
-        return res.status(400).json({
-          success: false,
-          message: "Time slot is no longer available"
-        });
-      }
+      // if (!availabilityCheck.available) {
+      //   await session.abortTransaction();
+      //   session.endSession();
+      //   return res.status(400).json({
+      //     success: false,
+      //     message: "Time slot is no longer available"
+      //   });
+      // }
 
       // Mark slot as booked when confirming
       await updateTrainerAvailability(
@@ -452,7 +477,7 @@ const updateAppointmentByTrainer = async (req, res, next) => {
 
     // Add notes if provided
     if (notes) {
-      updateData.notes = notes;
+      updateData.trainerNotes = notes;
     }
 
     // Perform the update
@@ -460,7 +485,7 @@ const updateAppointmentByTrainer = async (req, res, next) => {
       appointmentId,
       updateData,
       { new: true, session }
-    ).populate('user', 'name email');
+    ).populate('user', 'name email fitnessGoal image');
 
     // Commit transaction
     await session.commitTransaction();

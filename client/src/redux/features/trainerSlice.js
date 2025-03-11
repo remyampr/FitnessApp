@@ -7,7 +7,7 @@ const initialState = {
   selectedClient: null,
   revenue: 0,
   revenueHistory: [],
-  appointments:null,
+  appointments:[],
   workouts:null,
   nutritionPlans:null,
   isAuthenticated: false,
@@ -63,12 +63,35 @@ const trainerSlice = createSlice({
     setAppointments: (state, action) => {
       state.appointments = action.payload;
     },
+    updateAppointments: (state, action) => {
+      console.log("inside reducer : updating appointmnet details  action.payload ",action.payload);
+      
+      state.appointments = state.appointments.map((appointment) =>
+        appointment._id === action.payload._id ? { ...appointment, ...action.payload } : appointment
+      );
+    },
     setWorkouts: (state, action) => {
-      state.workouts = action.payload.totalRevenue;
+      state.workouts = action.payload; 
+    },
+    addWorkout: (state, action) => {
+      state.workouts = {
+        ...state.workouts, 
+        count: state.workouts.count + 1, 
+        data: [...state.workouts.data, action.payload], // Append new workout
+      };
     },
     setNutritionPlans: (state, action) => {
       state.nutritionPlans = action.payload;
     },
+    addNutrition:(state,action)=>{
+      state.nutritionPlans={
+        ...state.nutritionPlans,
+        count:state.nutritionPlans.count+1,
+        data:[...state.nutritionPlans.data, action.payload]
+      }
+    },
+
+
     setTrainerDashboardStats: (state, action) => {
       state.trainerDashboardStats = action.payload;
     },
@@ -102,14 +125,23 @@ const trainerSlice = createSlice({
 export const {
   setTrainer,
   setTrainerProfile,
+
   setClients,
   setSelectedClient,
   resetSelectedClient,
+
   setRevenue,
   setRevenueHistory,
+
   setAppointments,
+  updateAppointments,
+
   setWorkouts,
+  addWorkout,
+
   setNutritionPlans,
+  addNutrition,
+  
   setIsApproved,
   setTrainerDashboardStats,
   clearTrainer,

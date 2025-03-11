@@ -12,11 +12,23 @@ import {
   updateWorkoutPlan,
 } from "../../services/adminServices";
 import { AdminSidebar } from "../../components/admin/AdminSidebar";
+import { LoadingSpinner } from "../../components/shared/LoadingSpinner";
+import { AlertError } from "../../components/shared/AlertError";
 
 export const WorkoutPage = () => {
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const { workouts, loading, error } = useSelector((state) => state.admin);
+ const [selectedGoal, setSelectedGoal] = useState("");
+ const fitnessGoals = [
+  "Weight Loss",
+  "Weight Gain",
+  "Muscle Gain",
+  "Maintenance",
+  "Endurance Improvement",
+];
 
   const [workoutForm, setWorkoutForm] = useState({
     name: "",
@@ -35,6 +47,11 @@ export const WorkoutPage = () => {
 
   const [isEditing, setIsEditing] = useState(false);
   const [currentWorkoutId, setCurrentWorkoutId] = useState(null);
+
+  const filteredWorkouts = selectedGoal
+  ? workouts.filter((workout) => workout.fitnessGoal === selectedGoal)
+  : workouts;
+
 
   useEffect(() => {
     fetchWorkouts();
@@ -201,9 +218,7 @@ export const WorkoutPage = () => {
         <h1 className="text-3xl font-bold mb-6">Workout Management</h1>
 
         {error && (
-          <div className="alert alert-error mb-4">
-            <span>{error}</span>
-          </div>
+         <AlertError error={error} />
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -268,7 +283,7 @@ export const WorkoutPage = () => {
               </div>
 
               <div className="form-control">
-                <label className="label">Duration (weeks)</label>
+                <label className="label">Duration (mins)</label>
                 <input
                   type="number"
                   name="duration"
@@ -394,13 +409,14 @@ export const WorkoutPage = () => {
                         />
                       </div>
                     ))}
+                    
                     <button
-                      type="button"
-                      onClick={() => addExerciseToDay(dayIndex)}
-                      className="btn btn-xs btn-outline mt-2"
-                    >
-                      Add Exercise
-                    </button>
+                          type="button"
+                          className="btn btn-sm btn-secondary mt-2"
+                          onClick={() => addExerciseToDay(dayIndex)}
+                        >
+                         Add Exercise
+                        </button>
                   </div>
                 ))}
               </div>
@@ -437,47 +453,63 @@ export const WorkoutPage = () => {
           <div className="card bg-white shadow-xl p-6">
             <h2 className="text-2xl font-semibold mb-4">Existing Workouts</h2>
             {loading ? (
-              <div className="flex justify-center">
-                <span className="loading loading-spinner loading-lg"></span>
-              </div>
+              <LoadingSpinner/>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="table w-full">
-                  <thead>
-                    <tr>
-                      <th>Name</th>
-                      <th>Goal</th>
-                      <th>Difficulty</th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {workouts && workouts.length > 0 ? (
-                      workouts.map((workout) => (
-                        <tr key={workout._id}>
-                          <td>{workout.name}</td>
-                          <td>{workout.fitnessGoal}</td>
-                          <td>{workout.difficulty}</td>
-                          <td>
-                            <button
-                              onClick={() => editWorkout(workout)}
-                              className="btn btn-xs btn-primary mr-2"
-                            >
-                              Edit
-                            </button>
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan="4" className="text-center py-4">
-                          No workouts found
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+              <div>
+                     <div className="mb-4">
+        <label className="mr-2 font-medium">Filter by Goal:</label>
+        <select
+          className="p-2 border rounded"
+          value={selectedGoal}
+          onChange={(e) => setSelectedGoal(e.target.value)}
+        >
+          <option value="">All</option>
+          {fitnessGoals.map((goal) => (
+            <option key={goal} value={goal}>
+              {goal}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {filteredWorkouts.length > 0 ? (
+          filteredWorkouts.map((workout) => (
+            <div key={workout._id} className="bg-white p-4 rounded shadow-sm">
+              <div className="flex justify-between items-start">
+                <div>
+                  {/* Truncated Name with Tooltip */}
+                  <h3 className="font-medium text-lg mb-1">
+                    <div className="relative group">
+                      <span className="truncate" title={workout.name}>
+                        {workout.name.length > 10
+                          ? workout.name.slice(0, 6) + "..." + workout.name.slice(-4)
+                          : workout.name}
+                      </span>
+                      <span className="absolute bottom-0 left-0 w-full h-full bg-black opacity-0 group-hover:opacity-100 text-white text-xs p-1 rounded-md">
+                        {workout.name}
+                      </span>
+                    </div>
+                  </h3>
+                  {/* Goal */}
+                  <p className="text-sm text-gray-600">{workout.fitnessGoal}</p>
+                  {/* Difficulty */}
+                  <p className="text-sm">Difficulty: {workout.difficulty}</p>
+                </div>
+                {/* Edit Button */}
+                <button
+                  className="btn btn-warning btn-sm"
+                  onClick={() => editWorkout(workout)}
+                >
+                  Edit
+                </button>
               </div>
+            </div>
+          ))
+        ) : (
+          <div className="col-span-2 text-center py-4">No workouts found</div>
+        )}
+      </div>
+            </div>
             )}
           </div>
         </div>

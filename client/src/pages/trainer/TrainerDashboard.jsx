@@ -79,10 +79,11 @@ export const TrainerDashboard = () => {
         dispatch(setWorkouts(workoutsResponse.data));
         dispatch(setNutritionPlans(nutritionPlansResponse.data));
 
+
         dispatch(
           setTrainerDashboardStats({
             clientCount: clientResponse.data.count || 0,
-            appointmentsToday: appointmentResponse.data.count || 0,
+            appointmentsToday: getTodaysConfirmedAppointment(appointmentResponse.data.data),
             totalRevenue: revenueRsponse.data.totalRevenue || 0,
             totalWorkouts: workoutsResponse.data.count || 0,
             totalNutritionPlans: nutritionPlansResponse.data.count || 0,
@@ -115,7 +116,10 @@ export const TrainerDashboard = () => {
           JSON.stringify(trainerDashboardStats, null, 2)
         );
 
-        // dispatch(set)
+
+
+
+      
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
       } finally {
@@ -125,6 +129,13 @@ export const TrainerDashboard = () => {
 
     fetchDashboardData();
   }, []);
+
+const getTodaysConfirmedAppointment =(appointments)=>{
+
+  const today=new Date().toISOString().split("T")[0];
+  return appointments.filter((apt)=> apt.date.startsWith(today) && apt.status ==="Confirmed").length;
+
+}
 
   if (loading) {
     return (
@@ -145,7 +156,7 @@ export const TrainerDashboard = () => {
           color="bg-blue-500"
         />
         <StatsCard
-          title="Today's Appointments"
+          title=" Today's Appointments"
           value={trainerDashboardStats.appointmentsToday}
           icon="calendar"
           color="bg-green-500"

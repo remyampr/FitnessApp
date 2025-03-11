@@ -13,15 +13,20 @@ import {
   setError,
   setLoading,
   setNutritions,
+  setTodayNutrition,
+  setTodayWorkoutR,
+  setTomorrowNutrition,
+  setTomorrowWorkoutR,
   setUser,
   setWorkouts,
   updateWorkoutStatus,
 } from "../../redux/features/userSlice";
 import { UserSidebar } from "../../components/user/UserSidebar";
 import { useNavigate } from "react-router-dom";
-import { WorkoutCard } from "../../components/user/WorkoutCard";
+import { WorkoutCard } from "../../components/user/WorkoutCardDashboard";
 import { LoadingSpinner } from "../../components/shared/LoadingSpinner";
-import { NutritionCard } from "../../components/user/NutritionCard";
+import { NutritionCard } from "../../components/user/NutritionCardDashboard";
+import { AppointmentCardDashboard } from "../../components/user/AppointmentCardDashboard";
 
 export const UserDashboard = () => {
   const dispatch = useDispatch();
@@ -74,7 +79,7 @@ export const UserDashboard = () => {
 
         // console.log(" Profile : ", profileResponse.data.user);
         // console.log("workout response", workoutsResponse.data.data);
-        console.log("nutritionresponse", nutritionPlansResponse.data.data);
+        // console.log("nutritionresponse", nutritionPlansResponse.data.data);
         // console.log("appointment response", appointmentResponse.data.data);
         // console.log("progress response", progresstResponse.data.data);
         // console.log("notification response", notificationsRespoanse.data.data);
@@ -100,7 +105,7 @@ export const UserDashboard = () => {
         // console.log("User in redux : ", user);
         // console.log("Workouts in redux new : ", workouts);
         // console.log("Nutritios in redux : ", nutritionPlans);
-        // console.log("Appointments in redux : ", appointments);
+        console.log("Appointments in redux : ", appointments);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
       } finally {
@@ -136,6 +141,14 @@ export const UserDashboard = () => {
 
       // console.log("TODAYS Workout : ", todayWorkoutData);
       // console.log("TOMORROW Workout : ", tomorrowWorkoutData);
+
+      if (todayWorkoutData) {
+        dispatch(setTodayWorkoutR(todayWorkoutData));
+      }
+      if(tomorrowWorkoutData){
+        dispatch(setTomorrowWorkoutR(tomorrowWorkoutData))
+      } 
+
 
       // Process today's workout data
       if (todayWorkoutData) {
@@ -196,6 +209,13 @@ export const UserDashboard = () => {
 
       // console.log("TODAYS Nutrition : ", todayNutritionData);
       // console.log("TOMORROW Nutrition : ", tomorrowNutritionData);
+
+if (todayNutritionData) {
+  dispatch(setTodayNutrition(todayNutritionData));
+}
+if(tomorrowNutritionData){
+  dispatch(setTomorrowNutrition(tomorrowNutritionData))
+}     
 
 
       // Process today's Nutrition data
@@ -262,27 +282,8 @@ export const UserDashboard = () => {
  <NutritionCard todayNutritionPlan={todayNutritionPlan} todayNutritionData={todayNutritionData} />
 
           {/* Upcoming Appointments */}
-          <div className="card bg-blue-600 text-white shadow-xl">
-            <div className="card-body">
-              <h2 className="card-title">Upcoming Appointments</h2>
-              {/* {appointments && appointments.length > 0 ? (
-                <>
-                  <p>📅 {appointments?.[0]?.title}</p>
-                  <p className="text-sm">
-                    {appointments?.[0]?.date} with {appointments?.[0]?.trainer}
-                  </p>
-                  <button
-                    onClick={() => (window.location.href = "/appointments")}
-                    className="btn bg-blue-400 text-blue-900"
-                  >
-                    View All
-                  </button>
-                </>
-              ) : (
-                <p>No upcoming appointments</p>
-              )} */}
-            </div>
-          </div>
+          <AppointmentCardDashboard appointments={appointments} />
+         
         </div>
 
         {/* Secondary Content - Tabs */}

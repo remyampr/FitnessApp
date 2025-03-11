@@ -1,4 +1,5 @@
 const Activity = require("../Models/Activity");
+const { logActivity } = require("../Utilities/activityServices");
 const Nutrition = require("../Models/Nutrition");
 const User=require("../Models/User")
 const uploadToCloudinary = require("../Utilities/imageUpload");
@@ -15,12 +16,16 @@ const createNutrition = async (req, res, next) => {
         .json({ error: "All required fields must be provided." });
     }
 
-    // const existingNutrition = await Nutrition.findOne({ title,createdBy: req.user._id });
-    // if (existingNutrition) {
-    //   return res.status(400).json({ error: "This  already exists!" });
-    // }
+    let parsedSchedule;
 
-    const parsedSchedule = JSON.parse(schedule); 
+    if (typeof schedule === 'string') {
+      parsedSchedule = JSON.parse(schedule);  // Parse the string into an object
+    } else {
+      parsedSchedule = schedule;
+    }
+
+    console.log("Parsed Schedule:", parsedSchedule);
+   
 
     const cloudinaryRes = await uploadToCloudinary(image);
     console.log("image in cloudinary : ", cloudinaryRes);
@@ -29,6 +34,7 @@ const createNutrition = async (req, res, next) => {
       title,
       fitnessGoal,
       schedule:parsedSchedule,
+
       waterIntake,
        image: cloudinaryRes,
       createdBy: req.user._id,
@@ -42,7 +48,7 @@ const createNutrition = async (req, res, next) => {
  
 
     if(savedNutrition){
-        return res.status(200).json({msg:"New Nutrition data added",savedNutrition})
+        return res.status(200).json({message:"New Nutrition data added",savedNutrition})
     }
 
   } catch (error) {
@@ -96,6 +102,10 @@ try {
 
     if (req.user.role !== 'admin') {
         return res.status(403).json({ message: "You do not have permission to update this nutrition plan" });
+      }
+
+      if (updatedData.schedule && typeof updatedData.schedule === 'string') {
+        updatedData.schedule = JSON.parse(updatedData.schedule); 
       }
 
       const updatedPlan = await Nutrition.findByIdAndUpdate(id, updatedData, { new: true });

@@ -33,6 +33,12 @@ import { NutritionPlanPage } from "../pages/user/NutritionPlanPage";
 import { UserProfilePage } from "../pages/user/UserProfilePage";
 import { UserTrainerPage } from "../pages/user/UserTrainerPage";
 import { UserAppointmentPage } from "../pages/user/UserAppointmentPage";
+import { TrainerAppointmentsPage } from "../pages/trainer/TrainerAppointmentsPage";
+import { TrainerClientsPage } from "../pages/trainer/TrainerClinentsPage";
+import { TrainerWorkoutPage } from "../pages/trainer/TrainerWorkoutPage";
+import { TrainerNutritionPage } from "../pages/trainer/TrainerNutritionPage";
+import { NutritionListPage } from "../pages/user/NutritionListPage";
+import { WorkoutListPage } from "../pages/user/WorkoutListPage";
 
 
 
@@ -116,6 +122,18 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: "nutrition",
+              element: (
+         <NutritionListPage/>
+        ),
+      },
+      {
+        path: "workouts",
+              element: (
+         <WorkoutListPage/>
+        ),
+      },
+      {
         path: "progress",
               element: (
          <UserProgressPage/>
@@ -150,14 +168,55 @@ export const router = createBrowserRouter([
           </TrainerProtectedRoute>
         ),
       },
-      // {
-      //     path:"dashboard",
-      //     element:(
-      //       <TrainerProtectedRoute requiredRole="trainer">
-      //       <TrainerDashboard />
-      //     </TrainerProtectedRoute>
-      //     )
-      // },
+      {
+        path: "clients",
+        element: (
+          <TrainerProtectedRoute requiredRole="trainer">
+            <TrainerClientsPage />
+          </TrainerProtectedRoute>
+        ),
+      },
+      {
+        path: "appointments",
+        element: (
+          <TrainerProtectedRoute requiredRole="trainer">
+            <TrainerAppointmentsPage />
+          </TrainerProtectedRoute>
+        ),
+      },
+      {
+        path: "workouts",
+        element: (
+          <TrainerProtectedRoute requiredRole="trainer">
+            <TrainerWorkoutPage/>
+          </TrainerProtectedRoute>
+        ),
+      },
+      {
+        path: "nutrition",
+        element: (
+          <TrainerProtectedRoute requiredRole="trainer">
+            <TrainerNutritionPage/>
+          </TrainerProtectedRoute>
+        ),
+      },
+      {
+        path: "revenue",
+        element: (
+          <TrainerProtectedRoute requiredRole="trainer">
+            <TrainerWorkoutPage/>
+          </TrainerProtectedRoute>
+        ),
+      },
+      {
+        path: "profile",
+        element: (
+          <TrainerProtectedRoute requiredRole="trainer">
+            <TrainerWorkoutPage/>
+          </TrainerProtectedRoute>
+        ),
+      },
+     
     ],
   },
   {

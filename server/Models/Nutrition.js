@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 
 const nutritionSchema = new mongoose.Schema({
   
-  name: { type: String, required: true },
+  title: { type: String, required: true },
   fitnessGoal: { 
     type: String, 
     enum: ["Weight Loss", "Weight Gain", "Muscle Gain", "Maintenance", "Endurance Improvement"], 

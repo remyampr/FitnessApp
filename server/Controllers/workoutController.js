@@ -22,16 +22,19 @@ const createWorkout = async (req, res, next) => {
       return res.status(400).json({ error: "Invalid schedule format." });
     }
 
-    const existingWorkout = await Workout.findOne({ name, createdBy: req.user._id });
-    if (existingWorkout) {
-      return res.status(400).json({ error: "This workout already exists!" });
-    }
+    // const existingWorkout = await Workout.findOne({ name, createdBy: req.user._id });
+    // if (existingWorkout) {
+    //   return res.status(400).json({ error: "This workout already exists!" });
+    // }
 
     const cloudinaryRes = await uploadToCloudinary(image);
     if (!cloudinaryRes) {
       return res.status(500).json({ error: "Failed to upload image to Cloudinary." });
     }
-    console.log("image in cloudinary : ", cloudinaryRes);
+    // console.log("image in cloudinary : ", cloudinaryRes);
+    console.log("req.body : ",req.body);
+    // console.log("req.file.path : ",req.file.path);
+    
 
     const newWorkout = new Workout({
       name,
@@ -50,7 +53,9 @@ const createWorkout = async (req, res, next) => {
 
 
     if (savedWorkout) {
-      return res.status(200).json({ msg: "New Workout added", savedWorkout });
+      console.log("Saved workout : ",savedWorkout);
+      
+      return res.status(200).json({ message: "New Workout added", savedWorkout });
     }
 
   } catch (error) {

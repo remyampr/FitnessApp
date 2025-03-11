@@ -4,7 +4,7 @@ import { Header } from '../components/shared/Header'
 import { Footer } from '../components/shared/Footer'
 import { ScrollToTop } from '../components/shared/ScrollToTop'
 import { DarkMode } from '../components/shared/DarkMode'
-import { Sidebar } from '../components/trainer/Sidebar'
+import { Sidebar } from '../components/trainer/TrainerSidebar'
 import { Navbar } from '../components/shared/Navbar'
 
 export const TrainerLayout = () => {

@@ -33,13 +33,14 @@ export const MainLayout = () => {
   return (
    <>
    <ScrollToTop/>
-    {/* <div className='flex flex-col min-h-screen bg-[url("/fit18.jpg")] bg-cover bg-center'>  */}
+    <div className='flex flex-col min-h-screen bg-[url("/fit9.jpg")] bg-cover bg-center'> 
      <div className='flex flex-col min-h-screen bg-black-bg-cover bg-center'>  
         <Header/>
       <div  className=' flex-grow p-3 items-center justify-center min-h-screen text-white' > 
         <Outlet/> 
         </div>
       <Footer/>
+        </div>
         </div>
         </>
 

@@ -660,7 +660,10 @@ module.exports = {
   markWorkoutCompleted,
   markNutritionFollowed,
   getUserProgress,
+
   addProgressNote,
   getAllUserProgress,
+  getClientProgress,
+  
   getAllProgress,
 };

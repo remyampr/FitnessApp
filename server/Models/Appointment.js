@@ -26,6 +26,8 @@ const appointmentSchema = new mongoose.Schema({
     type: String,
     default: ""
   },
+  trainerNotes: { type: String, default: "" },
+
   cancellationReason: { 
     type: String, 
     default: "" 

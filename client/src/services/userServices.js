@@ -117,6 +117,8 @@ export const updateAppointment = ()=>{
     return axiosInstance.put(`/appointments/user/${id}`)
 }
 export const cancelAppointment = (id,data)=>{
+    console.log("axios cancel detail Id data",id,data);
+    
     return axiosInstance.delete(`/appointments/user/${id}`,{data})
 }
 

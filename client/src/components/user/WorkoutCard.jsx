@@ -1,164 +1,51 @@
-import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { checkWorkoutStatus } from "../../services/userServices";
-import { setWorkoutInProgress, updateWorkoutStatus } from "../../redux/features/userSlice";
-import { LoadingSpinner } from "../shared/LoadingSpinner";
+import React from 'react'
 
-export const WorkoutCard = ({ todayWorkout}) => {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = useState(false);
-
-  const workoutStatus = useSelector(state => 
-    state.user?.progress?.workoutStatus?.[todayWorkout?.id] || 'pending'
- 
-  );
-  const userId=useSelector(state => state.user?.user?.user?._id);
-
-//   console.log("inside workoutCard from redux todayWorkout:", todayWorkout);
-//   console.log("inside workoutCard from redux workoutstatus:::", workoutStatus);
-// console.log("inside workoutCard userId:", userId);
-
-
-  useEffect(() => {
-    const fetchWorkoutstatus = async () => {
-      if (todayWorkout && userId) {
-        setIsLoading(true);
-        try {
-          const workoutStatusResp = await checkWorkoutStatus();
-          const data = workoutStatusResp.data;
-          // console.log(" inside use Effect of Workout card : Workout status response:", data);
-
-          if (
-            data.completedWorkouts &&
-            data.completedWorkouts.includes(todayWorkout.id)
-          ) {
-            // console.log("dispatching workout status...");
-            
-            dispatch(
-              updateWorkoutStatus({
-                workoutId: todayWorkout.id,
-                status: "completed",
-              })
-            );
-          } else if (
-            data.inProgressWorkouts &&
-            data.inProgressWorkouts.includes(todayWorkout.id)
-          ) {
-            dispatch(
-              updateWorkoutStatus({
-                workoutId: todayWorkout.id,
-                status: "inProgress",
-              })
-            );
-          } else {
-            dispatch(
-              updateWorkoutStatus({
-                workoutId: todayWorkout.id,
-                status: "pending",
-              })
-            );
-          }
-        } catch (error) {
-          console.error('Error checking workout status:', error);
-        } finally {
-          setIsLoading(false);
-        }
-      }
-    };
-    fetchWorkoutstatus();
-  }, [dispatch, todayWorkout, userId]);
-
-
-
-  const handleStartWorkout = () => {
-    // Update Redux state to mark workout as in progress
-    dispatch(setWorkoutInProgress({ workoutId: todayWorkout._id }));
-
-    // Navigate to workout page
-    navigate("/user/workout/start", {
-      state: { workout: todayWorkout },
-    });
-  };
-
-
-
-  const handleResumeWorkout = () => {
-    // console.log("Navigating to /user/workout/start")
-     navigate("/user/workout/start", {
-      state: { workout: todayWorkout },
-    });
-  };
-
-  
-
-  const getStatusButton = () => {
-    if (isLoading) {
-      return (
-     <LoadingSpinner/>
-      );
-    }
-    switch (workoutStatus) {
-   
-      case "completed":
-        return (
-       
-          
-          <button className="btn btn-success btn-disabled" disabled>
-            Completed ✓
-          </button>
-        );
-      case "inProgress":
-        return (
-          <button onClick={handleResumeWorkout} className="btn btn-warning">
-            Resume Workout
-          </button>
-        );
-      default:
-        return (
-          <button onClick={handleStartWorkout} className="btn btn-accent">
-            Start Now
-          </button>
-        );
-    }
-  };
-
+export const WorkoutCard = ({workout}) => {
   return (
-    <div className="card bg-primary text-primary-content shadow-xl">
-      <div className="card-body">
-        <h2 className="card-title">Today's Workout</h2>
-        {todayWorkout ? (
-          <>
-            <p>
-              <img src="/workout.png" alt="" />
-               {todayWorkout.name} - {todayWorkout.duration} min
-            </p>
-            <p className="text-sm">Difficulty: {todayWorkout.difficulty}</p>
-            <div className="mt-2">{getStatusButton()}</div>
-            {workoutStatus === "completed" && (
-              <div className="mt-2">
-                <a
-                  onClick={() => navigate("/user/progress")}
-                  className="link link-hover text-sm"
-                >
-                  View your progress →
-                </a>
-              </div>
-            )}
-          </>
-        ) : (
-          <p>No workout scheduled for today</p>
-        )}
+    <div key={workout.id} className="card bg-base-100 shadow-xl overflow-hidden h-full">
+    <figure className="h-48 relative">
+      <img src={workout.image || "/workout.jpg"} alt={workout.name} className="w-full h-full object-cover object-center" />
+      <div className="absolute top-0 left-0 right-0 p-2 bg-gradient-to-b from-black/70 to-transparent">
+        <div className="badge badge-primary">{workout.fitnessGoal}</div>
+      </div>
+    </figure>
+  
+    <div className="card-body p-4">
+      <h2 className="card-title text-lg">{workout.name}</h2>
+      <p className="text-gray-700 text-sm">{workout.description}</p>
+  
+      <div className="flex justify-between items-center text-sm mt-2">
+        <span className="badge badge-outline">{workout.difficulty}</span>
+        <span className="text-gray-600">{workout.duration} min</span>
+      </div>
+  
+      <div className="divider my-2">Schedule</div>
+  
+      <div className="overflow-y-auto max-h-48 pr-2">
+        {workout.schedule.map((day, idx) => (
+          <div key={idx} className="mb-3">
+            <h4 className="font-bold text-sm">{day.day}</h4>
+            <div className="grid grid-cols-1 gap-1 pl-2 mt-1">
+              {day.exercises.map((exercise, eidx) => (
+                <div key={eidx} className="text-xs">
+                  <span className="font-semibold capitalize">{exercise.name}</span>: 
+                  <span className="text-gray-700">
+                    {exercise.sets} sets x {exercise.reps} reps
+                  </span>
+                  <div className="text-gray-500 text-xs">
+                    Rest: {exercise.restTime} sec
+                  </div>
+                  {exercise.notes && (
+                    <p className="text-gray-500 italic text-xs">{exercise.notes}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
-  );
-};
-
-
-
-
-
-
-
-
+  </div>
+  
+  )
+}

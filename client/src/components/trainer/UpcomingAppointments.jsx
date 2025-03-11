@@ -4,6 +4,9 @@ import { Link } from 'react-router-dom';
 
 export const UpcomingAppointments = ({ appointments }) => {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
+
+  console.log("Appointments in Upcoming appointment component : ",appointments);
+  
   
   if (!appointments || appointments.length === 0) {
     return (
@@ -21,14 +24,12 @@ export const UpcomingAppointments = ({ appointments }) => {
   }
   
   const handleStatusUpdate = async (appointmentId, status) => {
+    console.log("STATUS : ",status)
     try {
-      // This would be an API call to update the appointment status
-      // await api.put(`/appointments/${appointmentId}`, { status });
-      
-      // For demo purposes, let's just update the local state
+     
+
       setSelectedAppointment(prev => prev ? { ...prev, status } : null);
-      
-      // You would typically refresh the appointments list after this
+ 
     } catch (error) {
       console.error('Error updating appointment status:', error);
     }
@@ -47,14 +48,18 @@ export const UpcomingAppointments = ({ appointments }) => {
       console.error('Error adding appointment note:', error);
     }
   };
+
+
   
   const getStatusBadge = (status) => {
     switch (status) {
-      case 'scheduled':
-        return <span className="badge badge-primary">Scheduled</span>;
-      case 'completed':
+      case 'Confirmed':
+        return <span className="badge badge-primary">Confirmed</span>;
+      case 'Pending':
+        return <span className="badge badge-warning">Pending</span>;
+      case 'Completed':
         return <span className="badge badge-success">Completed</span>;
-      case 'cancelled':
+      case 'Cancelled':
         return <span className="badge badge-error">Cancelled</span>;
       case 'no-show':
         return <span className="badge badge-warning">No Show</span>;
@@ -72,6 +77,8 @@ export const UpcomingAppointments = ({ appointments }) => {
     const date = new Date(dateString);
     return date.toLocaleDateString();
   };
+
+  appointments.map((apt)=> (console.log("APT ::",apt,apt._id)))
   
   return (
     <div className="card bg-base-100 shadow-xl">
@@ -91,39 +98,40 @@ export const UpcomingAppointments = ({ appointments }) => {
                 <th>Date</th>
                 <th>Time</th>
                 <th>Status</th>
-                <th>Actions</th>
+             
               </tr>
             </thead>
             <tbody>
               {appointments?.map((appointment,index) => (
-                <tr key={appointment?._id|| index}>
+                               
+                <tr key={appointment?._id || index}>
                   <td>
                     <div className="flex items-center space-x-3">
                       <div className="avatar">
                         <div className="mask mask-squircle w-10 h-10">
                           <img
-                            src={appointment.client?.avatar || '/avatar-placeholder.png'}
-                            alt={appointment.client?.name}
+                            src={appointment.user?.image || '/avatar-placeholder.png'}
+                            alt={appointment.user?.name}
                           />
                         </div>
                       </div>
                       <div>
-                        <div className="font-bold">{appointment.client?.name}</div>
+                        <div className="font-bold">{appointment.user?.name}</div>
                         <div className="text-sm opacity-50">{appointment.type || 'Session'}</div>
                       </div>
                     </div>
                   </td>
                   <td>{formatDate(appointment.date)}</td>
-                  <td>{formatTime(appointment.date)}</td>
+                  <td>{(appointment.startTime)}</td>
                   <td>{getStatusBadge(appointment.status)}</td>
-                  <td>
+                  {/* <td>
                     <button
                       onClick={() => setSelectedAppointment(appointment)}
                       className="btn btn-sm btn-primary"
                     >
                       Manage
                     </button>
-                  </td>
+                  </td> */}
                 </tr>
               ))}
             </tbody>

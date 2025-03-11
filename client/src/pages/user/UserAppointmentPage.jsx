@@ -228,6 +228,8 @@ export const UserAppointmentPage = () => {
     }
 
     try {
+      console.log("details for cancelation : id,",appointmentId);
+      
       const cancelResponde = await cancelAppointment(appointmentId, {
         status: "Cancelled",
         cancellationReason: "User requested cancellation",

@@ -1,11 +1,12 @@
 
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchClients } from '../redux/trainerSlice';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
 
 import { User, Calendar, Dumbbell, Apple, ChevronDown, ChevronUp, Activity, FileText, Clock } from 'lucide-react';
+import { getClientProgressByid } from '../../services/trainerServices';
+import { LoadingSpinner } from '../../components/shared/LoadingSpinner';
+import { AlertError } from '../../components/shared/AlertError';
 
 export const TrainerClientsPage = () => {
   const dispatch = useDispatch();
@@ -15,14 +16,26 @@ export const TrainerClientsPage = () => {
   const [progressLoading, setProgressLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('workouts');
 
-  useEffect(() => {
-    dispatch(fetchClients());
-  }, [dispatch]);
+  console.log("Getting clients from redux : ",clients);
+  
+console.log(  "\nclient Progress :",
+  JSON.stringify(clientProgress, null, 2)
+);
+
+
+  
+  // useEffect(() => {
+  //   dispatch(fetchClients());
+  // }, [dispatch]);
 
   const fetchClientProgress = async (clientId) => {
     try {
       setProgressLoading(true);
-      const response = await axios.get(`/api/progress/${clientId}`);
+      
+      const response = await getClientProgressByid(clientId);
+
+      console.log("response : ",response);
+      
       setClientProgress(response.data.progress);
       setProgressLoading(false);
     } catch (error) {
@@ -51,22 +64,11 @@ export const TrainerClientsPage = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <span className="loading loading-spinner loading-lg text-primary"></span>
-      </div>
-    );
+    return <LoadingSpinner/>
   }
 
   if (error) {
-    return (
-      <div className="alert alert-error shadow-lg mx-4 my-6">
-        <div>
-          <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-          <span>Error loading clients: {error}</span>
-        </div>
-      </div>
-    );
+    return <AlertError error={`Error loading clients: ${error}`} />;
   }
 
   return (
@@ -84,7 +86,7 @@ export const TrainerClientsPage = () => {
       <div className="grid grid-cols-1 gap-6">
         {clients && clients.length > 0 ? (
           clients.map((client) => (
-            <div key={client._id} className="card bg-base-100 shadow-xl">
+            <div key={client?._id} className="card bg-base-100 shadow-xl">
               <div className="card-body p-4">
                 <div 
                   className="flex justify-between items-center cursor-pointer" 
@@ -102,7 +104,8 @@ export const TrainerClientsPage = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="badge badge-accent">{client.goal || "No goal set"}</div>
+                    <div className="badge badge-accent">{client.
+fitnessGoal || "No goal set"}</div>
                     {selectedClient && selectedClient._id === client._id ? (
                       <ChevronUp size={20} />
                     ) : (
@@ -166,7 +169,7 @@ export const TrainerClientsPage = () => {
                             <h3 className="text-lg font-medium mb-2">Fitness Goals</h3>
                             <div>
                               <p className="text-sm opacity-70">Current Goal</p>
-                              <p>{client.goal || "Not set"}</p>
+                              <p>{client.fitnessGoal|| "Not set"}</p>
                             </div>
                             <div>
                               <p className="text-sm opacity-70">Target Weight</p>
@@ -255,13 +258,8 @@ export const TrainerClientsPage = () => {
                               </table>
                             </div>
                           </div>
-                        ) : (
-                          <div className="alert alert-info">
-                            <div>
-                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current flex-shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                              <span>No workout progress data available for this client.</span>
-                            </div>
-                          </div>
+                        ) : (<AlertError error={"No workout progress data available for this client."}/>
+                          
                         )}
                       </div>
                     )}
@@ -269,9 +267,7 @@ export const TrainerClientsPage = () => {
                     {activeTab === 'nutrition' && (
                       <div>
                         {progressLoading ? (
-                          <div className="flex justify-center py-8">
-                            <span className="loading loading-spinner loading-md"></span>
-                          </div>
+                       <LoadingSpinner/>
                         ) : clientProgress && clientProgress.nutritionDetails && clientProgress.nutritionDetails.length > 0 ? (
                           <div>
                             <div className="stats shadow mb-4 w-full">
@@ -322,12 +318,7 @@ export const TrainerClientsPage = () => {
                             </div>
                           </div>
                         ) : (
-                          <div className="alert alert-info">
-                            <div>
-                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current flex-shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                              <span>No nutrition progress data available for this client.</span>
-                            </div>
-                          </div>
+                          <AlertError error={"No nutrition progress data available for this client."} />
                         )}
                       </div>
                     )}
@@ -346,15 +337,7 @@ export const TrainerClientsPage = () => {
             </div>
           ))
         ) : (
-          <div className="alert">
-            <div>
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-info flex-shrink-0 w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-              <span>You don't have any clients yet. Add your first client to get started.</span>
-            </div>
-            <div className="flex-none">
-              <Link to="/clients/add" className="btn btn-primary btn-sm">Add Client</Link>
-            </div>
-          </div>
+         <AlertError error={"You don't have any clients yet."} />
         )}
       </div>
     </div>

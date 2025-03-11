@@ -11,8 +11,14 @@ const initialState = {
   appointments: null,
 
   notifications: null,
+
   workouts: [],
+  todayWorkoutData: null,
+  tomorrowWorkoutData: null,
+
   nutritionPlans: [],
+  todayNutritionData: null,
+  tomorrowNutritionData: null,
 
   progress: {
     currentProgress: null,
@@ -85,6 +91,12 @@ const userSlice = createSlice({
     setNutritions: (state, action) => {
       state.nutritionPlans = action.payload;
     },
+    setTodayNutrition: (state, action) => {
+      state.todayNutritionData = action.payload;
+    },
+    setTomorrowNutrition: (state, action) => {
+      state.tomorrowNutritionData = action.payload;
+    },
 
     updateNutritionProgress: (state, action) => {
       const { nutritionId, progress } = action.payload;
@@ -97,6 +109,12 @@ const userSlice = createSlice({
 
     setWorkouts: (state, action) => {
       state.workouts = action.payload;
+    },
+    setTodayWorkoutR: (state, action) => {
+      state.todayWorkoutData = action.payload;
+    },
+    setTomorrowWorkoutR: (state, action) => {
+      state.tomorrowWorkoutData = action.payload;
     },
 
     setProgress: (state, action) => {
@@ -173,15 +191,22 @@ export const {
 
 
   setAppointmentR,
+
   setNutritions,
   updateNutritionProgress,
+  setTodayNutrition,
+  setTomorrowNutrition,
+
   setWorkouts,
-  setNotifications,
+  setTodayWorkoutR,
+  setTomorrowWorkoutR,
   setProgress,
   setWorkoutInProgress,
   // resetWorkoutStatus,
   updateWorkoutStatus,
   // updateWorkoutStatuses,
+
+  setNotifications,
   logout,
 } = userSlice.actions;
 export default userSlice.reducer;
