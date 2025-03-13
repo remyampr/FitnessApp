@@ -142,9 +142,7 @@ const updateUserProfile = async (req, res, next) => {
       return res.status(404).json({ error: "User not found" });
     }
     const { phone, height, weight, age, gender, fitnessGoal } = req.body;
-    //   if(!phone || !trainerId || !height || !weight || !age || !gender || !fitnessGoal){
-    //     return res.json({ Error: "All fields are required !" });
-    //   }
+ 
 
     let image = req.file ? req.file.path : "Uploads/user.jpg";
 

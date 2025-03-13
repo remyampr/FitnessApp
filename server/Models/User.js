@@ -27,12 +27,14 @@ const userSchema = new mongoose.Schema({
     startDate: { type: Date },
     endDate: { type: Date },
   },
-  paymentHistory: [{
-    transactionId: { type: String, required: true }, 
-    amount: { type: Number, required: true },
-    paymentStatus: { type: String, enum: ["Success", "Failed"], required: true },
-    paymentDate: { type: Date, default: Date.now }
-  }],
+  paymentHistory: [
+    {
+      transactionId: { type: String, required: true }, 
+      amount: { type: Number, required: true },
+      paymentStatus: { type: String, enum: ["Success", "Failed"], required: true },
+      paymentDate: { type: Date, default: Date.now }
+    }
+  ],
 
   isVerified: { type: Boolean, default: false },  // Initially false until OTP verification
   otp: { type: String }, 

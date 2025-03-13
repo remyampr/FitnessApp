@@ -199,7 +199,7 @@ export const TrainerModal = ({ trainer, isOpen, onClose }) => {
                     <label className="label">Availability</label>
                     <input
                       type="text"
-                      value={trainerData.availability?.map((item) => item.day).join(", ") || ""}
+                      value={trainerData.availability || ""}
                       className="input input-bordered w-full"
                       readOnly
                     />
@@ -218,22 +218,20 @@ export const TrainerModal = ({ trainer, isOpen, onClose }) => {
 
                 {/* Social Links */}
                 <div className="form-control mt-4">
-  <label className="label">Social Links</label>
-  <div className="grid grid-cols-2 gap-4">
-    {trainerData.socialLinks?.map((link, index) => (
-      <div key={index} className="form-control">
-        <label className="label">{link.platform}</label>
-        <input
-          type="text"
-          value={link.url}
-          className="input input-bordered w-full"
-          readOnly
-        />
-      </div>
-    ))}
-  </div>
-</div>
-
+                  <label className="label">Social Links</label>
+                  <div className="grid grid-cols-2 gap-4">
+                    {trainerData.socialLinks?.map((link, index) => (
+                      <div key={index} className="form-control">
+                        <input
+                          type="text"
+                          value={link}
+                          className="input input-bordered w-full"
+                          readOnly
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
                 {/* Notes */}
                 <div className="form-control mt-4">

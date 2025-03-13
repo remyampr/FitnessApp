@@ -3,15 +3,24 @@ const Trainer = require("../Models/Trainer");
 const Payment = require("../Models/Payment");
 const { logActivity } = require("../Utilities/activityServices");
 const Stripe = require("stripe");
+const Admin = require("../Models/Admin");
 
 const stripe = new Stripe(process.env.STRIPE_SECRET);
 
-
-
 const paymentFunction = async (req, res, next) => {
   try {
-    const { trainerId, plan, amount, startDate, endDate, duration,trainerRevenue,adminRevenue } = req.body;
+    const {
+      trainerId,
+      plan,
+      amount,
+      startDate,
+      endDate,
+      duration,
+      trainerRevenue,
+      adminRevenue,
+    } = req.body;
     const userId = req.user.id;
+    console.log("At payment function recived details  :  req.body ", req.body);
 
     const trainer = await Trainer.findById(trainerId);
     if (!trainer) {
@@ -22,6 +31,7 @@ const paymentFunction = async (req, res, next) => {
     const planName =
       plan === "basic" ? "Basic Fitness Plan" : "Premium Fitness Plan";
     const planDuration = duration === 3 ? "3 Month" : "6 Month";
+    const planKey = `${plan}_${duration}`;
 
     // checkout session
     const session = await stripe.checkout.sessions.create({
@@ -64,30 +74,61 @@ const paymentFunction = async (req, res, next) => {
       amount,
       adminRevenue,
       trainerRevenue,
-      plan: `${plan}_${duration}`,
-      status: "Completed", // Assuming the payment is successful
+      plan: planKey,
+      startDate: new Date(startDate),
+      endDate: new Date(endDate),
+      status: "Success", 
       transactionId: session.id,
     });
 
     await payment.save();
 
+    console.log("Paymentschema Payemnt saved  ::: ", payment);
+
     // Update User Subscription
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ error: "User not found" });
 
+    if (!user.paymentHistory) {
+      user.paymentHistory = [];
+    }
+
     user.subscription = {
       status: "Active",
       amount,
-      plan: `${plan}_${duration}`,
+      plan: planKey,
       startDate: new Date(startDate),
       endDate: new Date(endDate),
     };
     user.isProfileComplete = true;
+    user.paymentHistory.push({
+      transactionId: session.id,
+      paymentStatus: "Success",
+      amount,
+    });
+
     await user.save();
+
+    console.log("After payment user userschema: ", user);
+    console.log(
+      "After payment user.isprofileComplete : ",
+      user.isProfileComplete
+    );
 
     // Update Trainer Earnings
     const trainerShare = (trainer.trainerSharePercentage / 100) * amount;
     trainer.totalRevenue += trainerShare;
+
+    trainer.payments.push({
+      userId,
+      transactionId: session.id,
+      amount,
+      trainerShare,
+      plan: planKey,
+      startDate: new Date(startDate),
+      endDate: new Date(endDate),
+      date: new Date(),
+    });
 
     const months = parseInt(duration);
     const monthlyShare = trainerShare / months;
@@ -108,8 +149,7 @@ const paymentFunction = async (req, res, next) => {
       );
       if (monthEntry) {
         monthEntry.revenue += monthlyShare;
-        if (i === 0)
-          monthEntry.clientCount = (monthEntry.clientCount || 0) + 1;
+        if (i === 0) monthEntry.clientCount = (monthEntry.clientCount || 0) + 1;
       } else {
         trainer.revenueHistory.push({
           year,
@@ -123,12 +163,64 @@ const paymentFunction = async (req, res, next) => {
     if (!trainer.clients.includes(userId)) {
       trainer.clients.push(userId);
     }
+
     await trainer.save();
 
+   console.log("After payment Trainer userschema: ", trainer);
 
-    console.log(`Payment successful: ${userId} subscribed to ${plan} for ${duration} months.`);
+    const admin = await Admin.findOne({ role: "admin" });
+    if (admin) {
+      const adminShare = amount - trainerShare;
+      admin.totalRevenue += adminShare;
 
-    res.status(200).json({success: true, message: "Subscription activated successfully" ,sessionId: session.id });
+      const startDateObj = new Date(startDate);
+      const year = startDateObj.getFullYear();
+      const month = startDateObj.getMonth();
+
+   
+
+      let monthEntry = admin.revenueHistory.find(
+        (entry) => entry.year === year && entry.month === month
+      );
+      
+      if (monthEntry) {
+        // Update existing month entry
+        monthEntry.revenue += adminShare;
+        // If this is a new user, increment newUsers count
+        if (user.paymentHistory.length === 1) {
+          monthEntry.newUsers = (monthEntry.newUsers || 0) + 1;
+        }
+        // Track trainer payouts
+        monthEntry.trainerPayouts = (monthEntry.trainerPayouts || 0) + trainerShare;
+      } else {
+        // Create new month entry
+        admin.revenueHistory.push({
+                    year,
+          month,
+          revenue: adminShare,
+          trainerPayouts: trainerShare,
+          newUsers: user.paymentHistory.length === 1 ? 1 : 0,
+          newTrainers: 0 // You might want to increment this elsewhere when new trainers join
+        });
+      }
+      admin.userId=userId
+
+      await admin.save();
+      console.log("Admin payment ",admin);
+      
+    }
+
+    console.log(
+      `Payment successful: ${userId} subscribed to ${plan} for ${duration} months.`
+    );
+
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "Subscription activated successfully",
+        sessionId: session.id,
+      });
 
     // res.status(200).json({ success: true, sessionId: session.id });
   } catch (error) {
@@ -226,7 +318,6 @@ const paymentFunction = async (req, res, next) => {
 //       console.log(`Payment successful: ${userId} subscribed to ${plan} for ${duration} months.`);
 //       res.status(200).json({ message: "Subscription activated successfully" });
 
-
 //     } catch (error) {
 //       console.error("Error updating payment details:", error);
 //       res.status(500).json({ error: "Internal server error" });
@@ -262,7 +353,7 @@ const getUserPaymentHistory = async (req, res, next) => {
 module.exports = {
   paymentFunction,
   getUserPaymentHistory,
- 
+
   // createPaymentOrder,
   // confirmPayment,
 };

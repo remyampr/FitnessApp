@@ -24,9 +24,13 @@ router.post("/login", login);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
 router.post("/logout", logout);
+
 router.get("/revenue",protect, authorize(["trainer"]), getTrainerRevenue)
+
  router.put("/profile/update", protect, authorize(["trainer"]),upload.single("image"),updateTrainerProfile);
+ 
  router.get("/profile", protect, authorize(["trainer"]), getTrainerProfile);
+
  router.get("/clients", protect, authorize(["trainer"]), getTrainerClients);
  router.get("/clients/:clientId", protect, authorize(["trainer"]), getClientById);
 

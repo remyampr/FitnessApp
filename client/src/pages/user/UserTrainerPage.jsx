@@ -6,7 +6,6 @@ import { deleteMyReview, getMyTrainer, postReview } from '../../services/userSer
 import { setTrainerInfo } from '../../redux/features/userSlice';
 import { LoadingSpinner } from '../../components/shared/LoadingSpinner';
 import { AlertError } from '../../components/shared/AlertError';
-import { UserSidebar } from '../../components/user/UserSidebar';
 
 
 export const UserTrainerPage = () => {

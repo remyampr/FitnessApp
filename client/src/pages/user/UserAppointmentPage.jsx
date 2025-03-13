@@ -11,7 +11,6 @@ import {
 } from "../../services/userServices";
 import { AlertError } from "../../components/shared/AlertError";
 import { LoadingSpinner } from "../../components/shared/LoadingSpinner";
-import { UserSidebar } from "../../components/user/UserSidebar";
 
 export const UserAppointmentPage = () => {
   const [activeTab, setActiveTab] = useState("upcoming");
@@ -296,7 +295,6 @@ export const UserAppointmentPage = () => {
   return (
    
     <div className="flex min-h-screen">
-<UserSidebar className="w-64 bg-gray-100 p-4" />
 <div className="flex-1 p-6">
       <h1 className="text-2xl font-bold mb-6">My Appointments</h1>
 

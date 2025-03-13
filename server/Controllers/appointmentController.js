@@ -511,7 +511,7 @@ const updateAppointmentByTrainer = async (req, res, next) => {
 const getAppointmentById=async(req,res,next)=>{
   try {
 
-    console.log("getAppointmentById controller :");
+    // console.log("getAppointmentById controller :");
     
     const appointmentId = req.params.id;
     const userId = req.user._id;
@@ -549,7 +549,7 @@ const getAppointmentById=async(req,res,next)=>{
 // admin
  const getAllAppointments = async (req, res, next) => {
 
-  console.log("get all");
+  // console.log("get all");
   
   try {
     // Destructure query parameters with defaults
@@ -738,7 +738,7 @@ const forceDeleteAppointment = async (req, res, next) => {
 
   try {
     const { id } = req.params;
-    console.log("admin deleting appointment : ");
+    // console.log("admin deleting appointment : ");
     
 
 
@@ -747,7 +747,7 @@ const forceDeleteAppointment = async (req, res, next) => {
       .populate('trainer', '_id')
       .session(session);
 
-      console.log("appointment: ",appointment);
+      // console.log("appointment: ",appointment);
       
 
     if (!appointment) {

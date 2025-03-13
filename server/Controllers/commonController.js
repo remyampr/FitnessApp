@@ -10,10 +10,10 @@ const forgotPassword = async (req, res, next) => {
   try {
     const { email, role } = req.body;
     // console.log("Received in Backend:", req.body);
-    console.log("recived in backend: ",req.body);
+    // console.log("recived in backend: ",req.body);
     
     if (!email || !role) {
-      console.log(`Email : ${email} , Role : ${role}`);
+      // console.log(`Email : ${email} , Role : ${role}`);
       
       return res.status(400).json({ error: "Email and role are required" });
     }
@@ -35,7 +35,7 @@ const forgotPassword = async (req, res, next) => {
     account.otpExpires = Date.now() + 10 * 60 * 1000;
     await account.save();
 
-    console.log(`Reset OTP for ${email}: ${otp}`);
+    // console.log(`Reset OTP for ${email}: ${otp}`);
 
     const emailContent = `
         <h2>Password Reset</h2>
@@ -54,7 +54,7 @@ const resetPassword = async (req, res, next) => {
   try {
     const { email, role, otp, newPassword } = req.body;
 
-    console.log("in resetPassword: ",req.body)
+    // console.log("in resetPassword: ",req.body)
 
 
     if (!email || !role || !otp || !newPassword) {
@@ -70,7 +70,7 @@ const resetPassword = async (req, res, next) => {
     else return res.status(400).json({ error: "Invalid role" });
 
     const account = await Model.findOne({ email });
-    console.log("name",account.name);
+    // console.log("name",account.name);
     
     if (!account) {
       return res.status(404).json({ error: `${role} not found` });
@@ -122,7 +122,7 @@ const verifyEmail = async (req, res, next) => {
     const token = createToken(account._id, role);
     res.cookie("token", token, { httpOnly: true });
 
-    console.log("User login successful");
+    // console.log("User login successful");
 
     return res.json({ msg: "Email verified successfully!", user: account });
   } catch (error) {
@@ -133,7 +133,7 @@ const verifyEmail = async (req, res, next) => {
 const logout = async (req, res, next) => {
   try {
     res.clearCookie("token");
-    console.log("log Out");
+    // console.log("log Out");
     res.status(200).json({ msg: "Logout successful" });
   } catch (error) {
     next(error);
@@ -143,7 +143,7 @@ const logout = async (req, res, next) => {
 const login = async (req, res, next) => {
   try {
     const { email, password, role } = req.body;
-    console.log("Received from frontend:",req.body)
+    // console.log("Received from frontend:",req.body)
 
     if (!email || !password || !role) {
       return res
@@ -159,7 +159,7 @@ const login = async (req, res, next) => {
       return res.status(400).json({ error: "Invalid role" });
     }
 
-    console.log("Role : ",role,"model : ",model);
+    // console.log("Role : ",role,"model : ",model);
     
 
     const user = await model.findOne({ email });
@@ -191,7 +191,7 @@ const login = async (req, res, next) => {
     // });
 
       console.log(`${role.charAt(0).toUpperCase() + role.slice(1)} login successful`);
-      console.log(`isprofilecompleted? ${user.isProfileComplete}`);
+      console.log(` inside login isprofilecompleted? ${user.isProfileComplete}`);
   
 // for user  update last login and check profile completion
       if(role === "user"){

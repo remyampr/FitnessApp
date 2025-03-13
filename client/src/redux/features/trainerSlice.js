@@ -3,11 +3,16 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   trainer: {},
   profile: null,
+
   clients:[],
   selectedClient: null,
+
   revenue: 0,
-  revenueHistory: [],
+ paymentHistory: [],
+ revenueHistory: [],
+  
   appointments:[],
+
   workouts:null,
   nutritionPlans:null,
   isAuthenticated: false,
@@ -44,6 +49,16 @@ const trainerSlice = createSlice({
       state.isAuthenticated = true;
       state.loading = false;
     },
+  updateTrainerProfile : (state, action) => {
+      return {
+        ...state, 
+        trainer: {
+          ...state.trainer,  
+          ...action.payload,
+        },
+      };
+    },
+
     setClients: (state, action) => {
       state.clients = action.payload;
     },
@@ -54,12 +69,18 @@ const trainerSlice = createSlice({
     resetSelectedClient: (state) => {
       state.selectedClient = null;
     },
+
     setRevenue: (state, action) => {
       state.revenue = action.payload;
+    },
+    setPaymentHistory: (state, action) => {
+      state.paymentHistory = action.payload;
     },
     setRevenueHistory: (state, action) => {
       state.revenueHistory = action.payload;
     },
+
+
     setAppointments: (state, action) => {
       state.appointments = action.payload;
     },
@@ -125,12 +146,14 @@ const trainerSlice = createSlice({
 export const {
   setTrainer,
   setTrainerProfile,
+  updateTrainerProfile,
 
   setClients,
   setSelectedClient,
   resetSelectedClient,
 
   setRevenue,
+  setPaymentHistory,
   setRevenueHistory,
 
   setAppointments,

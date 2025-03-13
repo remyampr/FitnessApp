@@ -8,7 +8,10 @@ import {
   setLoading,
   setNutritionPlans,
   setRevenue,
-  setRevenueHistory,
+ setPaymentHistory,
+ setRevenueHistory,
+
+  setTrainer,
   setTrainerDashboardStats,
   setTrainerProfile,
   setWorkouts,
@@ -58,22 +61,26 @@ export const TrainerDashboard = () => {
         const workoutsResponse = await getTrainerWorkouts();
         const nutritionPlansResponse = await getTrainerNutritionPlans();
 
-        console.log("Profile response", profileResponse.data.trainer);
-        console.log("Client res", clientResponse.data.clients);
-        console.log("appointment response", appointmentResponse);
-        console.log("revenue response", revenueRsponse);
+        // console.log("Profile response", profileResponse.data.trainer);
+        // console.log("Client res", clientResponse.data.clients);
+        // console.log("appointment response", appointmentResponse);
+        // console.log("revenue response", revenueRsponse);
         console.log("revenueee :  ",revenueRsponse.data);
         
-        console.log("workout response", workoutsResponse.data);
-        console.log("nutritionresponse", nutritionPlansResponse.data);
+        // console.log("workout response", workoutsResponse.data);
+        // console.log("nutritionresponse", nutritionPlansResponse.data);
 
         // Update Redux state with the fetched data
-        dispatch(setTrainerProfile(profileResponse.data.trainer));
+        dispatch(setTrainerProfile(profileResponse.data.trainer)); 
+        dispatch(setTrainer(profileResponse.data.trainer))
         dispatch(setClients(clientResponse.data.clients));
         dispatch(setAppointments(appointmentResponse.data.data));
 
         dispatch(setRevenue(revenueRsponse.data.totalRevenue));
-        dispatch(setRevenueHistory(revenueRsponse.data.revenueHistory))
+        dispatch(setPaymentHistory(revenueRsponse.data.paymentHistory
+        ));
+        dispatch(setRevenueHistory(revenueRsponse.data.revenueHistory));
+
 
 
         dispatch(setWorkouts(workoutsResponse.data));
@@ -90,31 +97,31 @@ export const TrainerDashboard = () => {
           })
         );
 
-        console.log(
-          "trainer slice : \n",
-          "profile :",
-          JSON.stringify(profile, null, 2),
+        // console.log(
+        //   "trainer slice : \n",
+        //   "profile :",
+        //   JSON.stringify(profile, null, 2),
 
-          "\nclients :",
-          JSON.stringify(clients, null, 2),
+        //   "\nclients :",
+        //   JSON.stringify(clients, null, 2),
 
-          "\nrevenue :",
-          JSON.stringify(revenue, null, 2),
+        //   "\nrevenue :",
+        //   JSON.stringify(revenue, null, 2),
 
-          "\nrevenueHistory :",
-          JSON.stringify(revenueHistory, null, 2),
+        //   "\nrevenueHistory :",
+        //   JSON.stringify(revenueHistory, null, 2),
 
-          "\nworkouts :",
-          JSON.stringify(workouts, null, 2),
-          "\nnutritionplans :",
-          JSON.stringify(nutritionPlans, null, 2),
-          "\nappointments :",
-          JSON.stringify(appointments, null, 2),
-          "\nloading :",
-          loading,
-          "\ntrainerDasboardStats :",
-          JSON.stringify(trainerDashboardStats, null, 2)
-        );
+        //   "\nworkouts :",
+        //   JSON.stringify(workouts, null, 2),
+        //   "\nnutritionplans :",
+        //   JSON.stringify(nutritionPlans, null, 2),
+        //   "\nappointments :",
+        //   JSON.stringify(appointments, null, 2),
+        //   "\nloading :",
+        //   loading,
+        //   "\ntrainerDasboardStats :",
+        //   JSON.stringify(trainerDashboardStats, null, 2)
+        // );
 
 
 

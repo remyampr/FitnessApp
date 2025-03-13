@@ -21,7 +21,6 @@ import {
   setWorkouts,
   updateWorkoutStatus,
 } from "../../redux/features/userSlice";
-import { UserSidebar } from "../../components/user/UserSidebar";
 import { useNavigate } from "react-router-dom";
 import { WorkoutCard } from "../../components/user/WorkoutCardDashboard";
 import { LoadingSpinner } from "../../components/shared/LoadingSpinner";
@@ -263,9 +262,7 @@ if(tomorrowNutritionData){
 
   return (
     <div className="flex min-h-screen">
-      <div className="w-60 text-white p-4">
-        <UserSidebar />
-      </div>
+  
 
       <div className="flex-1 p-6">
         <h1 className="text-2xl font-bold ml-6 mb-6">

@@ -10,9 +10,8 @@ const trainerSchema = new mongoose.Schema(
     specialization: { type: [String], default: [] },
     experience: { type: Number, min: 0, default: 0 },
 
-    // rating: { type: Number, min: 1, max: 5, default: 5 },
+ 
 
-    // *****************************
 
     availability: [
       {
@@ -61,26 +60,35 @@ const trainerSchema = new mongoose.Schema(
     // Average rating (auto-calculated)
     averageRating: { type: Number, min: 1, max: 5, default: 5 },
 
+    payments: [{
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+      transactionId: { type: String, required: true },
+      amount: { type: Number, required: true }, 
+      trainerShare: { type: Number, required: true }, 
+      plan: { type: String, required: true }, 
+      startDate: { type: Date, required: true },
+      endDate: { type: Date, required: true },
+      date: { type: Date, default: Date.now }
+    }],
+
     // revenue
     totalRevenue: { type: Number, default: 0 },
     trainerSharePercentage: { type: Number, default: 30 },
+    
     clients: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
 
-    // monthly revenue tracking
-    revenueHistory: [
+ 
+
+  revenueHistory: [
       {
         year: { type: Number },
         month: { type: Number }, // 0-11 for Jan-Dec
         revenue: { type: Number, default: 0 },
         clientCount: { type: Number, default: 0 },
-      },
-    ],
-    // payments: [{
-    //   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    //   transactionId: { type: String, required: true },
-    //   amount: { type: Number, required: true },
-    //   date: { type: Date, default: Date.now }
-    // }],
+   
+      },],
+
+      
 
     isVerified: { type: Boolean, default: false }, // Initially false until OTP verification
     otp: { type: String },

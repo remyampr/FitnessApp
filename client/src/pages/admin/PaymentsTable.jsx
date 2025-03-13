@@ -43,7 +43,7 @@ export const PaymentsTable = ({ payments }) => {
   };
 
   return (
-    <div className="card bg-white shadow-xl">
+    <div className="card bg-base-100 shadow-xl">
       <div className="card-body">
         <h2 className="card-title">Payment Transactions</h2>
         
@@ -100,9 +100,9 @@ export const PaymentsTable = ({ payments }) => {
           <div className="text-sm text-gray-600">
             Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, payments.length)} of {payments.length} entries
           </div>
-          <div className="btn-group">
+          <div className="btn-group ">
             <button 
-              className="btn btn-sm"
+              className="btn btn-sm mr-2"
               onClick={prevPage}
               disabled={currentPage === 1}
             >

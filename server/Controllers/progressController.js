@@ -24,9 +24,9 @@ const saveProgress = async (req, res, next) => {
       waterIntake,
     } = req.body;
 
-    console.log("req.body : ", req.body);
+    // console.log("req.body : ", req.body);
 
-    console.log("nutritionDetails:", nutritionDetails);
+    // console.log("nutritionDetails:", nutritionDetails);
 
     const user = await User.findById(userId);
 
@@ -195,7 +195,7 @@ const saveProgress = async (req, res, next) => {
       });
     }
 
-    console.log("Progress saved : ", progress);
+    // console.log("Progress saved : ", progress);
 
     res.status(201).json({
       success: true,
@@ -224,7 +224,7 @@ const checkWorkoutCompletion = async (req, res, next) => {
         $lt: nextDay,
       },
     });
-    console.log("Progress inside checkWorkoutCompletion :  ", progress);
+    // console.log("Progress inside checkWorkoutCompletion :  ", progress);
 
     if (!progress) {
       return res.json({
@@ -259,7 +259,7 @@ const checkWorkoutCompletion = async (req, res, next) => {
 const getProgressHistory = async (req, res, next) => {
   try {
     const userId = req.user.id;
-    console.log("inside getProgress history userId ", userId);
+    // console.log("inside getProgress history userId ", userId);
 
     const progress = await Progress.find({ userId })
       .populate({
@@ -271,12 +271,12 @@ const getProgressHistory = async (req, res, next) => {
         select: "name type calories image", // specify fields you want
       });
 
-    console.log(
-      "inside get-progress-history controller progress  : ",
-      progress
-    );
+    // console.log(
+    //   "inside get-progress-history controller progress  : ",
+    //   progress
+    // );
 
-    console.log(`Found ${progress.length} progress entries for user ${userId}`);
+    // console.log(`Found ${progress.length} progress entries for user ${userId}`);
 
     // const total = await Progress.countDocuments(query);
 
@@ -510,7 +510,7 @@ const markNutritionFollowed = async (req, res, next) => {
 };
 const getUserProgress = async (req, res, next) => {
   try {
-    console.log("user progress : ");
+    // console.log("user progress : ");
 
     const progress = await Progress.find({ userId: req.user.id })
       .populate("workoutCompleted")
@@ -593,6 +593,9 @@ const getAllUserProgress = async (req, res, next) => {
 
 
 const getClientProgress = async (req, res, next) => {
+
+  // console.log("getting client progress : ...............");
+  
   try {
     const trainer = await Trainer.findById(req.user.id);
     
@@ -602,16 +605,18 @@ const getClientProgress = async (req, res, next) => {
         message: "Trainer not found" 
       });
     }
+    // console.log("user id : ",req.params.userid);
+    
     
     // Check if this client belongs to the trainer
-    if (!trainer.clients.includes(req.params.clientId)) {
+    if (!trainer.clients.includes(req.params.userid)) {
       return res.status(403).json({
         success: false,
         message: "This client is not associated with your account"
       });
     }
     
-    const progress = await Progress.findOne({ userId: req.params.clientId })
+    const progress = await Progress.findOne({ userId: req.params.userid })
       .sort({ date: -1 }) // Get the most recent progress entry
       .limit(1);
     

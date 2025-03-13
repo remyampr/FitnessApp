@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 
-import { AdminSidebar } from '../../components/admin/AdminSidebar';
 import { RevenueChart } from '../../components/admin/RevenueChart';
 import { setAdminRevenue, setError, setLoading, setPayments, setRevenueBreakdown, setTotalRevenue, setTrainerRevenue } from '../../redux/features/adminSlice';
 import { getRevenueBreakdown, getRevenueData } from '../../services/adminServices';
@@ -72,27 +71,27 @@ export const RevenuePage = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-base-200 w-full">
-      <AdminSidebar />
+    <div className="flex flex-col lg:flex-row min-h-screen bg-base-200 w-full p-0">
+    
       
-      <div className="flex-1 p-6">
+      <div className="flex-1 p-1">
         <h1 className="text-3xl font-bold mb-6">Revenue Dashboard</h1>
 
         {/* Revenue Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="card bg-white shadow-xl">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <div className="card bg-base-100 shadow-xl">
             <div className="card-body">
               <h2 className="card-title">Total Revenue</h2>
               <p className="text-2xl font-bold">{formatCurrency(totalRevenue)}</p>
             </div>
           </div>
-          <div className="card bg-white shadow-xl">
+          <div className="card bg-base-100 shadow-xl">
             <div className="card-body">
               <h2 className="card-title">Admin Revenue</h2>
               <p className="text-2xl font-bold">{formatCurrency(adminRevenue)}</p>
             </div>
           </div>
-          <div className="card bg-white shadow-xl">
+          <div className="card bg-base-100 shadow-xl">
             <div className="card-body">
               <h2 className="card-title">Trainer Revenue</h2>
               <p className="text-2xl font-bold">{formatCurrency(trainerRevenue)}</p>

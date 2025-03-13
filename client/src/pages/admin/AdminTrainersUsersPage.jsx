@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
-import { AdminSidebar } from "../../components/admin/AdminSidebar";
 import {
   setError,
   setLoading,
@@ -14,6 +13,7 @@ import { Pagination } from "../../components/shared/Pagination";
 
 import { UserCard } from "../../components/admin/UserCard";
 import { TrainerCard } from "../../components/admin/TrainerCard";
+import { AlertError } from "../../components/shared/AlertError";
 
 
 
@@ -40,20 +40,7 @@ export const AdminTrainersUsersPage = () => {
       setSelectedType("users"); 
     }
 
-    // const fetchAdminUsers = async () => {
-    //   try {
-    //     dispatch(setError(null));
-    //     dispatch(setLoading(true));
-    //     // const {users}=useSelector((state)=> state.admin)
-    //     dispatch(setLoading(false));
-    //   } catch (error) {
-    //     dispatch(setError("Failed to load Users"));
-    //     console.error("User fetch error:", error);
-    //     dispatch(setLoading(false));
-    //   }
-    // };
-
-    // fetchAdminUsers();
+   
   
   
   },  [location.search]);
@@ -65,7 +52,7 @@ export const AdminTrainersUsersPage = () => {
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-base-200">
       <div className="hidden lg:block">
-        <AdminSidebar />
+        {/* <AdminSidebar /> */}
       </div>
       <div className="flex-1 p-6">
         <div className="mb-8">
@@ -74,22 +61,7 @@ export const AdminTrainersUsersPage = () => {
         </div>
 
         {error && (
-          <div className="alert alert-error mb-6">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="stroke-current shrink-0 h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span>{error}</span>
-          </div>
+        <AlertError error={error} />
         )}
         {loading ? (
           <div className="flex justify-center items-center h-64">

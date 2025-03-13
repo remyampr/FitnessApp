@@ -20,7 +20,7 @@ export const RevenueChart = ({ data }) => {
   };
 
   return (
-    <div className="card bg-white shadow-xl mb-8">
+    <div className="card bg-base-100 shadow-xl mb-8 p-0">
       <div className="card-body">
         <h2 className="card-title">Monthly Revenue Breakdown</h2>
         <ResponsiveContainer width="100%" height={400}>

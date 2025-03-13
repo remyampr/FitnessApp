@@ -8,11 +8,12 @@ import {
   setTrainers,
 } from "../../redux/features/adminSlice";
 import { getAdminDashboard, getAdminUsers, getTrainers } from "../../services/adminServices";
-import { AdminSidebar } from "../../components/admin/AdminSidebar";
 import { Link, useNavigate } from "react-router-dom";
 import { dashboardMetadata } from "../../data/dashboardMetadata";
 import { DashboardCard } from "../../components/admin/DashBoardCard";
 import { RecentActivity } from "../../components/admin/RecentActivity";
+import { AlertError } from "../../components/shared/AlertError";
+import { LoadingSpinner } from "../../components/shared/LoadingSpinner";
 
 export const AdminDashboard = () => {
 
@@ -65,9 +66,7 @@ export const AdminDashboard = () => {
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-base-200 w-full">
-      <div className="hidden lg:block">
-        <AdminSidebar />
-      </div>
+    
 
       <div className="flex-1 p-6">
         <div className="mb-8">
@@ -75,28 +74,11 @@ export const AdminDashboard = () => {
           <p className="text-gray-600">Welcome to the admin dashboard</p>
         </div>
         {error && (
-          <div className="alert alert-error mb-6">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="stroke-current shrink-0 h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span>{error}</span>
-          </div>
+          <AlertError error={error} />
         )}
 
         {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <span className="loading loading-spinner loading-lg text-primary"></span>
-          </div>
+          <LoadingSpinner/>
         ) : (
           <>
             {/* Key Metrics Cards */}

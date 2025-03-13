@@ -32,7 +32,7 @@ const createWorkout = async (req, res, next) => {
       return res.status(500).json({ error: "Failed to upload image to Cloudinary." });
     }
     // console.log("image in cloudinary : ", cloudinaryRes);
-    console.log("req.body : ",req.body);
+    // console.log("req.body : ",req.body);
     // console.log("req.file.path : ",req.file.path);
     
 
@@ -49,11 +49,19 @@ const createWorkout = async (req, res, next) => {
     });
     let savedWorkout = await newWorkout.save();
 
-    await logActivity("NEW_WORKOUT", newWorkout._id, "workout", { createdBy: newWorkout.createdBy });
+    const logedActivity=await logActivity("NEW_WORKOUT", newWorkout._id, "workout", { createdBy: newWorkout.createdBy },{
+      _id: req.user._id,
+      role: req.user.role,
+      email: req.user.email,
+      name: req.user.name
+    });
+
+    console.log("LoggedActivity Workout creation ",logedActivity);
+    
 
 
     if (savedWorkout) {
-      console.log("Saved workout : ",savedWorkout);
+      // console.log("Saved workout : ",savedWorkout);
       
       return res.status(200).json({ message: "New Workout added", savedWorkout });
     }
@@ -77,7 +85,7 @@ const getAllWorkouts = async (req, res, next) => {
 const getWorkoutById = async (req, res, next) => {
   try {
     const{id}=req.params;
-    console.log("id  :  ",id);
+    // console.log("id  :  ",id);
     const workout = await Workout.findById(id);
     if (!workout) {
       return res.status(404).json({ error: "Workout not found." });
@@ -90,15 +98,15 @@ const getWorkoutById = async (req, res, next) => {
 
 //  updating a workout plan 
 const updateWorkoutPlan = async (req, res, next) => {
-  console.log("updating Work out .......");
+  // console.log("updating Work out .......");
 
-  console.log("Received update request for workout:", req.params.id);
-  console.log("Request body:", req.body);
-  console.log("Request file:", req.file);
+  // console.log("Received update request for workout:", req.params.id);
+  // console.log("Request body:", req.body);
+  // console.log("Request file:", req.file);
   
   try {
     const workout = await Workout.findById(req.params.id);
-    console.log("Workout ",workout );
+    // console.log("Workout ",workout );
     
     if (!workout) {
       return res.status(404).json({ error: "Workout not found." });
@@ -113,7 +121,7 @@ const updateWorkoutPlan = async (req, res, next) => {
         .json({ error: "You do not have permission to update this workout." });
     }
 
-    console.log("Req.Body : ",req.body);
+    // console.log("Req.Body : ",req.body);
     
 
     workout.name = req.body.name || workout.name;
@@ -148,7 +156,7 @@ const updateWorkoutPlan = async (req, res, next) => {
     }
 
     const updatedWorkout = await workout.save();
-    console.log("Workout updated successfully:", updatedWorkout._id);
+    // console.log("Workout updated successfully:", updatedWorkout._id);
     
     return res.status(200).json({
       message: "Workout updated successfully",
@@ -181,7 +189,7 @@ const getWorkoutsForTrainer = async (req, res, next) => {
   try {
 
     const trainerId = new mongoose.Types.ObjectId(req.user.id);
-    console.log("Trainer ID:", req.user.id, typeof req.user.id);
+    // console.log("Trainer ID:", req.user.id, typeof req.user.id);
 
     const workouts = await Workout.find({ createdBy: trainerId });
 
@@ -198,7 +206,7 @@ const getWorkoutsForTrainer = async (req, res, next) => {
 // Shouldnt get deactivated workout
 const getUserWorkouts = async (req, res, next) => {
   try {
-    console.log("inside get userWorkout controller !");
+    // console.log("inside get userWorkout controller !");
     
     const userId = req.user.id;
     // console.log("User Id ",userId);
@@ -239,7 +247,7 @@ const getUserWorkouts = async (req, res, next) => {
       "schedule.day": { $in: [todayName,tomorrowName] },
      })
 
-     console.log("workouts : ",workouts);
+    //  console.log("workouts : ",workouts);
      
 
      res.status(200).json({ success: true, data: workouts, user:userId});

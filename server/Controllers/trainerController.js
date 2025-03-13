@@ -124,6 +124,7 @@ const getTrainerRevenue = async (req, res, next) => {
       success: true,
       totalRevenue: trainer.totalRevenue,
       revenueHistory: trainer.revenueHistory,
+      paymentHistory:trainer.payments
     });
   } catch (error) {
     next(error);
@@ -133,8 +134,7 @@ const getTrainerRevenue = async (req, res, next) => {
 const updateTrainerProfile = async (req, res, next) => {
   try {
     const {
-      name,
-      phone,
+
       specialization,
       experience,
       certifications,
@@ -149,16 +149,23 @@ const updateTrainerProfile = async (req, res, next) => {
         .json({ success: false, message: "Trainer not found" });
     }
 
-    if (name) trainer.name = name;
-    if (phone) trainer.phone = phone;
+    if (req.file) {
+      let image=req.file.path
+    const cloudinaryRes=await uploadToCloudinary(image);
+    console.log("image in cloudinary : ", cloudinaryRes);
+      image = cloudinaryRes;
+      trainer.image=image;
+    }
+
+   
+
     if (specialization) trainer.specialization = specialization;
     if (experience) trainer.experience = experience;
     if (certifications) trainer.certifications = certifications;
     if (availability) trainer.availability = availability;
 
-    if (req.file) {
-      trainer.image = req.file.path;
-    }
+    
+    
 
     await trainer.save();
 
@@ -184,6 +191,8 @@ const getTrainerProfile = async (req, res, next) => {
         .json({ success: false, message: "Trainer not found" });
     }
 
+    console.log("trainer to send : ",trainer);
+    
     res.status(200).json({
       success: true,
       trainer,

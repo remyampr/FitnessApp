@@ -40,11 +40,7 @@ export const getApprovedTrainers=()=>{
 }
 export const assignTrainer=(data)=>{
     return axiosInstance.put("/user/trainers/assign",data)
-    // ,{
-    //     headers:{
-    //         "Content-Type": "application/json",
-    //     }
-    // }
+   
 }
 
 export const makePaymentOnStripe=(data)=>{

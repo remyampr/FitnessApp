@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { forceDeleteAppointment, forceUpdateAppointment, getAllAppointments, getAppointmentById } from '../../services/adminServices';
 import { deleteAppointmentFromStore, setAppointments, setCurrentAppointment, updateAppointmentInStore } from '../../redux/features/adminSlice';
-import { AdminSidebar } from '../../components/admin/AdminSidebar';
 
 
 export const AppointmentsPage = () => {
@@ -67,15 +66,15 @@ export const AppointmentsPage = () => {
     };
 
     //  delete appointment
-    const handleDeleteAppointment = async (id) => {
-        try {
-            await forceDeleteAppointment(id);
-            dispatch(deleteAppointmentFromStore(id));
-            setSelectedAppointment(null);
-        } catch (err) {
-            console.error('Failed to delete appointment:', err);
-        }
-    };
+    // const handleDeleteAppointment = async (id) => {
+    //     try {
+    //         await forceDeleteAppointment(id);
+    //         dispatch(deleteAppointmentFromStore(id));
+    //         setSelectedAppointment(null);
+    //     } catch (err) {
+    //         console.error('Failed to delete appointment:', err);
+    //     }
+    // };
 
     return (
         <div className="container mx-auto p-6">
@@ -108,35 +107,35 @@ export const AppointmentsPage = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {appointments.map((appointment) => (
-                            <tr key={appointment._id}>
-                                <td>{appointment._id}</td>
-                                <td>{appointment.user.name}</td>
-                                <td>{appointment.trainer.name}</td>
-                                <td>{new Date(appointment.date).toLocaleString()}</td>
+                        {appointments?.map((appointment) => (
+                            <tr key={appointment?._id}>
+                                <td>{appointment?._id}</td>
+                                <td>{appointment.user?.name || "N/A"}</td>
+                                <td>{appointment.trainer?.name || "N/A"}</td>
+                                <td>{new Date(appointment?.date).toLocaleString()}</td>
                                 <td>
                                     <span className={`badge ${
-                                        appointment.status === 'confirmed' ? 'badge-success' :
-                                        appointment.status === 'pending' ? 'badge-warning' :
+                                        appointment?.status === 'confirmed' ? 'badge-success' :
+                                        appointment?.status === 'pending' ? 'badge-warning' :
                                         'badge-error'
                                     }`}>
-                                        {appointment.status}
+                                        {appointment?.status}
                                     </span>
                                 </td>
                                 <td>
                                     <div className="flex space-x-2">
                                         <button 
                                             className="btn btn-sm btn-info"
-                                            onClick={() => handleViewAppointment(appointment._id)}
+                                            onClick={() => handleViewAppointment(appointment?._id)}
                                         >
                                             View
                                         </button>
-                                        <button 
+                                        {/* <button 
                                             className="btn btn-sm btn-error"
-                                            onClick={() => handleDeleteAppointment(appointment._id)}
+                                            onClick={() => handleDeleteAppointment(appointment?._id)}
                                         >
                                             Delete
-                                        </button>
+                                        </button> */}
                                     </div>
                                 </td>
                             </tr>
@@ -157,12 +156,12 @@ export const AppointmentsPage = () => {
                             <p>Status: {selectedAppointment.status}</p>
                         </div>
                         <div className="modal-action">
-                            <button 
+                            {/* <button 
                                 className="btn btn-primary"
                                 onClick={() => handleUpdateAppointment({ status: 'Confirmed' })}
                             >
                                 Confirm
-                            </button>
+                            </button> */}
                             <button 
                                 className="btn btn-ghost"
                                 onClick={() => setSelectedAppointment(null)}

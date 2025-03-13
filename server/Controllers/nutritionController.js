@@ -24,11 +24,11 @@ const createNutrition = async (req, res, next) => {
       parsedSchedule = schedule;
     }
 
-    console.log("Parsed Schedule:", parsedSchedule);
+    // console.log("Parsed Schedule:", parsedSchedule);
    
 
     const cloudinaryRes = await uploadToCloudinary(image);
-    console.log("image in cloudinary : ", cloudinaryRes);
+    // console.log("image in cloudinary : ", cloudinaryRes);
 
     const newNutrition = new Nutrition({
       title,
@@ -43,7 +43,12 @@ const createNutrition = async (req, res, next) => {
 
     let savedNutrition=await newNutrition.save();
 
-    await logActivity("NEW_NUTRITION_PLAN",newNutrition._id,"nutritionPlan", { createdBy: newNutrition.createdBy, goal: newNutrition.goal })
+    await logActivity("NEW_NUTRITION_PLAN",newNutrition._id,"nutritionPlan", { createdBy: newNutrition.createdBy, goal: newNutrition.goal },{
+      _id: req.user._id,
+      role: req.user.role,
+      email: req.user.email,
+      name: req.user.name
+    })
 
  
 

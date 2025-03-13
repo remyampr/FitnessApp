@@ -341,7 +341,10 @@ const getDashboard = async (req, res, next) => {
       timestamp: { $gte: oneWeekAgo },
     })
       .sort({ timestamp: -1 })
-      .limit(10);
+      .limit(10)
+      .lean(); 
+     
+
 
     const lastNutritionPlans = await Activity.find({
       activityType: "NEW_NUTRITION_PLAN",

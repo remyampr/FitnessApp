@@ -26,6 +26,20 @@ const activitySchema = new mongoose.Schema({
   details: {
     type: mongoose.Schema.Types.Mixed
   },
+
+
+
+
+  creatorId: {
+    type: mongoose.Schema.Types.ObjectId
+  },
+  creatorType: {
+    type: String,
+    enum: ['user', 'trainer', 'admin']
+  },
+ creatorEmail: String,
+ creatorName: String,    
+
   timestamp: {
     type: Date,
     default: Date.now

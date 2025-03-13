@@ -7,7 +7,6 @@ import {
   setNutritionPlans,
 } from "../../redux/features/adminSlice";
 
-import { AdminSidebar } from "../../components/admin/AdminSidebar";
 import { createNutritionPlan, getAllNutritionPlans, updateNutritionPlan } from "../../services/adminServices";
 import { LoadingSpinner } from "../../components/shared/LoadingSpinner";
 import { AlertError } from "../../components/shared/AlertError";
@@ -238,10 +237,9 @@ export const NutritionPage = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-base-200">
-      <AdminSidebar />
+    <div className="flex flex-col lg:flex-row min-h-screen bg-base-200 p-2">
 
-      <div className="flex-1 p-6">
+      <div >
         <h1 className="text-3xl font-bold mb-6">Nutrition Plan Management</h1>
 
         {error && (
@@ -250,13 +248,14 @@ export const NutritionPage = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Nutrition Plan Creation/Edit Form */}
-          <div className="card bg-white shadow-xl p-6">
+          <div className="card bg-base-100 shadow-xl p-6">
             <h2 className="text-2xl font-semibold mb-4">
               {isEditing ? "Edit Nutrition Plan" : "Create New Nutrition Plan"}
             </h2>
             <form onSubmit={handleSubmit}>
-              <div className="form-control">
-                <label className="label">Plan Title</label>
+            <div className="flex flex-col gap-4">
+             <div className="form-control m">
+                <label className="label mr-2 ">Plan Title</label>
                 <input
                   type="text"
                   name="title"
@@ -268,7 +267,7 @@ export const NutritionPage = () => {
               </div>
 
               <div className="form-control">
-                <label className="label">Goal</label>
+                <label className="label mr-2">Goal</label>
                 <select
                   name="fitnessGoal"
                   value={nutritionForm.fitnessGoal}
@@ -284,7 +283,7 @@ export const NutritionPage = () => {
               </div>
 
               <div className="form-control">
-                <label className="label">Water Intake (ml)</label>
+                <label className="label mr-2">Water Intake (ml)</label>
                 <input
                   type="number"
                   name="waterIntake"
@@ -296,7 +295,7 @@ export const NutritionPage = () => {
               </div>
 
               <div className="form-control">
-                <label className="label">Plan Image</label>
+                <label className="label mr-2">Plan Image</label>
                 <input
                   type="file"
                   onChange={handleImageChange}
@@ -309,12 +308,13 @@ export const NutritionPage = () => {
                   </p>
                 )}
               </div>
+             </div>
 
               {/* Schedule Section (Days and Meals) */}
               <div className="mt-4">
                 <h3 className="text-lg font-semibold mb-2">Schedule</h3>
                 {nutritionForm.schedule?.map((day, dayIndex) => (
-                  <div key={dayIndex} className="mt-4 p-4 bg-gray-100 rounded">
+                  <div key={dayIndex} className="mt-4 p-4 bg-base-200 rounded">
                     <div className="form-control">
                       <label className="label">Day</label>
                       <select
@@ -340,7 +340,7 @@ export const NutritionPage = () => {
                     </div>
                     
                     {day.meals?.map((meal, mealIndex) => (
-                      <div key={mealIndex} className="mt-4 p-4 bg-gray-50 rounded">
+                      <div key={mealIndex} className="mt-4 p-4 bg-base-50 rounded">
                         <div className="form-control">
                           <label className="label">Meal Type</label>
                           <select
@@ -364,7 +364,7 @@ export const NutritionPage = () => {
                         
                         <h4 className="font-medium mt-2">Foods</h4>
                         {meal.foods?.map((food, foodIndex) => (
-                          <div key={foodIndex} className="mt-2 p-2 bg-gray-100 rounded">
+                          <div key={foodIndex} className="mt-2 p-2 bg-base-100 rounded">
                             <div className="grid grid-cols-2 gap-2">
                               <div className="form-control">
                                 <label className="label text-xs">Food Name</label>
@@ -564,17 +564,17 @@ export const NutritionPage = () => {
           </div>
 
           {/* Nutrition Plan List */}
-          <div className="card bg-white shadow-xl p-6">
+          <div className="card bg-base-100 shadow-xl p-6">
             <h2 className="text-2xl font-semibold mb-4">All Nutrition Plans</h2>
             {loading ? (
               <LoadingSpinner />
             ) : (
-              <div>
+              <>
               {/* Filter Dropdown */}
-              <div className="mb-4">
+              <div className="mb-4 ">
                 <label className="mr-2 font-medium">Filter by Goal:</label>
                 <select
-                  className="p-2 border rounded"
+                  className="p-2 border rounded bg-base-100"
                   value={selectedGoal}
                   onChange={(e) => setSelectedGoal(e.target.value)}
                 >
@@ -591,7 +591,7 @@ export const NutritionPage = () => {
               <div>
                 {filteredPlans && filteredPlans.length > 0 ? (
                   filteredPlans.map((plan) => (
-                    <div key={plan._id} className="mb-4 p-4 bg-gray-50 rounded">
+                    <div key={plan._id} className="mb-4 p-4 bg-base-50 rounded">
                       <h3 className="font-semibold">{plan.title}</h3>
                       <p>
                         <strong>Goal:</strong> {plan.fitnessGoal}
@@ -611,7 +611,7 @@ export const NutritionPage = () => {
                   <p>No nutrition plans found.</p>
                 )}
               </div>
-            </div>
+            </>
             )}
           </div>
         </div>

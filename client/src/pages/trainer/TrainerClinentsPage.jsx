@@ -16,6 +16,21 @@ export const TrainerClientsPage = () => {
   const [progressLoading, setProgressLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('workouts');
 
+  const [selectedWorkout, setSelectedWorkout] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = (workout) => {
+    setSelectedWorkout(workout);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedWorkout(null);
+  };
+
+
+
   console.log("Getting clients from redux : ",clients);
   
 console.log(  "\nclient Progress :",
@@ -23,10 +38,6 @@ console.log(  "\nclient Progress :",
 );
 
 
-  
-  // useEffect(() => {
-  //   dispatch(fetchClients());
-  // }, [dispatch]);
 
   const fetchClientProgress = async (clientId) => {
     try {
@@ -72,6 +83,7 @@ console.log(  "\nclient Progress :",
   }
 
   return (
+    <>
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">My Clients</h1>
@@ -187,9 +199,7 @@ fitnessGoal || "No goal set"}</div>
                     {activeTab === 'workouts' && (
                       <div>
                         {progressLoading ? (
-                          <div className="flex justify-center py-8">
-                            <span className="loading loading-spinner loading-md"></span>
-                          </div>
+                          <LoadingSpinner/>
                         ) : clientProgress && clientProgress.workoutDetails && clientProgress.workoutDetails.length > 0 ? (
                           <div>
                             <div className="stats shadow mb-4 w-full">
@@ -224,33 +234,18 @@ fitnessGoal || "No goal set"}</div>
                                 </thead>
                                 <tbody>
                                   {clientProgress.workoutDetails.map((workout, index) => (
-                                    <tr key={index}>
+                                    <tr key={index} > 
                                       <td>{formatDate(workout.completedAt)}</td>
                                       <td>{workout.duration} mins</td>
                                       <td>{workout.exercises.length} exercises</td>
-                                      <td>
-                                        <div className="dropdown dropdown-end">
-                                          <label tabIndex={0} className="btn btn-ghost btn-xs">Details</label>
-                                          <div tabIndex={0} className="card dropdown-content z-10 shadow bg-base-100 rounded-box w-72">
-                                            <div className="card-body">
-                                              <h3 className="font-bold text-lg">Workout Details</h3>
-                                              <div className="space-y-2">
-                                                {workout.exercises.map((exercise, i) => (
-                                                  <div key={i} className="p-2 bg-base-200 rounded">
-                                                    <p className="font-medium">{exercise.name}</p>
-                                                    <p className="text-sm">
-                                                      {exercise.sets} sets × {exercise.reps} reps
-                                                      {exercise.weight ? ` @ ${exercise.weight}kg` : ''}
-                                                    </p>
-                                                    {exercise.notes && (
-                                                      <p className="text-xs italic mt-1">{exercise.notes}</p>
-                                                    )}
-                                                  </div>
-                                                ))}
-                                              </div>
-                                            </div>
-                                          </div>
-                                        </div>
+                                      <td >
+                                      <button 
+                    onClick={() => openModal(workout)} 
+                    className="btn btn-ghost btn-xs"
+                  >
+                    Details
+                  </button>
+                                      
                                       </td>
                                     </tr>
                                   ))}
@@ -323,14 +318,7 @@ fitnessGoal || "No goal set"}</div>
                       </div>
                     )}
 
-                    <div className="card-actions justify-end mt-4">
-                      <Link to={`/clients/${client._id}/edit`} className="btn btn-outline btn-primary btn-sm">
-                        <FileText size={16} className="mr-2" /> Edit Client
-                      </Link>
-                      <Link to={`/clients/${client._id}/progress`} className="btn btn-primary btn-sm">
-                        <Activity size={16} className="mr-2" /> View Full Progress
-                      </Link>
-                    </div>
+                    
                   </div>
                 )}
               </div>
@@ -341,6 +329,45 @@ fitnessGoal || "No goal set"}</div>
         )}
       </div>
     </div>
+    {isModalOpen && selectedWorkout && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-base-100 rounded-lg p-6 w-11/12 max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="font-bold text-lg">
+                Workout Details - {formatDate(selectedWorkout.completedAt)}
+              </h3>
+              <button 
+                onClick={closeModal}
+                className="btn btn-sm btn-circle"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="space-y-3">
+              {selectedWorkout.exercises.map((exercise, i) => (
+                <div key={i} className="p-3 bg-base-200 rounded">
+                  <p className="font-medium">{exercise.name}</p>
+                  <p className="text-sm">
+                    {exercise.sets} sets × {exercise.reps} reps
+                    {exercise.weight ? ` @ ${exercise.weight}kg` : ''}
+                  </p>
+                  {exercise.notes && (
+                    <p className="text-xs italic mt-1">{exercise.notes}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+            
+            <div className="mt-6 flex justify-end">
+         
+            </div>
+          </div>
+        </div>
+      )}
+
+
+    </>
   );
 };
 

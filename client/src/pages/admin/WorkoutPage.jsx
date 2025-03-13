@@ -11,24 +11,22 @@ import {
   getAllWorkouts,
   updateWorkoutPlan,
 } from "../../services/adminServices";
-import { AdminSidebar } from "../../components/admin/AdminSidebar";
 import { LoadingSpinner } from "../../components/shared/LoadingSpinner";
 import { AlertError } from "../../components/shared/AlertError";
 
 export const WorkoutPage = () => {
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const { workouts, loading, error } = useSelector((state) => state.admin);
- const [selectedGoal, setSelectedGoal] = useState("");
- const fitnessGoals = [
-  "Weight Loss",
-  "Weight Gain",
-  "Muscle Gain",
-  "Maintenance",
-  "Endurance Improvement",
-];
+  const [selectedGoal, setSelectedGoal] = useState("");
+  const fitnessGoals = [
+    "Weight Loss",
+    "Weight Gain",
+    "Muscle Gain",
+    "Maintenance",
+    "Endurance Improvement",
+  ];
 
   const [workoutForm, setWorkoutForm] = useState({
     name: "",
@@ -40,7 +38,7 @@ export const WorkoutPage = () => {
     schedule: [
       {
         day: "Monday",
-        exercises: [{ name: "", sets: 0, reps: 0, restTime: 0, notes: "" }],
+        exercises: [{ name: "", sets:"", reps: "", restTime: "", notes: "" }],
       },
     ],
   });
@@ -49,9 +47,8 @@ export const WorkoutPage = () => {
   const [currentWorkoutId, setCurrentWorkoutId] = useState(null);
 
   const filteredWorkouts = selectedGoal
-  ? workouts.filter((workout) => workout.fitnessGoal === selectedGoal)
-  : workouts;
-
+    ? workouts.filter((workout) => workout.fitnessGoal === selectedGoal)
+    : workouts;
 
   useEffect(() => {
     fetchWorkouts();
@@ -97,7 +94,6 @@ export const WorkoutPage = () => {
   };
 
   const handleSubmit = async (e) => {
-   
     e.preventDefault();
     try {
       dispatch(setLoading(true));
@@ -121,7 +117,7 @@ export const WorkoutPage = () => {
       console.log("FormData : ", formData);
 
       if (isEditing && currentWorkoutId) {
-        console.log("updating data ",formData);
+        console.log("updating data ", formData);
         
         const updateResponse = await updateWorkoutPlan(
           currentWorkoutId,
@@ -155,13 +151,13 @@ export const WorkoutPage = () => {
             exercises:
               day.exercises && day.exercises.length > 0
                 ? day.exercises
-                : [{ name: "", sets: 0, reps: 0, restTime: 0, notes: "" }],
+                : [{ name: "", sets: "", reps: "", restTime: "", notes: "" }],
           }))
         : [
             {
               day: "Monday",
               exercises: [
-                { name: "", sets: 0, reps: 0, restTime: 0, notes: "" },
+                { name: "", sets: "", reps: "", restTime: "", notes: "" },
               ],
             },
           ];
@@ -188,7 +184,7 @@ export const WorkoutPage = () => {
       schedule: [
         {
           day: "Monday",
-          exercises: [{ name: "", sets: 0, reps: 0, restTime: 0, notes: "" }],
+          exercises: [{ name: "", sets: "", reps: "", restTime: "", notes: "" }],
         },
       ],
     });
@@ -202,126 +198,125 @@ export const WorkoutPage = () => {
     const newSchedule = [...workoutForm.schedule];
     newSchedule[dayIndex].exercises.push({
       name: "",
-      sets: 0,
-      reps: 0,
-      restTime: 0,
+      sets: "",
+      reps: "",
+      restTime: "",
       notes: "",
     });
     setWorkoutForm((prev) => ({ ...prev, schedule: newSchedule }));
   };
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-base-200">
-      <AdminSidebar />
 
-      <div className="flex-1 p-6">
+    <div className="flex flex-col lg:flex-row min-h-screen bg-base-200">
+      <div>
         <h1 className="text-3xl font-bold mb-6">Workout Management</h1>
 
-        {error && (
-         <AlertError error={error} />
-        )}
+        {error && <AlertError error={error} />}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 ">
           {/* Workout Creation/Edit Form */}
-          <div className="card bg-white shadow-xl p-6">
-            <h2 className="text-2xl font-semibold mb-4">
+          <div className="card bg-base-100 shadow-xl p-6">
+            <h2 className="text-2xl font-semibold mb-4 ">
               {isEditing ? "Edit Workout" : "Create New Workout"}
             </h2>
             <form onSubmit={handleSubmit}>
-              <div className="form-control">
-                <label className="label">Workout Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={workoutForm.name}
-                  onChange={handleInputChange}
-                  className="input input-bordered"
-                  required
-                />
-              </div>
+              <div className="flex flex-col gap-4">
+                <div className="form-control">
+                  <label className="label dark:text-gray-300">Workout Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={workoutForm.name}
+                    onChange={handleInputChange}
+                    className="input input-bordered "
+                    required
+                  />
+                </div>
 
-              <div className="form-control">
-                <label className="label">Description</label>
-                <textarea
-                  name="description"
-                  value={workoutForm.description}
-                  onChange={handleInputChange}
-                  className="textarea textarea-bordered"
-                />
-              </div>
+                <div className="form-control">
+                  <label className="label mr-1.5">Description</label>
+                  <textarea
+                    name="description"
+                    value={workoutForm.description}
+                    onChange={handleInputChange}
+                    className="textarea textarea-bordered "
+                  />
+                </div>
 
-              <div className="form-control">
-                <label className="label">Fitness Goal</label>
-                <select
-                  name="fitnessGoal"
-                  value={workoutForm.fitnessGoal}
-                  onChange={handleInputChange}
-                  className="select select-bordered"
-                >
-                  <option value="Weight Loss">Weight Loss</option>
-                  <option value="Weight Gain">Weight Gain</option>
-                  <option value="Muscle Gain">Muscle Gain</option>
-                  <option value="Maintenance">Maintenance</option>
-                  <option value="Endurance Improvement">
-                    Endurance Improvement
-                  </option>
-                </select>
-              </div>
+                <div className="form-control">
+                  <label className="label mr-1.5">Fitness Goal</label>
+                  <select
+                    name="fitnessGoal"
+                    value={workoutForm.fitnessGoal}
+                    onChange={handleInputChange}
+                    className="select select-bordered "
+                  >
+                    <option value="Weight Loss">Weight Loss</option>
+                    <option value="Weight Gain">Weight Gain</option>
+                    <option value="Muscle Gain">Muscle Gain</option>
+                    <option value="Maintenance">Maintenance</option>
+                    <option value="Endurance Improvement">
+                      Endurance Improvement
+                    </option>
+                  </select>
+                </div>
 
-              <div className="form-control">
-                <label className="label">Difficulty</label>
-                <select
-                  name="difficulty"
-                  value={workoutForm.difficulty}
-                  onChange={handleInputChange}
-                  className="select select-bordered"
-                >
-                  <option value="Easy">Easy</option>
-                  <option value="Medium">Medium</option>
-                  <option value="Hard">Hard</option>
-                </select>
-              </div>
+                <div className="form-control">
+                  <label className="label mr-1.5">Difficulty</label>
+                  <select
+                    name="difficulty"
+                    value={workoutForm.difficulty}
+                    onChange={handleInputChange}
+                    className="select select-bordered "
+                  >
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                  </select>
+                </div>
 
-              <div className="form-control">
-                <label className="label">Duration (mins)</label>
-                <input
-                  type="number"
-                  name="duration"
-                  value={workoutForm.duration}
-                  onChange={handleInputChange}
-                  className="input input-bordered"
-                  min="1"
-                  required
-                />
-              </div>
+                <div className="form-control">
+                  <label className="label dark:text-gray-300">Duration (mins)</label>
+                  <input
+                    type="number"
+                    name="duration"
+                    value={workoutForm.duration}
+                    onChange={handleInputChange}
+                    className="input input-bordered "
+                    min="1"
+                    required
+                  />
+                </div>
 
-              <div className="form-control">
-                <label className="label">Workout Image</label>
-                <input
-                  type="file"
-                  onChange={handleImageChange}
-                  className="file-input file-input-bordered"
-                  accept="image/*"
-                />
-                {isEditing && (
-                  <p className="text-xs mt-1">
-                    Leave empty to keep current image
-                  </p>
-                )}
+                <div className="form-control">
+                  <label className="label ">Workout Image</label>
+                  <input
+                    type="file"
+                    onChange={handleImageChange}
+                    className="file-input file-input-bordered "
+                    accept="image/*"
+                  />
+                  {isEditing && (
+                    <p className="text-xs mt-1 ">
+                      Leave empty to keep current image
+                    </p>
+                  )}
+                </div>
               </div>
 
               {/* Schedule Section */}
               <div className="mt-4">
-                <h3 className="text-lg font-semibold mb-2">Weekly Schedule</h3>
+                <h3 className="text-lg font-semibold mb-2 ">Weekly Schedule</h3>
                 {workoutForm.schedule?.map((daySchedule, dayIndex) => (
-                  <div key={dayIndex} className="mt-4 p-4 bg-gray-100 rounded">
-                    <h3 className="text-lg font-semibold">
+                  <div key={dayIndex} className="mt-4 p-4 bg-base-200 ">
+                    <h3 className="text-lg font-semibold ">
                       {daySchedule.day} Schedule
                     </h3>
                     {daySchedule.exercises?.map((exercise, exerciseIndex) => (
                       <div
                         key={exerciseIndex}
-                        className="mt-2 p-2 bg-gray-50 rounded"
+                        className="mt-2 p-2 bg-base-50 "
                       >
                         <input
                           type="text"
@@ -337,13 +332,13 @@ export const WorkoutPage = () => {
                               schedule: newSchedule,
                             }));
                           }}
-                          className="input input-bordered input-sm w-full mb-2"
+                          className="input input-bordered input-sm w-full mb-2 "
                         />
                         <div className="grid grid-cols-3 gap-2">
                           <input
                             type="number"
                             placeholder="Sets"
-                            value={exercise.sets || 0}
+                            value={exercise.sets === undefined ? "" : exercise.sets}
                             onChange={(e) => {
                               const newSchedule = [...workoutForm.schedule];
                               newSchedule[dayIndex].exercises[
@@ -354,13 +349,14 @@ export const WorkoutPage = () => {
                                 schedule: newSchedule,
                               }));
                             }}
-                            className="input input-bordered input-sm"
+                            className="input input-bordered input-sm "
                             min="0"
                           />
                           <input
                             type="number"
                             placeholder="Reps"
-                            value={exercise.reps || 0}
+                           
+                            value={exercise.reps === undefined ? "" : exercise.reps}
                             onChange={(e) => {
                               const newSchedule = [...workoutForm.schedule];
                               newSchedule[dayIndex].exercises[
@@ -371,13 +367,14 @@ export const WorkoutPage = () => {
                                 schedule: newSchedule,
                               }));
                             }}
-                            className="input input-bordered input-sm"
+                            className="input input-bordered input-sm "
                             min="0"
                           />
                           <input
                             type="number"
                             placeholder="Rest Time (sec)"
-                            value={exercise.restTime || 0}
+                           
+                            value={exercise.restTime === undefined ? "" : exercise.restTime}
                             onChange={(e) => {
                               const newSchedule = [...workoutForm.schedule];
                               newSchedule[dayIndex].exercises[
@@ -388,7 +385,7 @@ export const WorkoutPage = () => {
                                 schedule: newSchedule,
                               }));
                             }}
-                            className="input input-bordered input-sm"
+                            className="input input-bordered input-sm "
                             min="0"
                           />
                         </div>
@@ -405,7 +402,7 @@ export const WorkoutPage = () => {
                               schedule: newSchedule,
                             }));
                           }}
-                          className="textarea textarea-bordered textarea-sm w-full mt-2"
+                          className="textarea textarea-bordered textarea-sm w-full mt-2 "
                         />
                       </div>
                     ))}
@@ -417,103 +414,103 @@ export const WorkoutPage = () => {
                         >
                          Add Exercise
                         </button>
-                  </div>
+                        </div>
                 ))}
               </div>
-
               <div className="form-control mt-6">
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <span className="loading loading-spinner loading-sm"></span>
-                  ) : isEditing ? (
-                    "Update Workout"
-                  ) : (
-                    "Create Workout"
-                  )}
-                </button>
-                {isEditing && (
-                  <button
-                    type="button"
-                    onClick={resetForm}
-                    className="btn btn-ghost mt-2"
-                    disabled={loading}
-                  >
-                    Cancel
-                  </button>
-                )}
-              </div>
-            </form>
-          </div>
-
-          {/* Workout List */}
-          <div className="card bg-white shadow-xl p-6">
-            <h2 className="text-2xl font-semibold mb-4">Existing Workouts</h2>
-            {loading ? (
-              <LoadingSpinner/>
-            ) : (
-              <div>
-                     <div className="mb-4">
-        <label className="mr-2 font-medium">Filter by Goal:</label>
-        <select
-          className="p-2 border rounded"
-          value={selectedGoal}
-          onChange={(e) => setSelectedGoal(e.target.value)}
-        >
-          <option value="">All</option>
-          {fitnessGoals.map((goal) => (
-            <option key={goal} value={goal}>
-              {goal}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {filteredWorkouts.length > 0 ? (
-          filteredWorkouts.map((workout) => (
-            <div key={workout._id} className="bg-white p-4 rounded shadow-sm">
-              <div className="flex justify-between items-start">
-                <div>
-                  {/* Truncated Name with Tooltip */}
-                  <h3 className="font-medium text-lg mb-1">
-                    <div className="relative group">
-                      <span className="truncate" title={workout.name}>
-                        {workout.name.length > 10
-                          ? workout.name.slice(0, 6) + "..." + workout.name.slice(-4)
-                          : workout.name}
-                      </span>
-                      <span className="absolute bottom-0 left-0 w-full h-full bg-black opacity-0 group-hover:opacity-100 text-white text-xs p-1 rounded-md">
-                        {workout.name}
-                      </span>
+                              <button
+                                type="submit"
+                                className="btn btn-primary"
+                                disabled={loading}
+                              >
+                                {loading ? (
+                                  <span className="loading loading-spinner loading-sm"></span>
+                                ) : isEditing ? (
+                                  "Update Workout"
+                                ) : (
+                                  "Create Workout"
+                                )}
+                              </button>
+                              {isEditing && (
+                                <button
+                                  type="button"
+                                  onClick={resetForm}
+                                  className="btn btn-ghost mt-2"
+                                  disabled={loading}
+                                >
+                                  Cancel
+                                </button>
+                              )}
+                            </div>
+                          </form>
+                        </div>
+              
+                        {/* Workout List */}
+                        <div className="card bg-base-100 shadow-xl p-6">
+                          <h2 className="text-2xl font-semibold mb-4">Existing Workouts</h2>
+                          {loading ? (
+                            <LoadingSpinner/>
+                          ) : (
+                            <div>
+                                   <div className="mb-4">
+                      <label className="mr-2 font-medium">Filter by Goal:</label>
+                      <select
+                        className="p-2 border rounded"
+                        value={selectedGoal}
+                        onChange={(e) => setSelectedGoal(e.target.value)}
+                      >
+                        <option value="">All</option>
+                        {fitnessGoals.map((goal) => (
+                          <option key={goal} value={goal}>
+                            {goal}
+                          </option>
+                        ))}
+                      </select>
                     </div>
-                  </h3>
-                  {/* Goal */}
-                  <p className="text-sm text-gray-600">{workout.fitnessGoal}</p>
-                  {/* Difficulty */}
-                  <p className="text-sm">Difficulty: {workout.difficulty}</p>
-                </div>
-                {/* Edit Button */}
-                <button
-                  className="btn btn-warning btn-sm"
-                  onClick={() => editWorkout(workout)}
-                >
-                  Edit
-                </button>
-              </div>
-            </div>
-          ))
-        ) : (
-          <div className="col-span-2 text-center py-4">No workouts found</div>
-        )}
-      </div>
-            </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {filteredWorkouts.length > 0 ? (
+                        filteredWorkouts.map((workout) => (
+                          <div key={workout._id} className="bg-base-100 p-4 rounded shadow-sm">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                {/* Truncated Name with Tooltip */}
+                                <h3 className="font-medium text-lg mb-1">
+                                  <div className="relative group">
+                                    <span className="truncate" title={workout.name}>
+                                      {workout.name.length > 10
+                                        ? workout.name.slice(0, 6) + "..." + workout.name.slice(-4)
+                                        : workout.name}
+                                    </span>
+                                    <span className="absolute bottom-0 left-0 w-full h-full bg-black opacity-0 group-hover:opacity-100 text-white text-xs  rounded-md">
+                                      {workout.name}
+                                    </span>
+                                  </div>
+                                </h3>
+                                {/* Goal */}
+                                <p className="text-sm text-gray-600">{workout.fitnessGoal}</p>
+                                {/* Difficulty */}
+                                <p className="text-sm">Difficulty: {workout.difficulty}</p>
+                              </div>
+                              {/* Edit Button */}
+                              <button
+                                className="btn btn-warning btn-sm"
+                                onClick={() => editWorkout(workout)}
+                              >
+                                Edit
+                              </button>
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="col-span-2 text-center py-4">No workouts found</div>
+                      )}
+                    </div>
+                          </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              };
+              

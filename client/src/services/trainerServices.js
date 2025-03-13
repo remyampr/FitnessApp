@@ -23,6 +23,9 @@ export const trainerLogout=( )=>{
 export const getProfile=( )=>{
         return axiosInstance.get("/trainer/profile")
 }
+export const updateProfile=(data )=>{
+        return axiosInstance.put("/trainer/profile/update",data)
+}
 
 // client
 export const getClients=( )=>{

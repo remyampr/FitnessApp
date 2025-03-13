@@ -4,7 +4,8 @@ const logActivity = async (
   activityType,
   entityId,
   entityType,
-  details = {}
+  details = {},
+  creator = {} 
 ) => {
   try {
     const activity = new Activity({
@@ -12,9 +13,18 @@ const logActivity = async (
       entityId,
       entityType,
       details,
+      creatorId: details.createdBy || creator._id,
+      creatorType: details.createdByType || creator.role,
+      creatorEmail: creator.email,
+      creatorName: creator.name,
     });
+    
+    
 
     await activity.save();
+
+    console.log("Activityyy : ",activity);
+    console.log("Activityyy : ",activity.creatorEmail);
 
     return activity;
   } catch (error) {

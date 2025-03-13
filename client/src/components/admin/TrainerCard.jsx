@@ -5,7 +5,7 @@ import { TrainerModal } from '../admin/TrainerModal';
 export const TrainerCard = ({ trainer }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // console.log("in TrainerCard : ",trainer);
+  console.log("in TrainerCard : ",trainer);
   
 
   // Determine the availability status
@@ -22,7 +22,7 @@ export const TrainerCard = ({ trainer }) => {
 
   return (
     <>
-      <div className="card bg-base-100 shadow-xl overflow-hidden">
+      <div className="card bg-base-100 shadow-xl overflow-hidden ">
         <div className="card-body p-4">
           {/* Trainer Header with avatar and basic info */}
           <div className="flex items-center mb-4">

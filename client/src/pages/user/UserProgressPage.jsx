@@ -8,7 +8,6 @@ import {
   getProgressSummary,
 } from "../../services/userServices";
 import { LoadingSpinner } from "../../components/shared/LoadingSpinner";
-import { UserSidebar } from "../../components/user/UserSidebar";
 
 export const UserProgressPage = () => {
   const dispatch = useDispatch();
@@ -82,7 +81,6 @@ export const UserProgressPage = () => {
 
   return (
     <div className="container mx-auto  p-4 flex">
-      <UserSidebar className="w-1/5 mr-10 "/>
 
 
  <div className="w-4/5">
@@ -339,9 +337,9 @@ export const UserProgressPage = () => {
       {/* Measurements Tab */}
       {activeTab === "measurements" && (
         <div>
-          <h2 className="text-xl font-bold mb-4">Body Measurements</h2>
+          {/* <h2 className="text-xl font-bold mb-4">Body Measurements</h2> */}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div className="bg-base-200 p-4 rounded-lg shadow">
               <h3 className="font-bold mb-2">Weight Tracking</h3>
               <div className="flex justify-between">
@@ -403,9 +401,9 @@ export const UserProgressPage = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
-          <h3 className="font-bold mb-2">Measurement History</h3>
+          <h2 className="font-bold mb-2">Measurement History</h2>
           <div className="overflow-x-auto">
             <table className="table table-zebra w-full">
               <thead>
@@ -418,7 +416,7 @@ export const UserProgressPage = () => {
               </thead>
               <tbody>
                 {(
-                  progress?.history?.filter(
+                  progress?.history?.data?.filter(
                     (item) => item.activityType === "measurement"
                   ) || []
                 ).map((entry, index) => (
@@ -453,7 +451,7 @@ export const UserProgressPage = () => {
                   </tr>
                 ))}
                 {(!progress?.history ||
-                  progress.history.filter(
+                  progress.history?.data?.filter(
                     (item) => item.activityType === "measurement"
                   ).length === 0) && (
                   <tr>

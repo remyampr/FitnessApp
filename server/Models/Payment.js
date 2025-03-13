@@ -13,6 +13,7 @@ const paymentSchema = new mongoose.Schema(
       required: true,
     },
     amount: { type: Number, required: true, min: 0 },
+
     adminRevenue: { 
       type: Number, 
       required: true 
@@ -27,19 +28,36 @@ const paymentSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["Pending", "Completed", "Failed"],
+      enum: ["Pending", "Success", "Failed"],
       required: true,
     },
+   
     plan: { type: String, required: true },
     transactionId: { type: String, unique: true, required: true },
+  
+    duration: { type: Number },
+    startDate: { type: Date },
+    endDate: { type: Date },
+
+
   },
+  
+
+
   { timestamps: true }
 );
 
+// Calculate revenue distribution before saving
 paymentSchema.pre('save', function(next) {
-  // 30% goes to trainer, 70% to admin
-  this.trainerRevenue = this.amount * 0.3;
-  this.adminRevenue = this.amount * 0.7;
+  if (!this.trainerRevenue || !this.adminRevenue) {
+    // Only calculate if not already set
+    const trainerPercentage = 30; 
+    this.trainerRevenue = this.amount * (trainerPercentage / 100);
+    this.adminRevenue = this.amount - this.trainerRevenue;
+  }
+  
+ 
+  
   next();
 });
 

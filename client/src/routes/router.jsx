@@ -39,6 +39,9 @@ import { TrainerWorkoutPage } from "../pages/trainer/TrainerWorkoutPage";
 import { TrainerNutritionPage } from "../pages/trainer/TrainerNutritionPage";
 import { NutritionListPage } from "../pages/user/NutritionListPage";
 import { WorkoutListPage } from "../pages/user/WorkoutListPage";
+import { TrainerProfilePage } from "../pages/trainer/TrainerProfilePage";
+import { TrainerRevenuePage } from "../pages/trainer/TrainerRevenuePage";
+import { AdminAuthLayout } from "../layout/AdminAuthLayout";
 
 
 
@@ -204,7 +207,7 @@ export const router = createBrowserRouter([
         path: "revenue",
         element: (
           <TrainerProtectedRoute requiredRole="trainer">
-            <TrainerWorkoutPage/>
+            <TrainerRevenuePage/>
           </TrainerProtectedRoute>
         ),
       },
@@ -212,7 +215,7 @@ export const router = createBrowserRouter([
         path: "profile",
         element: (
           <TrainerProtectedRoute requiredRole="trainer">
-            <TrainerWorkoutPage/>
+            <TrainerProfilePage/>
           </TrainerProtectedRoute>
         ),
       },
@@ -224,14 +227,14 @@ export const router = createBrowserRouter([
     element: <AdminLayout />,
     errorElement: <h1>Error page</h1>,
     children: [
-      {
-        path: "login",
-        element: <AdminLoginPage />,
-      },
-      {
-        path: "forgot-password",
-        element: <AdminForgotPassword />,
-      },
+      // {
+      //   path: "login",
+      //   element: <AdminLoginPage />,
+      // },
+      // {
+      //   path: "forgot-password",
+      //   element: <AdminForgotPassword />,
+      // },
       {
         path: "dashboard",
         element: (
@@ -300,4 +303,15 @@ export const router = createBrowserRouter([
       // admin routes
     ],
   },
+
+  {
+    path: "/admin",
+    element: <AdminAuthLayout />, // ✅ Now AuthLayout is applied properly
+    children: [
+      { path: "login", element: <AdminLoginPage /> },
+      { path: "forgot-password", element: <AdminForgotPassword /> },
+    ],
+  },
+
+
 ]);
