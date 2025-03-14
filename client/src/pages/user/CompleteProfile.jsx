@@ -10,6 +10,8 @@ import {
   faUser,
   faCertificate,
   faStar,
+  faChevronLeft,
+  faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   assignTrainer,
@@ -21,6 +23,7 @@ import {
   setLoading,
   setProfileComplete,
   setSelectedTrainer,
+  setUser,
 } from "../../redux/features/userSlice";
 import stripePromise from "../../Stripe/stripe";
 
@@ -31,6 +34,10 @@ export const CompleteProfile = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [trainers, setTrainers] = useState([]);
   const [loading, setLoading] = useState(false);
+
+
+  
+
 
   const [formData, setFormData] = useState({
     phone: "",
@@ -48,6 +55,10 @@ export const CompleteProfile = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.user);
+  // console.log("user!!!!!!",user);
+  
+
+
 
   useEffect(() => {
     if (currentStep === 2) {
@@ -69,11 +80,7 @@ export const CompleteProfile = () => {
     }
   };
 
-  // useEffect(() => {
-  //   console.log(" useeffect Updated Trainers:", trainers);
-  //   console.log("Trainers Reference:", JSON.stringify(trainers));
 
-  // }, [trainers]);
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -88,6 +95,7 @@ export const CompleteProfile = () => {
     const formDataToSend = new FormData();
     formDataToSend.append("phone", formData.phone);
     formDataToSend.append("weight", formData.weight);
+    formDataToSend.append("height", formData.height);
     formDataToSend.append("age", formData.age);
     formDataToSend.append("gender", formData.gender);
     formDataToSend.append("fitnessGoal", formData.fitnessGoal);
@@ -96,9 +104,10 @@ export const CompleteProfile = () => {
     }
 
     try {
-      await updateProfile(formDataToSend);
+      const profileupdateResponse=await updateProfile(formDataToSend);
       setCurrentStep(2);
-      console.log("Profile updated successfully");
+      console.log("Profile updated successfully",profileupdateResponse.data);
+      // dispatch(set)
 
       toast.success("Profile updated, Now select a trainer");
     } catch (error) {
@@ -109,7 +118,7 @@ export const CompleteProfile = () => {
   const handleTrainerSelect = async () => {
     try {
       const res = await assignTrainer({ trainerId: formData.trainerId });
-      console.log("response : ", res);
+      console.log("response after trainer select : ", res);
 
       if (res.data) {
         dispatch(setSelectedTrainer(formData.trainerId));
@@ -125,56 +134,7 @@ export const CompleteProfile = () => {
     }
   };
 
-  // const handlePayment = async () => {
-  //   if (!formData.plan || !formData.duration) {
-  //     alert("Please select a subscription plan and duration.");
-  //     return;
-  //   }
-  //   try {
-  //     const userId = user?._id;
-  //     console.log("userId :", userId);
-  //     console.log("TrainerId :", formData.trainerId);
-
-  //     const resOrderData = await createPaymentOrder({
-  //       userId,
-  //       plan: formData.plan,
-  //       trainerId: formData.trainerId,
-  //       duration: formData.duration,
-  //     });
-
-  //     // payment gateway here
-  //     const confirmation = await confirmPayment({
-  //       userId,
-  //       transactionId: resOrderData.data.transactionId,
-  //       paymentStatus: "Success",
-  //     });
-  //     console.log("orderData ", resOrderData);
-  //     console.log("confirmation:", confirmation);
-
-  //     if (
-  //       confirmation?.data?.message ===
-  //       "Payment successful, subscription activated"
-  //     ) {
-  //       console.log("Payment successful");
-  //       dispatch(setProfileComplete(true));
-
-  //       console.log("Payment successful!!!!!!!!!!!1");
-  //       // console.log("Redux isProfileComplete state:", isProfileComplete);
-  //       // navigate("/user/dashboard");
-  //       toast.success("Payment successful");
-
-  //       console.log("Profile updated! Navigating...");
-  //       navigate("/user/dashboard");
-  //     } else {
-  //       console.error("Unexpected response message:", confirmation?.data);
-  //       toast.error("Payment failed");
-  //     }
-  //   } catch (error) {
-  //     console.log("error ", error);
-
-  //     toast.error(" Internal error Payment failed");
-  //   }
-  // };
+ 
 
   
   const calculatePrice = () => {
@@ -247,323 +207,309 @@ export const CompleteProfile = () => {
     switch (currentStep) {
       case 1:
         return (
-          <div className="max-w-2xl mx-auto bg-transparent p-7">
-            <form className="p-7" onSubmit={handleProfileSubmit}>
-              {/* Phone */}
-              <div className="relative z-0 mb-6 w-full group">
-                <input
-                  type="text"
-                  name="phone"
-                  className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                  placeholder=" "
-                  required
-                  onChange={(e) => {
-                    setFormData({
-                      ...formData,
-                      [e.target.name]: e.target.value,
-                    });
-                  }}
-                />
-                <label className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
-                  Phone
-                </label>
-              </div>
-
-              {/* Height */}
-              <div className="relative z-0 mb-6 w-full group">
-                <input
-                  type="text"
-                  name="height"
-                  className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                  placeholder=" "
-                  required
-                  onChange={(e) => {
-                    setFormData({
-                      ...formData,
-                      [e.target.name]: e.target.value,
-                    });
-                  }}
-                />
-                <label className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
-                  Height (in cm)
-                </label>
-              </div>
-
-              {/* Weight */}
-              <div className="relative z-0 mb-6 w-full group">
-                <input
-                  type="text"
-                  name="weight"
-                  className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                  placeholder=" "
-                  required
-                  onChange={(e) => {
-                    setFormData({
-                      ...formData,
-                      [e.target.name]: e.target.value,
-                    });
-                  }}
-                />
-                <label className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
-                  Weight (in kg)
-                </label>
-              </div>
-
-              {/* Age */}
-              <div className="relative z-0 mb-6 w-full group">
-                <input
-                  type="number"
-                  name="age"
-                  className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                  placeholder=" "
-                  required
-                  onChange={(e) => {
-                    setFormData({
-                      ...formData,
-                      [e.target.name]: e.target.value,
-                    });
-                  }}
-                />
-                <label className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
-                  Age
-                </label>
-              </div>
-
-              {/* Gender */}
-              <div className="relative z-0 mb-6 w-full group">
-                <div className="flex items-center space-x-4">
-                  <div>
-                    <input
-                      type="radio"
-                      id="male"
-                      name="gender"
-                      value="Male"
-                      checked={formData.gender === "Male"}
-                      onChange={(e) => {
-                        setFormData({
-                          ...formData,
-                          gender: e.target.value,
-                        });
-                      }}
-                      className="peer hidden"
-                    />
-                    <label
-                      htmlFor="male"
-                      className="text-sm text-gray-500 dark:text-gray-400 cursor-pointer peer-checked:text-blue-600"
-                    >
-                      Male
-                    </label>
-                  </div>
-                  <div>
-                    <input
-                      type="radio"
-                      id="female"
-                      name="gender"
-                      value="Female"
-                      checked={formData.gender === "Female"}
-                      onChange={(e) => {
-                        setFormData({
-                          ...formData,
-                          gender: e.target.value,
-                        });
-                      }}
-                      className="peer hidden"
-                    />
-                    <label
-                      htmlFor="female"
-                      className="text-sm text-gray-500 dark:text-gray-400 cursor-pointer peer-checked:text-blue-600"
-                    >
-                      Female
-                    </label>
-                  </div>
-                  <div>
-                    <input
-                      type="radio"
-                      id="other"
-                      name="gender"
-                      value="Other"
-                      checked={formData.gender === "Other"}
-                      onChange={(e) => {
-                        setFormData({
-                          ...formData,
-                          gender: e.target.value,
-                        });
-                      }}
-                      className="peer hidden"
-                    />
-                    <label
-                      htmlFor="other"
-                      className="text-sm text-gray-500 dark:text-gray-400 cursor-pointer peer-checked:text-blue-600"
-                    >
-                      Other
-                    </label>
-                  </div>
+          <div className="max-w-2xl mx-auto bg-base-100 rounded-xl shadow-lg p-8">
+          <h2 className="text-2xl font-bold  mb-6 text-center">Your Fitness Profile</h2>
+          
+          <form className="space-y-6" onSubmit={handleProfileSubmit}>
+            {/* Personal Information Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                {/* Phone */}
+                <div className="relative">
+                  <label htmlFor="phone" className="block text-sm font-medium  mb-1">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    required
+                    onChange={(e) => setFormData({...formData, [e.target.name]: e.target.value})}
+                  />
                 </div>
-                <label className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
-                  Gender
-                </label>
-              </div>
-
-              {/* Fitness Goal */}
-              <div className="relative z-0 mb-6 w-full group">
-                <label className="text-sm text-gray-500 dark:text-gray-400">
-                  Fitness Goal
-                </label>
-                <div className="flex flex-col space-y-2">
-                  {[
-                    "Weight Loss",
-                    "Weight Gain",
-                    "Muscle Gain",
-                    "Maintenance",
-                    "Endurance Improvement",
-                  ].map((goal) => (
-                    <label key={goal} className="inline-flex items-center">
-                      <input
-                        type="radio"
-                        name="fitnessGoal"
-                        value={goal}
-                        checked={formData.fitnessGoal === goal}
-                        onChange={(e) => {
-                          setFormData({
-                            ...formData,
-                            fitnessGoal: e.target.value,
-                          });
-                        }}
-                        required
-                        className="form-radio"
-                      />
-                      <span className="ml-2">{goal}</span>
-                    </label>
-                  ))}
+                
+                {/* Age */}
+                <div className="relative">
+                  <label htmlFor="age" className="block text-sm font-medium  mb-1">
+                    Age
+                  </label>
+                  <input
+                    type="number"
+                    id="age"
+                    name="age"
+                    min="16"
+                    max="100"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    required
+                    onChange={(e) => setFormData({...formData, [e.target.name]: e.target.value})}
+                  />
                 </div>
               </div>
-
-              {/* Profile Image (Optional) */}
-              <div className="relative z-0 mb-6 w-full group">
-                <input
-                  type="file"
-                  name="image"
-                  accept="image/*"
-                  className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-                  onChange={handleImageChange}
-                />
-                <label className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
-                  Upload Image (Optional)
+              
+              <div className="space-y-4">
+                {/* Height */}
+                <div className="relative">
+                  <label htmlFor="height" className="block text-sm font-medium  mb-1">
+                    Height (cm)
+                  </label>
+                  <input
+                    type="number"
+                    id="height"
+                    name="height"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    required
+                    onChange={(e) => setFormData({...formData, [e.target.name]: e.target.value})}
+                  />
+                </div>
+                
+                {/* Weight */}
+                <div className="relative">
+                  <label htmlFor="weight" className="block text-sm font-medium  mb-1">
+                    Weight (kg)
+                  </label>
+                  <input
+                    type="number"
+                    id="weight"
+                    name="weight"
+                    step="0.1"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    required
+                    onChange={(e) => setFormData({...formData, [e.target.name]: e.target.value})}
+                  />
+                </div>
+              </div>
+            </div>
+            
+            {/* Gender Selection */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium ">Gender</label>
+              <div className="flex space-x-6">
+                {["Male", "Female", "Other"].map((option) => (
+                  <div key={option} className="flex items-center">
+                    <input
+                      type="radio"
+                      id={option.toLowerCase()}
+                      name="gender"
+                      value={option}
+                      checked={formData.gender === option}
+                      onChange={(e) => setFormData({...formData, gender: e.target.value})}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                    />
+                    <label htmlFor={option.toLowerCase()} className="ml-2 text-sm ">
+                      {option}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Fitness Goal Selection */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium ">Fitness Goal</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {[
+                  "Weight Loss",
+                  "Weight Gain",
+                  "Muscle Gain",
+                  "Maintenance",
+                  "Endurance Improvement",
+                ].map((goal) => (
+                  <div key={goal} className="flex items-center">
+                    <input
+                      type="radio"
+                      id={goal.replace(/\s+/g, "-").toLowerCase()}
+                      name="fitnessGoal"
+                      value={goal}
+                      checked={formData.fitnessGoal === goal}
+                      onChange={(e) => setFormData({...formData, fitnessGoal: e.target.value})}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500"
+                      required
+                    />
+                    <label htmlFor={goal.replace(/\s+/g, "-").toLowerCase()} className="ml-2 text-sm ">
+                      {goal}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Profile Image */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium ">Profile Image (Optional)</label>
+              <div className="flex items-center justify-center w-full">
+                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-base-950 hover:border-gray-900">
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <svg className="w-8 h-8 mb-3 " fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <p className="text-sm ">Click to upload</p>
+                  </div>
+                  <input 
+                    type="file" 
+                    name="image"
+                    accept="image/*"
+                    className="hidden" 
+                    onChange={handleImageChange}
+                  />
                 </label>
               </div>
-
-              {/* Submit Button */}
-              <div className="flex justify-center">
-                <button
-                  type="submit"
-                  className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                >
-                  Continue to Trainer Selection
-                </button>
-              </div>
-            </form>
-          </div>
+            </div>
+            
+            {/* Submit Button */}
+            <div className="pt-4">
+              <button
+                type="submit"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              >
+                Continue to Trainer Selection
+              </button>
+            </div>
+          </form>
+        </div>
         );
       case 2:
         return (
-          <div className="max-w-5xl mx-auto bg-gray-50 p-8 rounded-xl shadow-sm">
-            <h2 className="text-3xl font-bold mb-6 text-gray-800">
-              Select a Trainer
-            </h2>
-
-            {trainers.length === 0 ? (
-              <div className="flex flex-col items-center justify-center p-10 bg-white rounded-lg shadow-sm">
+          <div className="max-w-5xl mx-auto bg-base-100 p-8 rounded-xl shadow-lg">
+          <h2 className="text-3xl font-bold mb-6  border-b pb-4">
+            Choose Your Fitness Trainer
+          </h2>
+        
+          {trainers.length === 0 ? (
+            <div className="flex flex-col items-center justify-center p-10 bg-gray-50 rounded-lg">
+              <div className="h-24 w-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                 <FontAwesomeIcon
                   icon={faUserTimes}
-                  className="text-gray-400 text-6xl"
+                  className="text-gray-400 text-4xl"
                 />
-                <p className="mt-4 text-lg text-gray-600">
-                  No trainers available at the moment. Please try again later.
-                </p>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {trainers.map((trainer) => (
-                  <div
-                    key={trainer._id}
-                    className="bg-white border-2 border-gray-100 rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:border-blue-300"
-                  >
+              <p className="text-lg text-gray-600 font-medium">
+                No trainers available at the moment
+              </p>
+              <p className="mt-2 text-gray-500">
+                Please check back later or contact support for assistance
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {trainers.map((trainer) => (
+                <div
+                  key={trainer._id}
+                  className={`bg-white rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl ${
+                    formData.trainerId === trainer._id 
+                      ? "ring-2 ring-blue-500 shadow-lg" 
+                      : "border border-gray-200 shadow-sm"
+                  }`}
+                >
+                  <div className="relative">
                     {trainer.image ? (
                       <img
                         src={trainer.image}
                         alt={trainer.name}
-                        className="w-full h-52 object-cover"
+                        className="w-full h-56 object-cover"
                         onError={(e) => {
                           e.target.onerror = null;
-                          e.target.src =
-                            "https://via.placeholder.com/400x300/f3f4f6/94a3b8?text=No+Image";
+                          e.target.src = "https://via.placeholder.com/400x300/f3f4f6/94a3b8?text=No+Image";
                         }}
                       />
                     ) : (
-                      <div className="w-full h-52 bg-gray-200 flex items-center justify-center">
+                      <div className="w-full h-56 bg-gradient-to-r from-blue-50 to-gray-100 flex items-center justify-center">
                         <FontAwesomeIcon
                           icon={faUser}
-                          className="text-gray-400 text-6xl"
+                          className="text-gray-300 text-5xl"
                         />
                       </div>
                     )}
-
-                    <div className="p-5">
-                      <h3 className="text-xl font-bold text-gray-800 mb-2">
-                        {trainer.name}
-                      </h3>
-                      <p className="text-gray-600 mb-2">
-                        {trainer.specialization
-                          ? trainer.specialization.join(", ")
-                          : "No specialization available"}
-                      </p>
-                      <p className="text-gray-600 mb-2">
-                        Experience: {trainer.experience} years
-                      </p>
-                      <p className="text-gray-600 mb-2">
-                        Bio: {trainer.bio || "No bio available"}
-                      </p>
-                      <p className="text-gray-600 mb-2 flex items-center">
-                        <FontAwesomeIcon
-                          icon={faStar}
-                          className="text-yellow-500 mr-2"
-                        />
-                        {trainer.averageRating} / 5
-                      </p>
-                      <p className="text-gray-600 mb-4 flex items-center">
-                        <FontAwesomeIcon
-                          icon={faCertificate}
-                          className="text-blue-500 mr-2"
-                        />
-                        {trainer.certifications.length > 0
-                          ? trainer.certifications.join(", ")
-                          : "No certifications"}
-                      </p>
-
-                      <button
-                        className="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-300 focus:ring-2 focus:ring-blue-300 focus:outline-none"
-                        onClick={() =>
-                          setFormData({ ...formData, trainerId: trainer._id })
-                        }
-                      >
-                        Select Trainer
-                      </button>
+                    
+                    <div className="absolute top-4 right-4 bg-white bg-opacity-90 px-3 py-1 rounded-full flex items-center">
+                      <FontAwesomeIcon
+                        icon={faStar}
+                        className="text-yellow-400 mr-1"
+                      />
+                      <span className="font-medium">{trainer.averageRating}</span>
+                      <span className="text-gray-500 text-sm">/5</span>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-
-            <div className="mt-8 flex justify-end">
-              <button
-                onClick={handleTrainerSelect}
-                disabled={!formData.trainerId}
-                className="bg-blue-700 hover:bg-blue-800 text-white px-8 py-3 rounded-lg font-semibold transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              >
-                Continue to Payment
-              </button>
+        
+                  <div className="p-6">
+                    <div className="flex justify-between items-start mb-3">
+                      <h3 className="text-xl font-bold text-gray-800">
+                        {trainer.name}
+                      </h3>
+                      <span className="text-sm font-medium bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                        {trainer.experience} yrs
+                      </span>
+                    </div>
+        
+                    {trainer.specialization && trainer.specialization.length > 0 && (
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {trainer.specialization.map((spec, index) => (
+                          <span 
+                            key={index} 
+                            className="bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full"
+                          >
+                            {spec}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+        
+                    <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                      {trainer.bio || "No bio available"}
+                    </p>
+        
+                    {trainer.certifications && trainer.certifications.length > 0 && (
+                      <div className="mb-4">
+                        <div className="flex items-center mb-2">
+                          <FontAwesomeIcon
+                            icon={faCertificate}
+                            className="text-blue-500 mr-2"
+                          />
+                          <span className="text-sm font-medium">Certifications</span>
+                        </div>
+                        <div className="pl-6">
+                          <p className="text-xs text-gray-600 line-clamp-2">
+                            {trainer.certifications.join(", ")}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+        
+                    <button
+                      className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-300 focus:outline-none ${
+                        formData.trainerId === trainer._id
+                          ? "bg-blue-600 text-white hover:bg-blue-700"
+                          : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                      }`}
+                      onClick={() => setFormData({ ...formData, trainerId: trainer._id })}
+                    >
+                      {formData.trainerId === trainer._id ? "Selected" : "Select Trainer"}
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
+          )}
+        
+          <div className="mt-12 flex justify-between items-center border-t pt-6">
+            <button 
+              className="text-gray-600 hover:text-gray-800 flex items-center font-medium"
+              onClick={() => navigate(-1)}
+            >
+              <FontAwesomeIcon icon={faChevronLeft} className="mr-2" />
+              Back to Profile
+            </button>
+            
+            <button
+              onClick={handleTrainerSelect}
+              disabled={!formData.trainerId}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed focus:ring-2 focus:ring-blue-500 focus:outline-none flex items-center"
+            >
+              Continue to Payment
+              <FontAwesomeIcon icon={faChevronRight} className="ml-2" />
+            </button>
           </div>
+        </div>
         );
 
       case 3:

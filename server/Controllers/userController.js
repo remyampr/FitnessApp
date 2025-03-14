@@ -8,11 +8,11 @@ const {
 const { createToken } = require("../Utilities/generateToken");
 const uploadToCloudinary = require("../Utilities/imageUpload");
 const crypto = require("crypto");
-const sendEmail = require("../Config/emailService");
 const { generateOTP } = require("../Utilities/generateOTP");
 const { cloudinary_js_config } = require("../Config/cloudinaryConfig");
 const { log } = require("console");
 const { logActivity } = require("../Utilities/activityServices");
+const sendEmail = require("../Utilities/EmailServices/sendEmail");
 
 const registerUser = async (req, res, next) => {
   try {
@@ -145,6 +145,8 @@ const updateUserProfile = async (req, res, next) => {
  
 
     let image = req.file ? req.file.path : "Uploads/user.jpg";
+    console.log("height:............. ",height);
+    
 
     if (image !== "uploads/user.jpg") {
       const cloudinaryRes = await uploadToCloudinary(image);
@@ -185,11 +187,14 @@ const getUserProfile = async (req, res, next) => {
       .populate(
         "trainerId",
         "name image specialization experience email availability certifications bio socialLinks status reviews averageRating"
-      ); // Populate trainer info
+      )
+      .populate("testimonial");
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
+    // console.log("inside getuserProfile >> >>>",user);
+    
     res.status(200).json({
       msg: "User profile :",
       user,

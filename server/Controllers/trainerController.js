@@ -7,7 +7,7 @@ const {
 const { createToken } = require("../Utilities/generateToken");
 const uploadToCloudinary = require("../Utilities/imageUpload");
 const { generateOTP } = require("../Utilities/generateOTP");
-const sendEmail = require("../Config/emailService");
+const sendEmail = require("../Config/nodemailer");
 const { logActivity } = require("../Utilities/activityServices");
 const { generateTimeSlots } = require("../Utilities/trainerAppointment");
 
@@ -281,6 +281,27 @@ const getMyReviews = async (req, res, next) => {
   }
 };
 
+const getAllTrainers = async (req, res, next) => {
+  try {
+    console.log("Searching Approved trainers :..");
+
+    const trainers = await Trainer.find({ isApproved: true }).select("-password ");
+    console.log("Approved : ", trainers);
+
+    if (!trainers || trainers.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No approved trainers found" });
+    }
+    res.status(200).json({ success: true, trainers });
+  } catch (error) {
+    next();
+  }
+};
+
+
+
+
 module.exports = {
   registerTrainer,
   getTrainerRevenue,
@@ -289,4 +310,5 @@ module.exports = {
   getTrainerClients,
   getClientById,
   getMyReviews,
+  getAllTrainers
 };

@@ -37,4 +37,7 @@ router.post("/my-trainer/review",protect,authorize(["user"]),reviewMyTrainer);
 
 router.delete("/my-trainer/review",protect, authorize(["user"]),deleteMyTrainerReview);
 
+
+
+
 module.exports = router;

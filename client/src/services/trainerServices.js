@@ -1,6 +1,15 @@
 import  axiosInstance  from "../axios/axiosInstance"
 
 // bascis
+export const trainerSignup=(data)=>{
+    return axiosInstance.post("/trainer/register",data)
+}
+export const trainerverify=(email,otp, role = "trainer")=>{
+    return axiosInstance.post("/trainer/verify-email",{email,otp, role})
+}
+
+
+
 export const trainerLogin=(data)=>{
     return axiosInstance.post("/trainer/login",{ ...data, role: "trainer" })
 }

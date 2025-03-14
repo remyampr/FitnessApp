@@ -4,109 +4,161 @@ import { userLogin } from '../../services/userServices';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import { setProfileComplete, setUser } from '../../redux/features/userSlice';
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
 
 export const UserLoginPage = () => {
+  console.log("UserLoginPage rendered!");
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const isProfileComplete = useSelector(state => state.user.isProfileComplete);
 
-  const navigate=useNavigate();
-  const dispatch=useDispatch();
+const [showPassword, setShowPassword] = useState(false);
+  const [values, setValues] = useState({
+    email: "",
+    password: ""
+  });
 
-  const isProfileComplete=useSelector(state => state.user.isProfileComplete)
+  const [loading, setLoading] = useState(false);
 
-const [values,setValues]=useState({
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setValues({ ...values, [name]: value });
+  };
 
-  email:"",
-  password:""
-})
+  const onSubmit = (event) => {
+    event.preventDefault();
 
-const onSubmit=(event)=>{
-  event.preventDefault();
-
-  if (!values.email || !values.password) {
-    // return setError("Please fill in all fields");
-    toast.error("Please fill in all fields")
-  }
- 
-  // console.log("values in state : ",values);
-  userLogin(values).then((res)=>{
-    // console.log("values sending");
+    if (!values.email || !values.password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
     
-    
-    if (res.data && res.data.user) {
-      console.log("login time res got , : ",res);
-      
-      dispatch(setUser(res.data.user));
-      dispatch(setProfileComplete(res.data.user.isProfileComplete));
-      console.log("res : ",res);
-      toast.success("Login successful!");
-    console.log("isProfilecompleted ?: ",isProfileComplete);
-     if(res.data.user.isProfileComplete){
-
+    setLoading(true);
+    userLogin(values)
+      .then((res) => {
+        if (res.data && res.data.user) {
+          console.log("login time res got , : ", res);
+          
+          dispatch(setUser(res.data.user));
+          dispatch(setProfileComplete(res.data.user.isProfileComplete));
+          
+          console.log("login res : ", res);
+          toast.success("Login successful!");
+          console.log("isProfilecompleted ?: ", isProfileComplete);
+          
+          if (res.data.user.isProfileComplete) {
             navigate("/user/dashboard");
-    }else  navigate("/user/complete-profile");
-    } else {
-      console.error("Login API response does not contain user data");
-      toast.error("Login failed. Please try again.");
-    }
-    
+          } else {
+            navigate("/user/complete-profile");
+          }
+        } else {
+          console.error("Login API response does not contain user data");
+          toast.error("Login failed. Please try again.");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        if (err.response && err.response.data && err.response.data.error) {
+          toast.error(err.response.data.error);
+        } else {
+          toast.error("An unexpected error occurred.");
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
-   
-    
-  }).catch((err)=>{
-    console.log(err);
-    if (err.response && err.response.data && err.response.data.error) {
-      toast.error(err.response.data.error); // Show error message
-    } else {
-      toast.error("An unexpected error occurred."); // Fallback error message
-    }
-  })
-
-}
-
-const handleForgotPassword = () => {
-  navigate("/forgot-password", { state: { role: "user" } });
-};
-
-
-
+  const handleForgotPassword = () => {
+    navigate("/forgot-password", { state: { role: "user" } });
+  };
 
   return (
-    <div className="max-w-2xl mx-auto bg-transparent p-7">
-     <form onSubmit={onSubmit} className="p-7">
-      <div className='p-7'>
-        {/* Email */}
-        <div className="relative z-0 mb-6 w-full group">
-          <input type="email" name="email" className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required 
-           onChange={(e)=>{setValues({...values,[e.target.name]:e.target.value}) }} />
-          <label htmlFor="floating_email" className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Email</label>
-        </div>
+    <div className="flex items-center justify-center min-h-[110vh]">
+      <div className="max-w-md w-full bg-base-300/50 backdrop-blur-sm p-8 rounded-xl shadow-lg">
+        <h2 className="text-2xl font-bold text-center mb-6">Login to Your Account</h2>
+        
+        <form onSubmit={onSubmit}>
+          {/* Email Field */}
+          <div className="form-control w-full mb-4 ">
+            <label className="label">
+              <span className="label-text font-medium">Email</span>
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <FaEnvelope className="text-gray-400" />
+              </div>
+              <input
+                type="email"
+                name="email"
+                value={values.email}
+                onChange={handleChange}
+                className="input input-bordered w-full pl-10  "
+                placeholder="Enter your email"
+                required
+              />
+            </div>
+          </div>
 
-        {/* Password */}
-        <div className="relative z-0 mb-6 w-full group">
-          <input type="password" name="password" id="floating_password" className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required 
-          onChange={(e)=>{setValues({...values,[e.target.name]:e.target.value}) }}  />
-          <label htmlFor="floating_password" className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Password</label>
-        </div>
+          {/* Password Field */}
+          <div className="form-control w-full mb-4">
+            <label className="label">
+              <span className="label-text font-medium">Password</span>
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <FaLock className="text-gray-400" />
+              </div>
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={values.password}
+                onChange={handleChange}
+                className="input input-bordered w-full pl-10 pr-10 "
+                placeholder="Enter your password"
+                required
+              />
+              <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500"
+                      >
+                        {showPassword ? <FaEyeSlash /> : <FaEye />}
+                      </button>
+            </div>
+          </div>
 
-        {/* Forgot Password */}
-        <div className="mb-6 text-right">
-          <button onClick={handleForgotPassword} className="text-sm text-blue-600 hover:underline"
+          {/* Forgot Password */}
+          <div className="flex justify-end mb-6">
+            <button 
+              type="button" 
+              onClick={handleForgotPassword} 
+              className="text-sm text-blue-600 hover:underline"
+            >
+              Forgot Password?
+            </button>
+          </div>
 
-          >Forgot Password?</button> 
-        </div>
-
-        <div className="flex justify-center">
-          <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" 
-           >Submit</button>
-        </div>
+          {/* Submit Button */}
+          <button
+            type="submit"
+            className={`btn btn-primary w-full ${loading ? 'loading' : ''}`}
+            disabled={loading}
+          >
+            {loading ? 'Logging in...' : 'Login'}
+          </button>
+        </form>
 
         {/* Sign Up Link */}
         <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600 dark:text-gray-400">Not registered? 
-            <Link to="/user/signup" className="text-blue-600 hover:underline ml-1">Create an account</Link>
+          <p className="text-sm">
+            Not registered?{' '}
+            <Link to="/user/signup" className="text-primary hover:underline font-medium">
+              Create an account
+            </Link>
           </p>
         </div>
-        </div>
-      </form>  
+      </div>
     </div>
   );
 };

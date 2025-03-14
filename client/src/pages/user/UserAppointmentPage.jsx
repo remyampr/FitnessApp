@@ -421,109 +421,113 @@ export const UserAppointmentPage = () => {
         </div>
       )}
 
-        {modalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-11/12 max-w-lg">
-            <h3 className="font-bold text-lg mb-4 text-black">
-              Book New Appointment
-            </h3>
+      {modalOpen && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-base-200 rounded-lg w-11/12 max-w-lg flex flex-col max-h-[90vh]">
+      {/* Fixed header */}
+      <div className="p-4 border-b">
+        <h3 className="font-bold text-lg">
+          Book New Appointment
+        </h3>
+      </div>
 
-            <>
-              <div className="form-control mb-4">
-                <label className="label">
-                  <span className="label-text text-black">Select Date</span>
-                </label>
-                <Calendar
-                  onChange={handleDateChange}
-                  value={selectedDate}
-                  tileClassName={getTileClassName}
-                  tileDisabled={tileDisabled}
-                  className="rounded-lg overflow-hidden"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <label className="block mb-2 font-medium">
-                  Available Time Slots
-                </label>
-                {availableTimeSlots.length === 0 ? (
-                  <p className="text-error">
-                    No available time slots for this date
-                  </p>
-                ) : (
-                  <div className="grid grid-cols-1 gap-2">
-                    {availableTimeSlots.map((slot, index) => (
-                      <button
-                        key={index}
-                        className={`btn ${
-                          selectedTimeSlot === slot
-                            ? "btn-primary"
-                            : "btn-outline"
-                        }`}
-                        onClick={() => setSelectedTimeSlot(slot)}
-                      >
-                        {slot.startTime} - {slot.endTime}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div className=" mt-4">
-              <label className="block mb-2 font-medium">Appointment Type</label>
-                <select
-                  className="select select-bordered w-full"
-                  value={bookingType}
-                  onChange={(e) => setBookingType(e.target.value)}
-                >
-                   <option value="">Select type</option>
-          <option value="Consultation">Consultation</option>
-          <option value="Training Session">Training Session</option>
-          <option value="Progress Review">Progress Review</option>
-          <option value="Diet Planning">Diet Planning</option>
-                </select>
-              </div>
-
-              <div className="form-control mb-4">
-                <label className="label">
-                  <span className="label-text text-black">
-                    Additional Notes
-                  </span>
-                </label>
-                <textarea
-                  className="textarea textarea-bordered h-24"
-                  placeholder="Add any special requirements or notes for your trainer"
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                ></textarea>
-              </div>
-
-              <div className="modal-action">
-                <button
-                  type="button"
-                  className="btn btn-ghost"
-                  onClick={() => setModalOpen(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  onClick={handleBookAppointment}
-      disabled={!selectedTimeSlot || !bookingType}
-                >
-                  {loading ? (
-                    <span className="loading loading-spinner loading-sm"></span>
-                  ) : (
-                    "Book Appointment"
-                  )}
-
-                </button>
-              </div>
-            </>
-          </div>
+      {/* Scrollable content */}
+      <div className="overflow-y-auto p-4 flex-grow">
+        <div className="form-control mb-4">
+          <label className="label">
+            <span className="label-text ">Select Date</span>
+          </label>
+          <Calendar
+            onChange={handleDateChange}
+            value={selectedDate}
+            tileClassName={getTileClassName}
+            tileDisabled={tileDisabled}
+            className="rounded-lg overflow-hidden bg-base-800"
+          />
         </div>
-      )}
+
+        <div className="mb-4">
+          <label className="block mb-2 font-medium">
+            Available Time Slots
+          </label>
+          {availableTimeSlots.length === 0 ? (
+            <p className="text-error">
+              No available time slots for this date
+            </p>
+          ) : (
+            <div className="grid grid-cols-2 gap-2">
+              {availableTimeSlots.map((slot, index) => (
+                <button
+                  key={index}
+                  className={`btn ${
+                    selectedTimeSlot === slot
+                      ? "btn-primary"
+                      : "btn-outline"
+                  }`}
+                  onClick={() => setSelectedTimeSlot(slot)}
+                >
+                  {slot.startTime} - {slot.endTime}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="mb-4">
+          <label className="block mb-2 font-medium">Appointment Type</label>
+          <select
+            className="select select-bordered w-full"
+            value={bookingType}
+            onChange={(e) => setBookingType(e.target.value)}
+          >
+            <option value="">Select type</option>
+            <option value="Consultation">Consultation</option>
+            <option value="Training Session">Training Session</option>
+            <option value="Progress Review">Progress Review</option>
+            <option value="Diet Planning">Diet Planning</option>
+          </select>
+        </div>
+
+        <div className="form-control mb-4">
+          <label className="label">
+            <span className="label-text">
+              Additional Notes
+            </span>
+          </label>
+          <textarea
+            className="textarea textarea-bordered h-24"
+            placeholder="Add any special requirements or notes for your trainer"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+          ></textarea>
+        </div>
+      </div>
+
+      {/* Fixed footer with action buttons */}
+      <div className="border-t p-4 flex justify-end space-x-2">
+        <button
+          type="button"
+          className="btn btn-ghost"
+          onClick={() => setModalOpen(false)}
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          className="btn btn-primary"
+          onClick={handleBookAppointment}
+          disabled={!selectedTimeSlot || !bookingType}
+        >
+          {loading ? (
+            <span className="loading loading-spinner loading-sm"></span>
+          ) : (
+            "Book Appointment"
+          )}
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       </div>
     </div>
   );

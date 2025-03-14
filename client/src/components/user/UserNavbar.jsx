@@ -6,6 +6,7 @@ import { userLogout } from "../../services/userServices";
 import { clearUser } from "../../redux/features/userSlice";
 import { persistor } from "../../redux/store";
 import { LogOut } from "lucide-react";
+import { FaDumbbell } from 'react-icons/fa';
 
 export const UserNavbar = ({ toggleSidebar }) => {
   const navigate = useNavigate();
@@ -45,11 +46,18 @@ export const UserNavbar = ({ toggleSidebar }) => {
             <i className="fas fa-bars text-xl"></i>
           </button>
 
-          <div className="flex-1 flex justify-center md:justify-start">
+          {/* <div className="flex-1 flex justify-center md:justify-start">
             <div className="flex-shrink-0 flex items-center">
               <span className="text-xl font-bold">FitMaster</span>
             </div>
-          </div>
+          </div> */}
+
+<div className="flex-1 flex justify-center md:justify-start">
+        <Link to={"/user/dashboard"} className="flex items-center space-x-2 text-xl font-bold hover:text-primary transition-colors">
+          <FaDumbbell className="text-primary text-2xl" />
+          <span className="text-2xl tracking-wider">FitMaster</span>
+        </Link>
+      </div>
 
           <div className="flex items-center ">
             {/* Align items in a row */}

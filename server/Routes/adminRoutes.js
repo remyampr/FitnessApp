@@ -49,28 +49,11 @@ router.get("/revenue/breakdown", protect, authorize(["admin"]), getRevenueBreakd
 // router.get("/subscriptions", protect, authorize(["admin"]), getSubscriptions);
 
 
-
-// Admin Dashboard
-
-// ✅ Key Metrics:
-// Total Users
-// Active Users
-// Total Trainers
-// Pending Trainer Approvals
-// Total Revenue
-// Monthly/Weekly Earnings
-// 🔹 GET /api/admin/dashboard → Get admin dashboard data
+// Public Routes
 
 
-/*
 
 
-// Analytics & Reports
-router.get('/dashboard', adminAuth, adminController.getDashboardStats);
-router.get('/reports/revenue', adminAuth, adminController.getRevenueReport);
-router.get('/reports/user-growth', adminAuth, adminController.getUserGrowthReport);
-
-*/
 
 
 

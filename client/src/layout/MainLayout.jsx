@@ -19,10 +19,10 @@ export const MainLayout = () => {
   return (
    <>
    <ScrollToTop/>
-    <div className='flex flex-col min-h-screen bg-[url("/fit10.jpg")] bg-cover bg-center'> 
-     <div className='flex flex-col min-h-screen bg-black-bg-cover bg-center'>  
+    <div className='flex flex-col min-h-screen bg-[url("/fit10.jpg")] bg-cover bg-center '> 
+     <div className='flex flex-col min-h-screen bg-base-100-bg-cover bg-center'>  
         <MainNavbar/>
-      <div  className=' flex-grow p-3 items-center justify-center min-h-screen text-white' > 
+      <div  className=' flex-grow p-3 items-center justify-center min-h-screen ' > 
         <Outlet/> 
         </div>
       <Footer/>

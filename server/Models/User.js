@@ -26,6 +26,7 @@ const userSchema = new mongoose.Schema({
     amount: { type: Number, default: 0 },  
     startDate: { type: Date },
     endDate: { type: Date },
+    
   },
   paymentHistory: [
     {
@@ -46,6 +47,10 @@ const userSchema = new mongoose.Schema({
     default: 'Uploads/user.jpg' 
   },
   isProfileComplete:{type: Boolean, default: false},
+  testimonial: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Testimonial"
+  },
   lastLogin: { type: Date, default: null },
 }, { timestamps: true });
 

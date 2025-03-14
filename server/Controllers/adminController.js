@@ -11,7 +11,7 @@ const {
   comparePassword,
 } = require("../Utilities/passwordUtilities");
 const { createToken } = require("../Utilities/generateToken");
-const sendEmail = require("../Config/emailService");
+const sendEmail = require("../Config/nodemailer");
 const generateOTP = require("../Utilities/generateOTP");
 const { getRecentActivities } = require("../Utilities/activityServices");
 

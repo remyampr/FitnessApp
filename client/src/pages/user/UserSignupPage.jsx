@@ -1,201 +1,294 @@
-import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { userSignup, userVerify } from '../../services/userServices'
-import { toast } from 'react-toastify'
-import { useDispatch } from 'react-redux'
-import { setUser } from '../../redux/features/userSlice'
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { userSignup, userVerify } from '../../services/userServices';
+import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../redux/features/userSlice';
+import { FaEnvelope, FaLock, FaUser, FaKey } from 'react-icons/fa';
 
 export const UserSignupPage = () => {
-
-  const navigate=useNavigate();
-  const dispatch=useDispatch();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   
- 
-  const [values,setValues]=useState({
-    name:"",
-    email:"",
-    password:""
-  })
+  const [values, setValues] = useState({
+    name: "",
+    email: "",
+    password: ""
+  });
 
-  const [otpSent,setOtpSent]=useState(false); //tracking otp sent
-  const[otp,setOtp]=useState("");
-  const[loading,setLoading]=useState(false);
+  const [errors, setErrors] = useState({
+    name: "",
+    email: "",
+    password: ""
+  });
 
-  const onSubmit = async () => {
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [formValid, setFormValid] = useState(false);
+
+  // Validate form on input change
+  useEffect(() => {
+    validateForm();
+  }, [values]);
+
+  const validateForm = () => {
+    const newErrors = { name: "", email: "", password: "" };
+    let isValid = true;
+
+    // Name validation
+    if (values.name.trim() === "") {
+      newErrors.name = "Name is required";
+      isValid = false;
+    } else if (values.name.length < 2) {
+      newErrors.name = "Name must be at least 2 characters";
+      isValid = false;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (values.email.trim() === "") {
+      newErrors.email = "Email is required";
+      isValid = false;
+    } else if (!emailRegex.test(values.email)) {
+      newErrors.email = "Please enter a valid email";
+      isValid = false;
+    }
+
+    // Password validation
+    if (values.password.trim() === "") {
+      newErrors.password = "Password is required";
+      isValid = false;
+    } else if (values.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    setFormValid(isValid);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setValues({ ...values, [name]: value });
+  };
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Final validation before submission
+    validateForm();
+    if (!formValid) return;
+    
     setLoading(true);
     try {
-      console.log("Sending request to backend with:", values);
-      
-      const res=await userSignup(values);
-      console.log("res :",res);
-      toast.success("SignUp Successful! Check your email for the OTP.");
+      const res = await userSignup(values);
+      toast.success("Signup successful! Check your email for the OTP.");
       setOtpSent(true);
     } catch (err) {
-      console.log(err); 
-      if (err.response && err.response.data && err.response.data.error) {
-        toast.error(err.response.data.error); 
-    }
-    else {
-            toast.error("An unexpected error occurred."); // Fallback error message
-          }     
+      console.log(err);
+      if (err.response?.data?.error) {
+        toast.error(err.response.data.error,{
+          onClose: () => navigate("/user/login"),
+        })
+       
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
     } finally {
-      setLoading(false); // Set loading state to false when the request is done
+      setLoading(false);
     }
-  }
+  };
 
-  const onVerifyOtp=()=>{
+  const validateOtp = () => {
+    return otp.trim().length > 0;
+  };
+
+  const onVerifyOtp = async (e) => {
+    e.preventDefault();
+    
+    if (!validateOtp()) {
+      toast.error("Please enter the OTP");
+      return;
+    }
+    
     setLoading(true);
-    userVerify(values.email,otp).then((res=>{
-      console.log("res :",res);
+    try {
+      const res = await userVerify(values.email, otp);
       toast.success("Email verified successfully!");
       dispatch(setUser(res.data.user));
-      console.log("after dispatch to slice : ",res.data.user);
-      if(res.data.user.isProfileComplete){
-     
+      
+      if (res.data.user.isProfileComplete) {
         navigate("/user/dashboard");
-}else  navigate("/user/complete-profile");
-
-    })).catch((err)=>{
+      } else {
+        navigate("/user/complete-profile");
+      }
+    } catch (err) {
       console.log(err);
-       if (err.response && err.response.data && err.response.data.error) {
-         toast.error(err.response.data.error); 
-       } else {
-         toast.error("An unexpected error occurred."); // Fallback error message
-       }
- })
-  }
-
-
+      if (err.response?.data?.error) {
+        toast.error(err.response.data.error);
+        // navigate("/user/login")
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="max-w-2xl mx-auto bg-transparent p-7">
-  <div className='p-7'>
-    
-    {/* Name */}
-    <div className="relative z-0 mb-6 w-full group">
-      <input 
-        type="text" 
-        name="name" 
-        className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" 
-        placeholder=" " required 
-        onChange={(e)=>{setValues({...values,[e.target.name]:e.target.value}) }}
-      />
-      <label className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
-        Name
-      </label>
-    </div>
-
-    {/* Email */}
-    <div className="relative z-0 mb-6 w-full group">
-      <input 
-        type="email" 
-        name="email" 
-        className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" 
-        placeholder=" " required 
-        onChange={(e)=>{setValues({...values,[e.target.name]:e.target.value}) }}
-      />
-      <label className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
-        Email
-      </label>
-    </div>
-
-    {/* Password */}
-    <div className="relative z-0 mb-6 w-full group">
-      <input 
-        type="password" 
-        name="password" 
-        className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" 
-        placeholder=" " required 
-        onChange={(e)=>{setValues({...values,[e.target.name]:e.target.value}) }}
-      />
-      <label className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
-        Password
-      </label>
-    </div>
-
-    {/* Forgot Password */}
-    <div className="mb-6 text-right">
-      <Link to="/forgot-password" className="text-sm text-blue-600 hover:underline">
-        Forgot Password?
-      </Link>
-    </div>
-
-    {/* Submit Button */}
-    {
-      !otpSent &&(
-        <div className="flex justify-center">
-        <button 
-          type="submit" 
-          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" 
-          onClick={onSubmit}
-          disabled={loading}
-        >
-         {loading ? 'Sign Up...' : 'Submit'}
-        </button>
-      </div>
-        
-      )}
+    <div className="flex items-center justify-center min-h-[110vh]">
    
+      <div className="max-w-md w-full bg-base-300 backdrop-blur-sm p-8 rounded-xl shadow-lg">
+        <h2 className="text-2xl font-bold text-center mb-6">Create Your Account</h2>
+        
+        {!otpSent ? (
+          <form onSubmit={onSubmit}>
+            {/* Name Field */}
+            <div className="form-control w-full mb-4">
+              <label className="label">
+                <span className="label-text font-medium">Name</span>
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <FaUser className="text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  name="name"
+                  value={values.name}
+                  onChange={handleChange}
+                  className={`input input-bordered w-full pl-10 ${errors.name ? 'input-error' : ''}`}
+                  placeholder="Enter your full name"
+                />
+              </div>
+              {errors.name && <span className="text-error text-sm mt-1">{errors.name}</span>}
+            </div>
 
-{/* otp after register  */}
+            {/* Email Field */}
+            <div className="form-control w-full mb-4">
+              <label className="label">
+                <span className="label-text font-medium">Email</span>
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <FaEnvelope className="text-gray-400" />
+                </div>
+                <input
+                  type="email"
+                  name="email"
+                  value={values.email}
+                  onChange={handleChange}
+                  className={`input input-bordered w-full pl-10 ${errors.email ? 'input-error' : ''}`}
+                  placeholder="Enter your email"
+                />
+              </div>
+              {errors.email && <span className="text-error text-sm mt-1">{errors.email}</span>}
+            </div>
 
-{otpSent && (
-   <div className="mt-6">
-   <p className="text-sm text-gray-600 dark:text-gray-400">
-     A verification code has been sent to your email.
-   </p>
-   <div className="relative z-0 mb-6 mt-3 w-full group">
-     <input
-       type="text"
-       name="otp"
-       className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-       placeholder=" "
-       required
-       onChange={(e) => { setOtp(e.target.value) }}
-     />
-     <label className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
-       OTP
-     </label>
-   </div>
+            {/* Password Field */}
+            <div className="form-control w-full mb-4">
+              <label className="label">
+                <span className="label-text font-medium">Password</span>
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <FaLock className="text-gray-400" />
+                </div>
+                <input
+                  type="password"
+                  name="password"
+                  value={values.password}
+                  onChange={handleChange}
+                  className={`input input-bordered w-full pl-10 ${errors.password ? 'input-error' : ''}`}
+                  placeholder="Create a password"
+                />
+              </div>
+              {errors.password && <span className="text-error text-sm mt-1">{errors.password}</span>}
+            </div>
 
-   <div className="flex justify-center">
-     <button
-       type="button"
-       className="text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-       onClick={onVerifyOtp}
-       disabled={loading}
-     >
-       {loading ? 'Verifying...' : 'Verify OTP'}
-     </button>
-   </div>
- </div>
-)}
+            {/* Forgot Password */}
+            <div className="flex justify-end mb-6">
+              <Link to="/forgot-password" className="text-sm text-blue-600 hover:underline">
+                Forgot Password?
+              </Link>
+            </div>
 
+            {/* Submit Button */}
+            <button
+              type="submit"
+              className={`btn btn-primary w-full ${loading ? 'loading' : ''}`}
+              disabled={loading || !formValid}
+            >
+              {loading ? 'Creating Account...' : 'Sign Up'}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={onVerifyOtp}>
+            {/* OTP Verification Section */}
+            <div className="bg-info/10 p-4 rounded-lg mb-6">
+              <p className="text-sm">
+                A verification code has been sent to <span className="font-bold">{values.email}</span>
+              </p>
+            </div>
 
+            {/* OTP Field */}
+            <div className="form-control w-full mb-6">
+              <label className="label">
+                <span className="label-text font-medium">Enter OTP</span>
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <FaKey className="text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  name="otp"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  className="input input-bordered w-full pl-10"
+                  placeholder="Enter the 6-digit code"
+                  maxLength="6"
+                />
+              </div>
+            </div>
 
+            {/* Verify Button */}
+            <button
+              type="submit"
+              className={`btn btn-success w-full ${loading ? 'loading' : ''}`}
+              disabled={loading || !otp.trim()}
+            >
+              {loading ? 'Verifying...' : 'Verify OTP'}
+            </button>
 
-    {/* Sign Up / Login Link */}
-    <div className="mt-6 text-center">
-      <p className="text-sm text-gray-600 dark:text-gray-400">
-        Already registered? 
-        <Link to="/user/login" className="text-blue-600 hover:underline ml-1">
-          Login here
-        </Link>
-      </p>
-      {/* <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-        New User? 
-        <Link to="/user/signup" className="text-blue-600 hover:underline ml-1">
-          Create an account
-        </Link>
-      </p> */}
+            {/* Resend OTP option */}
+            {/* <div className="mt-4 text-center">
+              <button 
+                type="button"
+                className="btn btn-link btn-sm"
+                onClick={onSubmit}
+                disabled={loading}
+              >
+                Didn't receive the code? Resend
+              </button>
+            </div> */}
+          </form>
+        )}
+
+        {/* Sign Up / Login Link */}
+        <div className="mt-6 text-center">
+          <p className="text-sm">
+            Already have an account?{' '}
+            <Link to="/user/login" className="text-primary hover:underline font-medium">
+              Login instead
+            </Link>
+          </p>
+        </div>
+      </div>
     </div>
-
-  </div>
-</div>
-
-  )
-}
-
+  );
+};
 
 
 

@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import { FiX, FiSave, FiTrash2, FiAlertTriangle } from "react-icons/fi";
 import { useDispatch } from "react-redux";
 import { deactivateTrainer, updateTrainer } from "../../services/adminServices";
-import { deleteTrainerFromStore, updateTrainerInStore } from "../../redux/features/adminSlice";
-
+import {
+  deleteTrainerFromStore,
+  updateTrainerInStore,
+} from "../../redux/features/adminSlice";
 
 export const TrainerModal = ({ trainer, isOpen, onClose }) => {
   const dispatch = useDispatch();
@@ -25,18 +27,17 @@ export const TrainerModal = ({ trainer, isOpen, onClose }) => {
 
   const handleSave = async () => {
     console.log();
-    ("save")
+    ("save");
     setLoading(true);
     try {
       const { isApproved, notes } = trainerData;
       const updatedData = { isApproved, notes };
 
-      console.log("trainer to update : ",trainerData._id, updatedData)
+      console.log("trainer to update : ", trainerData._id, updatedData);
 
       const res = await updateTrainer(trainerData._id, updatedData);
 
-      console.log("res after updating : ",res);
-      
+      console.log("res after updating : ", res);
 
       if (res && res.data.trainer) {
         dispatch(updateTrainerInStore(res.data.trainer));
@@ -88,7 +89,7 @@ export const TrainerModal = ({ trainer, isOpen, onClose }) => {
               <h3 className="text-lg font-bold mb-2">
                 Are you sure you want to suspend this trainer?
               </h3>
-           
+
               <div className="flex justify-center space-x-4">
                 <button
                   className="btn btn-error"
@@ -116,9 +117,9 @@ export const TrainerModal = ({ trainer, isOpen, onClose }) => {
               <div className="md:col-span-1 flex flex-col items-center">
                 <div className="avatar mb-4">
                   <div className="w-48 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                    <img 
-                      src={trainerData.image || "/default-avatar.png"} 
-                      alt={`${trainerData.name}'s profile`} 
+                    <img
+                      src={trainerData.image || "/default-avatar.png"}
+                      alt={`${trainerData.name}'s profile`}
                     />
                   </div>
                 </div>
@@ -199,7 +200,11 @@ export const TrainerModal = ({ trainer, isOpen, onClose }) => {
                     <label className="label">Availability</label>
                     <input
                       type="text"
-                      value={trainerData.availability?.map((item) => item.day).join(", ") || ""}
+                      value={
+                        trainerData.availability
+                          ?.map((item) => item.day)
+                          .join(", ") || ""
+                      }
                       className="input input-bordered w-full"
                       readOnly
                     />
@@ -218,22 +223,21 @@ export const TrainerModal = ({ trainer, isOpen, onClose }) => {
 
                 {/* Social Links */}
                 <div className="form-control mt-4">
-  <label className="label">Social Links</label>
-  <div className="grid grid-cols-2 gap-4">
-    {trainerData.socialLinks?.map((link, index) => (
-      <div key={index} className="form-control">
-        <label className="label">{link.platform}</label>
-        <input
-          type="text"
-          value={link.url}
-          className="input input-bordered w-full"
-          readOnly
-        />
-      </div>
-    ))}
-  </div>
-</div>
-
+                  <label className="label">Social Links</label>
+                  <div className="grid grid-cols-2 gap-4">
+                    {trainerData.socialLinks?.map((link, index) => (
+                      <div key={index} className="form-control">
+                        <label className="label">{link.platform}</label>
+                        <input
+                          type="text"
+                          value={link.url}
+                          className="input input-bordered w-full"
+                          readOnly
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
                 {/* Notes */}
                 <div className="form-control mt-4">
@@ -254,23 +258,22 @@ export const TrainerModal = ({ trainer, isOpen, onClose }) => {
         {/* Modal Footer */}
         {!isDeleting && (
           <div className="flex justify-between items-center p-4 border-t">
-           
-              <button onClick={onClose} className="btn btn-outline">
-                Cancel
-              </button>
-              <button
-                onClick={handleSave}
-                className="btn btn-primary"
-                disabled={loading}
-              >
-                {loading ? (
-                  <span className="loading loading-spinner loading-sm"></span>
-                ) : (
-                  <>
-                    <FiSave className="mr-2" /> Save Changes
-                  </>
-                )}
-              </button>
+            <button onClick={onClose} className="btn btn-outline">
+              Cancel
+            </button>
+            <button
+              onClick={handleSave}
+              className="btn btn-primary"
+              disabled={loading}
+            >
+              {loading ? (
+                <span className="loading loading-spinner loading-sm"></span>
+              ) : (
+                <>
+                  <FiSave className="mr-2" /> Save Changes
+                </>
+              )}
+            </button>
           </div>
         )}
       </div>

@@ -3,227 +3,217 @@ import { userForgotPassword, userResetPassword } from '../../services/userServic
 import { toast } from 'react-toastify';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { trainerForgotPassword, trainerResetPassword } from '../../services/trainerServices';
+import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaKey } from 'react-icons/fa';
 
 export const ForgotPassword = () => {
-
   const location = useLocation();
-  const role = location.state?.role || "unknown"; 
+  const role = location.state?.role || "unknown";
+  const navigate = useNavigate();
 
-const [step,setStep]=useState("email");
-// const [email, setEmail] = useState("");
-const [data, setData] = useState({
-     email:"",
-  role:role
-});
+  const [step, setStep] = useState("email");
+  const [data, setData] = useState({
+    email: "",
+    role: role
+  });
+  const [maskedEmail, setMaskedEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-console.log("Role ForgotPassword : ",data.role);
+  console.log("Role ForgotPassword : ", data.role);
 
-const [maskedEmail, setMaskedEmail] = useState("");
-const [otp, setOtp] = useState("");
-const [newPassword, setNewPassword] = useState("");
-
-
-
-const navigate = useNavigate();
-
-const handleSendOTP=async ()=>{
+  const handleSendOTP = async () => {
     try {
-        console.log("step : ",step);
-        
-        if(data.role === "user"){
-          const response=await userForgotPassword(data);
-          console.log("at handle otp data : ",data);
-          console.log("at handle otp response : ",response);
-        }
-        else if(data.role === "trainer"){
-          const response=await trainerForgotPassword(data);
-          console.log("at handle otp data : ",data);
-          console.log("at handle otp response : ",response);
-        }
-       
-        toast.success("otp send");
-        setMaskedEmail(maskEmail(data.email));
-        setStep("otp");
-        
+      console.log("step : ", step);
+      setLoading(true);
+      
+      if (data.role === "user") {
+        const response = await userForgotPassword(data);
+        console.log("at handle otp data : ", data);
+        console.log("at handle otp response : ", response);
+      }
+      else if (data.role === "trainer") {
+        const response = await trainerForgotPassword(data);
+        console.log("at handle otp data : ", data);
+        console.log("at handle otp response : ", response);
+      }
+      
+      toast.success("OTP sent successfully");
+      setMaskedEmail(maskEmail(data.email));
+      setStep("otp");
     } catch (error) {
-        console.log(error.response,error);
-        toast.error(error.response?.data?.error || "Something went wrong.");
+      console.log(error.response, error);
+      toast.error(error.response?.data?.error || "Something went wrong.");
+    } finally {
+      setLoading(false);
     }
-}
+  }
 
-const maskEmail = (email) => {
+  const maskEmail = (email) => {
     const [name, domain] = email.split("@");
     return name.slice(0, 2) + "***@" + domain;
   };
 
-
-const handleResetPassword=async () =>{
+  const handleResetPassword = async () => {
     try {
-
-      if(data.role === "user"){
-        const response=await userResetPassword(data.email,otp,newPassword);
-        console.log("at handle resetPassword data : ",data);
-        console.log("at handle resetPassword response : ",response);
-      }else if(data.role === "trainer"){
-        const response=await trainerResetPassword(data.email,otp,newPassword);
-        console.log("at handle resetPassword data : ",data);
-        console.log("at handle resetPassword response : ",response);
+      setLoading(true);
+      
+      if (data.role === "user") {
+        const response = await userResetPassword(data.email, otp, newPassword);
+        console.log("at handle resetPassword data : ", data);
+        console.log("at handle resetPassword response : ", response);
+      } else if (data.role === "trainer") {
+        const response = await trainerResetPassword(data.email, otp, newPassword);
+        console.log("at handle resetPassword data : ", data);
+        console.log("at handle resetPassword response : ", response);
       }
-        
-        toast.success("password reset ");
-        navigate(`/${data.role}/login`);
-        
+      
+      toast.success("Password reset successfully");
+      navigate(`/${data.role}/login`);
     } catch (error) {
-        console.log(error.response,error);
-        
-        toast.error(error.response?.data?.error || "Something went wrong.");
+      console.log(error.response, error);
+      toast.error(error.response?.data?.error || "Something went wrong.");
+    } finally {
+      setLoading(false);
     }
-}
-
+  }
 
   return (
-<div className="max-w-2xl mx-auto bg-transparent p-7">
-    <div className="p-7">
-      {step === "email" ? (
-        <>
-          <h2 className="text-lg font-semibold mb-4">Forgot Password?</h2>
-          <p className="text-sm text-gray-600 mb-4">Enter your email to receive a reset OTP.</p>
-
-          {/* Email */}
-          <div className="relative z-0 mb-6 w-full group">
-            <input
-              type="email"
-              name="email"
-              className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-              placeholder=" "
-              required
-              onChange={(e)=>{setData({...data,[e.target.name]:e.target.value}) }} />
+    <div className="flex items-center justify-center min-h-[110vh]">
+      <div className="max-w-md w-full bg-base-300/50 backdrop-blur-sm p-8 rounded-xl shadow-lg">
+        {step === "email" ? (
+          <>
+            <h2 className="text-2xl font-bold text-center mb-6">Forgot Password?</h2>
+            <p className="text-sm  text-center mb-6">Enter your email to receive a reset OTP.</p>
             
-            <label
-              htmlFor="email"
-              className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-            >
-              Email
-            </label>
-          </div>
+            <form onSubmit={(e) => { e.preventDefault(); handleSendOTP(); }}>
+              {/* Email Field */}
+              <div className="form-control w-full mb-6">
+                <label className="label">
+                  <span className="label-text font-medium">Email</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <FaEnvelope className="" />
+                  </div>
+                  <input
+                    type="email"
+                    name="email"
+                    className="input input-bordered w-full pl-10"
+                    placeholder="Enter your email"
+                    required
+                    value={data.email}
+                    onChange={(e) => setData({ ...data, [e.target.name]: e.target.value })}
+                  />
+                </div>
+              </div>
 
-          <button
-            type="button"
-            onClick={handleSendOTP}
-            className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-          >
-            Continue
-          </button>
-        </>
-      ) : (
-        <>
-          <h2 className="text-lg font-semibold mb-4">Reset Password</h2>
-          <p className="text-sm text-gray-600 mb-4">
-            We have sent an OTP to your email <strong>{maskedEmail}</strong>.
-          </p>
+              {/* Submit Button */}
+              <button
+                type="submit"
+                className={`btn btn-primary w-full ${loading ? 'loading' : ''}`}
+                disabled={loading}
+              >
+                {loading ? 'Sending OTP...' : 'Continue'}
+              </button>
+            </form>
+            
+            {/* Back to Login Link */}
+            <div className="mt-6 text-center">
+              <p className="text-sm">
+                Remember your password?{' '}
+                <a 
+                  onClick={() => navigate(`/${data.role}/login`)} 
+                  className="text-primary hover:underline font-medium cursor-pointer"
+                >
+                  Back to Login
+                </a>
+              </p>
+            </div>
+          </>
+        ) : (
+          <>
+            <h2 className="text-2xl font-bold text-center mb-6">Reset Password</h2>
+            <p className="text-sm  text-center mb-6">
+              We've sent an OTP to <strong>{maskedEmail}</strong>
+            </p>
+            
+            <form onSubmit={(e) => { e.preventDefault(); handleResetPassword(); }}>
+              {/* OTP Field */}
+              <div className="form-control w-full mb-4">
+                <label className="label">
+                  <span className="label-text font-medium">OTP</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <FaKey className="" />
+                  </div>
+                  <input
+                    type="text"
+                    name="otp"
+                    className="input input-bordered w-full pl-10"
+                    placeholder="Enter OTP"
+                    required
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                  />
+                </div>
+              </div>
 
-          {/* OTP */}
-          <div className="relative z-0 mb-6 w-full group">
-            <input
-              type="text"
-              name="otp"
-              className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-              placeholder=" "
-              required
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-            />
-            <label
-              htmlFor="otp"
-              className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-            >
-              OTP
-            </label>
-          </div>
+              {/* New Password Field */}
+              <div className="form-control w-full mb-6">
+                <label className="label">
+                  <span className="label-text font-medium">New Password</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <FaLock className="" />
+                  </div>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="newPassword"
+                    className="input input-bordered w-full pl-10 pr-10"
+                    placeholder="Enter new password"
+                    required
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 "
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                </div>
+              </div>
 
-          {/* New Password */}
-          <div className="relative z-0 mb-6 w-full group">
-            <input
-              type="password"
-              name="newPassword"
-              className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
-              placeholder=" "
-              required
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-            />
-            <label
-              htmlFor="newPassword"
-              className="absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6"
-            >
-              New Password
-            </label>
-          </div>
-
-          <button
-            type="button"
-            onClick={handleResetPassword}
-            className="text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800"
-          >
-            Reset Password
-          </button>
-        </>
-      )}
+              {/* Submit Button */}
+              <button
+                type="submit"
+                className={`btn btn-primary w-full ${loading ? 'loading' : ''}`}
+                disabled={loading}
+              >
+                {loading ? 'Resetting...' : 'Reset Password'}
+              </button>
+            </form>
+            
+            {/* Back to Email Step */}
+            <div className="mt-6 text-center">
+              <p className="text-sm">
+                Didn't receive the OTP?{' '}
+                <a 
+                  onClick={() => setStep("email")} 
+                  className="text-primary hover:underline font-medium cursor-pointer"
+                >
+                  Try again
+                </a>
+              </p>
+            </div>
+          </>
+        )}
+      </div>
     </div>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-//     <div className="max-w-md mx-auto p-6 bg-white shadow-md rounded-lg">
-//     {step === "email" ? (
-//       <div>
-//         <h2 className="text-lg font-semibold">Forgot Password?</h2>
-  
-//         <p className="text-sm text-gray-600">Enter your email to receive a reset OTP.</p>
-//         <input
-//           type="email"
-//           placeholder="Enter your email"
-//           className="w-full mt-3 p-2 border rounded"
-//           value={email}
-//           onChange={(e) => setEmail(e.target.value)}
-//         />
-//         <button onClick={handleSendOTP} className="mt-4 w-full bg-blue-600 text-white p-2 rounded">
-//           Continue
-//         </button>
-//       </div>
-//     ) : (
-//       <>
-//         <h2 className="text-lg font-semibold">Reset Password</h2>
-//         <p className="text-sm text-gray-600">
-//           We have sent an OTP to your email <strong>{maskedEmail}</strong>.
-//         </p>
-//         <input
-//           type="text"
-//           placeholder="Enter OTP"
-//           className="w-full mt-3 p-2 border rounded"
-//           value={otp}
-//           onChange={(e) => setOtp(e.target.value)}
-//         />
-//         <input
-//           type="password"
-//           placeholder="Enter new password"
-//           className="w-full mt-3 p-2 border rounded"
-//           value={newPassword}
-//           onChange={(e) => setNewPassword(e.target.value)}
-//         />
-//         <button onClick={handleResetPassword} className="mt-4 w-full bg-green-600 text-white p-2 rounded">
-//           Reset Password
-//         </button>
-//       </>
-//     )}
-//   </div>
-  )
+  );
 }

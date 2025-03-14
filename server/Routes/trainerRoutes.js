@@ -11,6 +11,7 @@ const {
   getTrainerClients,
   getClientById,
   getMyReviews,
+  getAllTrainers,
 
 } = require("../Controllers/trainerController");
 
@@ -35,6 +36,10 @@ router.get("/revenue",protect, authorize(["trainer"]), getTrainerRevenue)
  router.get("/clients/:clientId", protect, authorize(["trainer"]), getClientById);
 
 router.get('/my-reviews',  protect, authorize(["trainer"]),getMyReviews);
+
+
+router.get("/public",getAllTrainers)
+
 
 
 

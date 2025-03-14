@@ -131,5 +131,12 @@ export const deleteMyReview=()=>{
     return axiosInstance.delete("/user/my-trainer/review")
 }
 
+export const postMyTestimonial=(data)=>{
+    return axiosInstance.post("/testimonials/user",data)
+}
+export const getMyTestimonial=()=>{
+    return axiosInstance.get("/testimonials/user")
+}
+
 
 

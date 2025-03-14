@@ -106,12 +106,12 @@ export const UserProgressPage = () => {
         >
           Nutrition
         </a>
-        <a
+        {/* <a
           className={`tab ${activeTab === "measurements" ? "tab-active" : ""}`}
           onClick={() => setActiveTab("measurements")}
         >
           Measurements
-        </a>
+        </a> */}
       </div>
 
       {/* Summary Tab */}
@@ -339,130 +339,10 @@ export const UserProgressPage = () => {
         <div>
           {/* <h2 className="text-xl font-bold mb-4">Body Measurements</h2> */}
 
-          {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div className="bg-base-200 p-4 rounded-lg shadow">
-              <h3 className="font-bold mb-2">Weight Tracking</h3>
-              <div className="flex justify-between">
-                <div>
-                  <p className="text-sm">Starting</p>
-                  <p className="font-bold">
-                    {progress?.summary?.startingWeight || "0"} lbs
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm">Current</p>
-                  <p className="font-bold">
-                    {progress?.summary?.currentWeight || "0"} lbs
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm">Goal</p>
-                  <p className="font-bold">
-                    {progress?.summary?.goalWeight || "0"} lbs
-                  </p>
-                </div>
-              </div>
-              <div className="mt-4">
-                <p className="text-sm">Progress to goal</p>
-                <progress
-                  className="progress progress-accent w-full"
-                  value={progress?.summary?.weightProgressPercentage || 0}
-                  max="100"
-                ></progress>
-                <p className="text-right text-sm">
-                  {progress?.summary?.weightChange > 0 ? "+" : ""}
-                  {progress?.summary?.weightChange || "0"} lbs
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-base-200 p-4 rounded-lg shadow">
-              <h3 className="font-bold mb-2">Body Composition</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm">Body Fat %</p>
-                  <p className="font-bold">
-                    {progress?.summary?.bodyFatPercentage || "0"}%
-                  </p>
-                  <p className="text-xs opacity-70">
-                    {progress?.summary?.bodyFatChange > 0 ? "+" : ""}
-                    {progress?.summary?.bodyFatChange || "0"}% from start
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm">Muscle Mass</p>
-                  <p className="font-bold">
-                    {progress?.summary?.muscleMass || "0"} lbs
-                  </p>
-                  <p className="text-xs opacity-70">
-                    {progress?.summary?.muscleMassChange > 0 ? "+" : ""}
-                    {progress?.summary?.muscleMassChange || "0"} lbs from start
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div> */}
+    
 
           <h2 className="font-bold mb-2">Measurement History</h2>
-          <div className="overflow-x-auto">
-            <table className="table table-zebra w-full">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Weight</th>
-                  <th>Body Fat</th>
-                  <th>Other Measurements</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(
-                  progress?.history?.data?.filter(
-                    (item) => item.activityType === "measurement"
-                  ) || []
-                ).map((entry, index) => (
-                  <tr key={index}>
-                    <td>{new Date(entry.date).toLocaleDateString()}</td>
-                    <td>{entry.weight} lbs</td>
-                    <td>{entry.bodyFat || "N/A"}%</td>
-                    <td>
-                      <details className="dropdown">
-                        <summary className="btn btn-xs">View</summary>
-                        <ul className="p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52">
-                          <li>
-                            <a>Chest: {entry.measurements?.chest || "N/A"}"</a>
-                          </li>
-                          <li>
-                            <a>Waist: {entry.measurements?.waist || "N/A"}"</a>
-                          </li>
-                          <li>
-                            <a>Hips: {entry.measurements?.hips || "N/A"}"</a>
-                          </li>
-                          <li>
-                            <a>Arms: {entry.measurements?.arms || "N/A"}"</a>
-                          </li>
-                          <li>
-                            <a>
-                              Thighs: {entry.measurements?.thighs || "N/A"}"
-                            </a>
-                          </li>
-                        </ul>
-                      </details>
-                    </td>
-                  </tr>
-                ))}
-                {(!progress?.history ||
-                  progress.history?.data?.filter(
-                    (item) => item.activityType === "measurement"
-                  ).length === 0) && (
-                  <tr>
-                    <td colSpan="4" className="text-center">
-                      No measurement data available
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+         
         </div>
       )}
     </div>

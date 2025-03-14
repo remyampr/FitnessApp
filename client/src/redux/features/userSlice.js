@@ -10,6 +10,8 @@ const initialState = {
   isProfileComplete: false,
   appointments: null,
 
+  testimonial:null,
+
   notifications: null,
 
   workouts: [],
@@ -160,6 +162,10 @@ const userSlice = createSlice({
       state.notifications = action.payload;
     },
 
+    setTestimonial:(state,action)=>{
+      state.testimonial=action.payload;
+    },
+
     clearUser: (state) => {
       state.user = initialState;
       state.isAuthenticated = false;
@@ -206,6 +212,7 @@ export const {
   updateWorkoutStatus,
   // updateWorkoutStatuses,
 
+    setTestimonial,
   setNotifications,
   logout,
 } = userSlice.actions;

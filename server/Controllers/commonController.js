@@ -1,10 +1,12 @@
 const User = require("../Models/User");
 const Admin = require("../Models/Admin");
 const Trainer = require("../Models/Trainer");
-const sendEmail = require("../Config/emailService");
+// const sendEmail = require("../Config/emailService");
 const { hashPassword, comparePassword } = require("../Utilities/passwordUtilities");
 const { createToken } = require("../Utilities/generateToken");
 const { generateOTP } = require("../Utilities/generateOTP");
+const sendEmail = require("../Utilities/EmailServices/sendEmail");
+
 
 const forgotPassword = async (req, res, next) => {
   try {

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   checkWorkoutStatus,
+  getMyTestimonial,
   getUserAppointments,
   getUserNotifications,
   getUserNutritionPlans,
@@ -13,6 +14,7 @@ import {
   setError,
   setLoading,
   setNutritions,
+  setTestimonial,
   setTodayNutrition,
   setTodayWorkoutR,
   setTomorrowNutrition,
@@ -26,6 +28,8 @@ import { WorkoutCard } from "../../components/user/WorkoutCardDashboard";
 import { LoadingSpinner } from "../../components/shared/LoadingSpinner";
 import { NutritionCard } from "../../components/user/NutritionCardDashboard";
 import { AppointmentCardDashboard } from "../../components/user/AppointmentCardDashboard";
+import TestimonialCard from "../../components/user/TestimonialCard";
+
 
 export const UserDashboard = () => {
   const dispatch = useDispatch();
@@ -41,6 +45,7 @@ export const UserDashboard = () => {
     notifications,
     workouts,
     nutritionPlans,
+    testimonial
     
   } = useSelector((state) => state.user);
 
@@ -59,6 +64,7 @@ export const UserDashboard = () => {
   // console.log("USERR ID : ",userId);
   
 // console.log("inside userdashboard : user from redux : ", user);
+// console.log("Mytestimonial dashboard !!",testimonial);
 
 
 
@@ -75,6 +81,7 @@ export const UserDashboard = () => {
         const workoutsResponse = await getUserWorkouts();
         const nutritionPlansResponse = await getUserNutritionPlans();
           const workoutStatusResp = await checkWorkoutStatus();
+          // const testimonialResp = await getMyTestimonial();
 
         // console.log(" Profile : ", profileResponse.data.user);
         // console.log("workout response", workoutsResponse.data.data);
@@ -96,8 +103,10 @@ export const UserDashboard = () => {
         }
         // dispatch(updateWorkoutStatus(workoutStatusResp.data.completed));
 
-
-        // console.log("Userdashboard in redux workoutstatus!!! : ",workoutStatusResp.data);
+        console.log(" Profile : , profileResponse.data.user.testimonial ");
+        dispatch(setTestimonial(profileResponse.data?.user.testimonial || null));
+       console.log("Mytestimonial dashboard ",testimonial);
+       
         
 
 
@@ -264,7 +273,7 @@ if(tomorrowNutritionData){
     <div className="flex min-h-screen">
   
 
-      <div className="flex-1 p-6">
+      <div className="flex-1 p-6 bg-base-100">
         <h1 className="text-2xl font-bold ml-6 mb-6">
           {" "}
           Let's Achieve Your Goals!
@@ -280,10 +289,13 @@ if(tomorrowNutritionData){
 
           {/* Upcoming Appointments */}
           <AppointmentCardDashboard appointments={appointments} />
+
+       <TestimonialCard/>
+
          
         </div>
 
-        {/* Secondary Content - Tabs */}
+       
       </div>
     </div>
   );

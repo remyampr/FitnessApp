@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import { MainLayout } from "../layout/MainLayout";
 
 import { HomePage } from "../pages/shared/HomePage";
@@ -42,18 +42,31 @@ import { WorkoutListPage } from "../pages/user/WorkoutListPage";
 import { TrainerProfilePage } from "../pages/trainer/TrainerProfilePage";
 import { TrainerRevenuePage } from "../pages/trainer/TrainerRevenuePage";
 import { AdminAuthLayout } from "../layout/AdminAuthLayout";
-
-
+import { TrainersListingPage } from "../pages/shared/TrainersListingPage";
+import { PricingPage } from "../pages/shared/PricingPage";
+import { ErrorPage } from "../pages/shared/ErrorPage";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <MainLayout />,
-    errorElement: <h1>Error page</h1>,
+    errorElement: <ErrorPage />,
     children: [
+      {
+        path: "/login",
+        element: <Navigate to="/" replace />,
+      },
       {
         path: "/",
         element: <HomePage />,
+      },
+      {
+        path: "our-trainers",
+        element: <TrainersListingPage />,
+      },
+      {
+        path: "pricing",
+        element: <PricingPage />,
       },
       {
         path: "/user/signup",
@@ -84,11 +97,7 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "complete-profile",
-        element: (
-          <ProtectedRoute requiredRole="user" allowIncomplete={true}>
-            <CompleteProfile />
-          </ProtectedRoute>
-        ),
+        element: <CompleteProfile />,
       },
       {
         path: "payment-success",
@@ -96,57 +105,39 @@ export const router = createBrowserRouter([
       },
       {
         path: "dashboard",
-        element: (
-         <UserDashboard/>
-        ),
+        element: <UserDashboard />,
       },
       {
         path: "profile",
-        element: (
-         <UserProfilePage/>
-        ),
+        element: <UserProfilePage />,
       },
       {
         path: "mytrainer",
-        element: (
-         <UserTrainerPage/>
-        ),
+        element: <UserTrainerPage />,
       },
       {
         path: "workout/start",
-              element: (
-         <WorkoutStartPage/>
-        ),
+        element: <WorkoutStartPage />,
       },
       {
         path: "nutrition/plan",
-              element: (
-         <NutritionPlanPage/>
-        ),
+        element: <NutritionPlanPage />,
       },
       {
         path: "nutrition",
-              element: (
-         <NutritionListPage/>
-        ),
+        element: <NutritionListPage />,
       },
       {
         path: "workouts",
-              element: (
-         <WorkoutListPage/>
-        ),
+        element: <WorkoutListPage />,
       },
       {
         path: "progress",
-              element: (
-         <UserProgressPage/>
-        ),
+        element: <UserProgressPage />,
       },
       {
         path: "appointments",
-              element: (
-         <UserAppointmentPage/>
-        ),
+        element: <UserAppointmentPage />,
       },
     ],
   },
@@ -191,7 +182,7 @@ export const router = createBrowserRouter([
         path: "workouts",
         element: (
           <TrainerProtectedRoute requiredRole="trainer">
-            <TrainerWorkoutPage/>
+            <TrainerWorkoutPage />
           </TrainerProtectedRoute>
         ),
       },
@@ -199,7 +190,7 @@ export const router = createBrowserRouter([
         path: "nutrition",
         element: (
           <TrainerProtectedRoute requiredRole="trainer">
-            <TrainerNutritionPage/>
+            <TrainerNutritionPage />
           </TrainerProtectedRoute>
         ),
       },
@@ -207,7 +198,7 @@ export const router = createBrowserRouter([
         path: "revenue",
         element: (
           <TrainerProtectedRoute requiredRole="trainer">
-            <TrainerRevenuePage/>
+            <TrainerRevenuePage />
           </TrainerProtectedRoute>
         ),
       },
@@ -215,11 +206,10 @@ export const router = createBrowserRouter([
         path: "profile",
         element: (
           <TrainerProtectedRoute requiredRole="trainer">
-            <TrainerProfilePage/>
+            <TrainerProfilePage />
           </TrainerProtectedRoute>
         ),
       },
-     
     ],
   },
   {
@@ -312,6 +302,4 @@ export const router = createBrowserRouter([
       { path: "forgot-password", element: <AdminForgotPassword /> },
     ],
   },
-
-
 ]);

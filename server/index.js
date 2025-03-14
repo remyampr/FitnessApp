@@ -14,6 +14,10 @@ const appointmentRoutes=require("./Routes/appointmentRoutes");
 const paymentRoutes =require("./Routes/paymentRoutes");
 const progressRoutes = require("./Routes/progressRoutes");
 const notificationRoutes = require("./Routes/notificationRoutes");
+const testimonialRoutes=require("./Routes/testimonialRoutes");
+
+// const socketIo=require("socket.io")
+const cornJob=require("./Utilities/cornJobs/subscriptionCheck")
 
 const app = express();
 
@@ -47,8 +51,11 @@ app.use("/api/workouts", workoutRoutes);
 app.use("/api/nutrition",nutritionRoutes);
 app.use("/api/appointments",appointmentRoutes);
 app.use("/api/payment",paymentRoutes);
-app.use("/api/progress",progressRoutes)
-app.use("/api/notifications",notificationRoutes)
+app.use("/api/progress",progressRoutes);
+app.use("/api/testimonials",testimonialRoutes);
+app.use("/api/notifications",notificationRoutes);
+
+
 
 const PORT = process.env.PORT || 5100;
 
