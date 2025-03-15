@@ -89,6 +89,9 @@ const paymentFunction = async (req, res, next) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ error: "User not found" });
 
+    console.log("User : ",user);
+    
+
     if (!user.paymentHistory) {
       user.paymentHistory = [];
     }
@@ -211,7 +214,7 @@ const paymentFunction = async (req, res, next) => {
     }
 
     console.log(
-      `Payment successful: ${userId} subscribed to ${plan} for ${duration} months.`
+      `Payment successful: ${userId} and ${user.name} subscribed to ${plan} for ${duration} months.`
     );
 
     res
