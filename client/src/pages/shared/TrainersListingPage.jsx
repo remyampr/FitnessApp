@@ -18,6 +18,8 @@ export const TrainersListingPage = () => {
       
       try {
         const response = await getAllTrainers();
+        console.log("Treainer res",response);
+        
         setTrainers(response.data.trainers);
         setLoading(false);
       } catch (err) {
