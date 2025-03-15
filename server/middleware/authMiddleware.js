@@ -47,7 +47,7 @@ if (await User.exists({ _id: decoded.id, role: 'user' })) {
         });
       }
 
-      // console.log(`Authenticated ${userModel} with role: ${user.role}`);
+      console.log(`Authenticated ${userModel} with role: ${user.role}`);
      
 
     // req.user = {
