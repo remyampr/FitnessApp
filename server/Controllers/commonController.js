@@ -125,6 +125,8 @@ const verifyEmail = async (req, res, next) => {
     res.cookie("token", token, { httpOnly: true });
 
     // console.log("User login successful");
+    console.log("user verified with otp  user:",account);
+    
 
     return res.json({ msg: "Email verified successfully!", user: account });
   } catch (error) {

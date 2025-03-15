@@ -36,6 +36,7 @@ export const CompleteProfile = () => {
   const [loading, setLoading] = useState(false);
 
 
+  console.log("inside ProfileComplete page !!!!!");
   
 
 
@@ -90,6 +91,8 @@ export const CompleteProfile = () => {
   };
 
   const handleProfileSubmit = async (event) => {
+    console.log("Inside Profilesubmit !");
+    
     event.preventDefault();
     console.log(import.meta.env.VITE_BASE_URL);
 

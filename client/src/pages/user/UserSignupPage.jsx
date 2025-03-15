@@ -115,7 +115,7 @@ export const UserSignupPage = () => {
     setLoading(true);
     try {
       const res = await userVerify(values.email, otp);
-      toast.success("Email verified successfully!");
+      toast.success("Email verified successfully!!!!");
       dispatch(setUser(res.data.user));
       
       if (res.data.user.isProfileComplete) {
