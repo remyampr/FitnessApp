@@ -57,7 +57,7 @@ export const getAppointmentForTrainer=( )=>{
         return axiosInstance.get("/appointments/trainer");
 }
 export const updateAppointment=(id,data)=>{
-    console.log("in axios data sending : id,data", id, data);
+    // console.log("in axios data sending : id,data", id, data);
     
         return axiosInstance.put(`/appointments/trainer/${id}`,data);
 }

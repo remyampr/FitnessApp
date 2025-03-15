@@ -36,9 +36,9 @@ export const TrainerRevenuePage = () => {
   const { revenue, revenueHistory, paymentHistory, loading, error } =
     useSelector((state) => state.trainer);
 
-  console.log("Inside revnue page : revenue :", revenue);
-  console.log("Inside revnue page : revenueHistory :", revenueHistory);
-  console.log("Inside revnue page : paymentHistory :", paymentHistory);
+  // console.log("Inside revnue page : revenue :", revenue);
+  // console.log("Inside revnue page : revenueHistory :", revenueHistory);
+  // console.log("Inside revnue page : paymentHistory :", paymentHistory);
 
   // Format revenue history data for charts
   const formatRevenueData = () => {

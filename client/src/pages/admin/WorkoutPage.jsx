@@ -60,7 +60,7 @@ export const WorkoutPage = () => {
       dispatch(setLoading(true));
       const response = await getAllWorkouts();
 
-      console.log("Workout resp ", response.data);
+      // console.log("Workout resp ", response.data);
 
       if (response && response.data && response.data.workouts) {
         dispatch(setWorkouts(response.data.workouts));
@@ -68,7 +68,7 @@ export const WorkoutPage = () => {
         dispatch(setWorkouts(response.data));
       }
 
-      console.log("Workout in redux ", workouts);
+      // console.log("Workout in redux ", workouts);
 
       dispatch(setLoading(false));
     } catch (err) {
@@ -97,37 +97,37 @@ export const WorkoutPage = () => {
     e.preventDefault();
     try {
       dispatch(setLoading(true));
-      console.log("workoutForm before creating FormData:", workoutForm);
+      // console.log("workoutForm before creating FormData:", workoutForm);
 
       const formData = new FormData();
       Object.keys(workoutForm).forEach((key) => {
         if (key === "image" && workoutForm[key]) {
           formData.append(key, workoutForm[key]);
-          console.log(`Added ${key} file to FormData`);
+          // console.log(`Added ${key} file to FormData`);
         } else if (key === "schedule") {
           const scheduleString = JSON.stringify(workoutForm[key]);
           formData.append(key, scheduleString);
-          console.log(`Added ${key} to FormData with length: ${scheduleString.length}`);
+          // console.log(`Added ${key} to FormData with length: ${scheduleString.length}`);
         } else {
           formData.append(key, workoutForm[key]);
-          console.log(`Added ${key}: ${workoutForm[key]} to FormData`);
+          // console.log(`Added ${key}: ${workoutForm[key]} to FormData`);
         }
       });
 
-      console.log("FormData : ", formData);
+      // console.log("FormData : ", formData);
 
       if (isEditing && currentWorkoutId) {
-        console.log("updating data ", formData);
+        // console.log("updating data ", formData);
         
         const updateResponse = await updateWorkoutPlan(
           currentWorkoutId,
           formData
         );
 
-        console.log("Update response : ", updateResponse.data);
+        // console.log("Update response : ", updateResponse.data);
       } else {
         const createResponse = await createWorkout(formData);
-        console.log("Create response : ", createResponse);
+        // console.log("Create response : ", createResponse);
       }
 
       await fetchWorkouts();

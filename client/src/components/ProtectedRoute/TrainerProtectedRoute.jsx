@@ -12,11 +12,11 @@ export const TrainerProtectedRoute = ({ children }) => {
   const { isAuthenticated,  trainer } = trainerState;
   // const { isAuthenticated, loading, trainer } = trainerState;
   
-  console.log("trainerProtectedRoute - auth state:", { 
-    isAuthenticated, 
-    // loading,
-    trainer
-  });
+  // console.log("trainerProtectedRoute - auth state:", { 
+  //   isAuthenticated, 
+  //   // loading,
+  //   trainer
+  // });
   
   // Check if the trainer has the isApproved property
   const isApproved = trainer?.isApproved || false;

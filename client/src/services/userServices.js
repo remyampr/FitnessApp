@@ -5,7 +5,7 @@ export const userLogin=(data)=>{
 }
 // ***************
 export const userForgotPassword=(data )=>{
-    console.log("data sending to backend: ",data);
+    // console.log("data sending to backend: ",data);
     
     return axiosInstance.post("/user/forgot-password",data)
 }
@@ -16,7 +16,7 @@ export const userResetPassword=(email, otp, newPassword , role="user" )=>{
 
 
 export const userSignup=(data)=>{
-    console.log("in axios User Signup : ",data);
+    // console.log("in axios User Signup : ",data);
     
     return axiosInstance.post("/user/register",data)
 }
@@ -44,7 +44,7 @@ export const assignTrainer=(data)=>{
 }
 
 export const makePaymentOnStripe=(data)=>{
-    console.log("Payment data : ",data);
+    // console.log("Payment data : ",data);
     
     return axiosInstance.post("/payment/makepayment",data)
 
@@ -94,14 +94,14 @@ export const getProgressSummary = ()=>{
 // Appoinments
 
 export const getTrainerAvailability = (trainerId)=>{
-    console.log("trainerid type :",typeof(trainerId));
-    console.log("trainerid :",trainerId);
+    // console.log("trainerid type :",typeof(trainerId));
+    // console.log("trainerid :",trainerId);
     
     return axiosInstance.get(`/appointments/trainer-availability/${trainerId}`)
 }
 
 export const bookAppointment = (appointmentData) => {
-    console.log("in axios ,Booking Appointmentdata :",appointmentData);
+    // console.log("in axios ,Booking Appointmentdata :",appointmentData);
     
     return axiosInstance.post("/appointments/book", appointmentData);
 };
@@ -113,7 +113,7 @@ export const updateAppointment = ()=>{
     return axiosInstance.put(`/appointments/user/${id}`)
 }
 export const cancelAppointment = (id,data)=>{
-    console.log("axios cancel detail Id data",id,data);
+    // console.log("axios cancel detail Id data",id,data);
     
     return axiosInstance.delete(`/appointments/user/${id}`,{data})
 }
@@ -123,7 +123,7 @@ export const getMyTrainer=()=>{
     return axiosInstance.get("/user/my-trainer")
 }
 export const postReview=(data)=>{
-    console.log("sending data in axios : ",data);
+    // console.log("sending data in axios : ",data);
     
     return axiosInstance.post("/user/my-trainer/review",data)
 }

@@ -9,7 +9,6 @@ import { TrainerSignupPage } from "../pages/trainer/TrainerSignupPage";
 import { UserDashboard } from "../pages/user/UserDashboard";
 import { UserLayout } from "../layout/UserLayout";
 import { CompleteProfile } from "../pages/user/CompleteProfile";
-import { ProtectedRoute } from "../components/ProtectedRoute/ProtectedRoute";
 import { TrainerLayout } from "../layout/TrainerLayout";
 import { PendingApproval } from "../pages/trainer/PendingApproval";
 import { TrainerDashboard } from "../pages/trainer/TrainerDashboard";

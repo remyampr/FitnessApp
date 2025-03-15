@@ -70,7 +70,7 @@ export const NutritionPage = () => {
       dispatch(setLoading(true));
       const response = await getAllNutritionPlans();
 
-      console.log("Nutrition resp ", response.data);
+      // console.log("Nutrition resp ", response.data);
 
       if (response && response.data && response.data.nutritionPlans) {
         dispatch(setNutritionPlans(response.data.nutritionPlans));
@@ -78,7 +78,7 @@ export const NutritionPage = () => {
         dispatch(setNutritionPlans(response.data));
       }
       
-      console.log("nutritionplans in redux ", nutritionPlans);
+      // console.log("nutritionplans in redux ", nutritionPlans);
 
       dispatch(setLoading(false));
     } catch (err) {
@@ -107,7 +107,7 @@ export const NutritionPage = () => {
     e.preventDefault();
     try {
       dispatch(setLoading(true));
-      console.log("nutritionForm before creating FormData:", nutritionForm);
+      // console.log("nutritionForm before creating FormData:", nutritionForm);
       const formData = new FormData();
       
       // Add all form fields to FormData with correct field names
@@ -132,10 +132,10 @@ export const NutritionPage = () => {
           currentPlanId,
           formData
         );
-        console.log("Update response : ", updateResponse.data);
+        // console.log("Update response : ", updateResponse.data);
       } else {
         const createResponse = await createNutritionPlan(formData);
-        console.log("Create response : ", createResponse);
+        // console.log("Create response : ", createResponse);
       }
 
       await fetchNutritionPlans();

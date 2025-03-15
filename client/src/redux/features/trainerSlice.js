@@ -33,11 +33,11 @@ const trainerSlice = createSlice({
   initialState,
   reducers: {
     setTrainer: (state, action) => {
-      console.log("Dispatched trainer data:", action.payload);
+      // console.log("Dispatched trainer data:", action.payload);
       state.trainer = action.payload;
       state.isAuthenticated = true;
       state.loading = false;
-      console.log("inslice setTrainer reducer trainer data:", state.trainer);
+      // console.log("inslice setTrainer reducer trainer data:", state.trainer);
     },
     setIsApproved: (state, action) => {
       if (state.trainer) {
@@ -85,7 +85,7 @@ const trainerSlice = createSlice({
       state.appointments = action.payload;
     },
     updateAppointments: (state, action) => {
-      console.log("inside reducer : updating appointmnet details  action.payload ",action.payload);
+      // console.log("inside reducer : updating appointmnet details  action.payload ",action.payload);
       
       state.appointments = state.appointments.map((appointment) =>
         appointment._id === action.payload._id ? { ...appointment, ...action.payload } : appointment

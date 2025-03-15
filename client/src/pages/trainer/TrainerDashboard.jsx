@@ -47,7 +47,7 @@ export const TrainerDashboard = () => {
   } = useSelector((state) => state.trainer);
 
   useEffect(() => {
-    console.log("Running fetchDashboardData...");
+    // console.log("Running fetchDashboardData...");
 
     const fetchDashboardData = async () => {
       try {
@@ -65,7 +65,7 @@ export const TrainerDashboard = () => {
         // console.log("Client res", clientResponse.data.clients);
         // console.log("appointment response", appointmentResponse);
         // console.log("revenue response", revenueRsponse);
-        console.log("revenueee :  ",revenueRsponse.data);
+        // console.log("revenueee :  ",revenueRsponse.data);
         
         // console.log("workout response", workoutsResponse.data);
         // console.log("nutritionresponse", nutritionPlansResponse.data);

@@ -21,22 +21,22 @@ export const ForgotPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  console.log("Role ForgotPassword : ", data.role);
+  // console.log("Role ForgotPassword : ", data.role);
 
   const handleSendOTP = async () => {
     try {
-      console.log("step : ", step);
+      // console.log("step : ", step);
       setLoading(true);
       
       if (data.role === "user") {
         const response = await userForgotPassword(data);
-        console.log("at handle otp data : ", data);
-        console.log("at handle otp response : ", response);
+        // console.log("at handle otp data : ", data);
+        // console.log("at handle otp response : ", response);
       }
       else if (data.role === "trainer") {
         const response = await trainerForgotPassword(data);
-        console.log("at handle otp data : ", data);
-        console.log("at handle otp response : ", response);
+        // console.log("at handle otp data : ", data);
+        // console.log("at handle otp response : ", response);
       }
       
       toast.success("OTP sent successfully");
@@ -61,12 +61,12 @@ export const ForgotPassword = () => {
       
       if (data.role === "user") {
         const response = await userResetPassword(data.email, otp, newPassword);
-        console.log("at handle resetPassword data : ", data);
-        console.log("at handle resetPassword response : ", response);
+        // console.log("at handle resetPassword data : ", data);
+        // console.log("at handle resetPassword response : ", response);
       } else if (data.role === "trainer") {
         const response = await trainerResetPassword(data.email, otp, newPassword);
-        console.log("at handle resetPassword data : ", data);
-        console.log("at handle resetPassword response : ", response);
+        // console.log("at handle resetPassword data : ", data);
+        // console.log("at handle resetPassword response : ", response);
       }
       
       toast.success("Password reset successfully");

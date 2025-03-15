@@ -66,13 +66,13 @@ const userSlice = createSlice({
     },
     updateUserProfilePic: (state, action) => {
       if (state.user) {
-        console.log(
-          "inside Reducer updateUserProfilePic : action.payload : ",
-          action.payload
-        );
+        // console.log(
+        //   "inside Reducer updateUserProfilePic : action.payload : ",
+        //   action.payload
+        // );
 
         state.user = { ...state.user, image: action.payload };
-        console.log("image after updatereducer :", state.user.image);
+        // console.log("image after updatereducer :", state.user.image);
       } else {
         console.error(
           "Error: User is not defined when updating profile picture"

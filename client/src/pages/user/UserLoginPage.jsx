@@ -37,14 +37,14 @@ const [showPassword, setShowPassword] = useState(false);
     userLogin(values)
       .then((res) => {
         if (res.data && res.data.user) {
-          console.log("login time res got , : ", res);
+          // console.log("login time res got , : ", res);
           
           dispatch(setUser(res.data.user));
           dispatch(setProfileComplete(res.data.user.isProfileComplete));
           
-          console.log("login res : ", res);
+          // console.log("login res : ", res);
           toast.success("Login successful!");
-          console.log("isProfilecompleted ?: ", isProfileComplete);
+          // console.log("isProfilecompleted ?: ", isProfileComplete);
           
           if (res.data.user.isProfileComplete) {
             navigate("/user/dashboard");

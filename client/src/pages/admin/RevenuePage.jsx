@@ -46,11 +46,11 @@ export const RevenuePage = () => {
         dispatch(setRevenueBreakdown(breakdownResponse.data));
 
 
-        console.log("revenue breakdown in store : ",breakdown);
-        console.log("Total revenue in store : ",totalRevenue);
-        console.log("Admin Revenue in store : ",adminRevenue);
-        console.log("trainer revenue in store : ",trainerRevenue);
-        console.log("payments in store : ",payments);
+        // console.log("revenue breakdown in store : ",breakdown);
+        // console.log("Total revenue in store : ",totalRevenue);
+        // console.log("Admin Revenue in store : ",adminRevenue);
+        // console.log("trainer revenue in store : ",trainerRevenue);
+        // console.log("payments in store : ",payments);
 
         dispatch(setLoading(false));
       } catch (fetchError) {

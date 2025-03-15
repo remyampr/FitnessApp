@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 export const UpcomingAppointments = ({ appointments }) => {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
 
-  console.log("Appointments in Upcoming appointment component : ",appointments);
+  // console.log("Appointments in Upcoming appointment component : ",appointments);
   
   
   if (!appointments || appointments.length === 0) {
@@ -24,7 +24,7 @@ export const UpcomingAppointments = ({ appointments }) => {
   }
   
   const handleStatusUpdate = async (appointmentId, status) => {
-    console.log("STATUS : ",status)
+    // console.log("STATUS : ",status)
     try {
      
 

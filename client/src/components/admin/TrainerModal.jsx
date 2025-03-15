@@ -26,18 +26,18 @@ export const TrainerModal = ({ trainer, isOpen, onClose }) => {
   };
 
   const handleSave = async () => {
-    console.log();
+ 
     ("save");
     setLoading(true);
     try {
       const { isApproved, notes } = trainerData;
       const updatedData = { isApproved, notes };
 
-      console.log("trainer to update : ", trainerData._id, updatedData);
+      // console.log("trainer to update : ", trainerData._id, updatedData);
 
       const res = await updateTrainer(trainerData._id, updatedData);
 
-      console.log("res after updating : ", res);
+      // console.log("res after updating : ", res);
 
       if (res && res.data.trainer) {
         dispatch(updateTrainerInStore(res.data.trainer));

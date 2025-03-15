@@ -23,7 +23,7 @@ export const TrainerNavbar = ({ toggleSidebar }) => {
     name=trainer.trainer.name
   }
   
-console.log("Inside nav : trainer ",trainer);
+// console.log("Inside nav : trainer ",trainer);
 
 
   const handleLogout = async () => {

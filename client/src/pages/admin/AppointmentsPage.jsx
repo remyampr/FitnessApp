@@ -21,7 +21,7 @@ export const AppointmentsPage = () => {
                 // console.log("Appointment  : ",response.data.data);
                 
                 dispatch(setAppointments(response.data.data));
-                console.log("Appointment in store  : ",appointments);
+                // console.log("Appointment in store  : ",appointments);
 
             } catch (err) {
                 console.error('Failed to fetch appointments:', err);
@@ -40,7 +40,7 @@ export const AppointmentsPage = () => {
             
             setSelectedAppointment(response.data.data);
             dispatch(setCurrentAppointment(response.data.data));
-            console.log("current Appointment in store: ",currentAppointment);
+            // console.log("current Appointment in store: ",currentAppointment);
             // console.log("current Appointment in state: ",selectedAppointment); async so no updating imeadietly so use useEffect to view state
         } catch (err) {
             console.error('Failed to fetch appointment details:', err);
@@ -48,9 +48,7 @@ export const AppointmentsPage = () => {
     };
 
     // for loging appointment in state
-    useEffect(() => {
-        console.log("Updated current Appointment in state: ", selectedAppointment);
-    }, [selectedAppointment]); 
+ 
 
     //  update appointment
     const handleUpdateAppointment = async (updateData) => {

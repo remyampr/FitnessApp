@@ -17,8 +17,8 @@ export const UserProfilePage = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
 
-  console.log("User : ", user);
-  console.log("image in redux : ", user?.image);
+  // console.log("User : ", user);
+  // console.log("image in redux : ", user?.image);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -51,10 +51,10 @@ export const UserProfilePage = () => {
       const response = await updateProfile(formData);
 
       if (response.data) {
-        console.log(
-          "image updating in redux : ",
-          response.data.userUpdated.image
-        );
+        // console.log(
+        //   "image updating in redux : ",
+        //   response.data.userUpdated.image
+        // );
 
         dispatch(updateUserProfilePic(response.data.userUpdated.image));
       } else {

@@ -49,7 +49,7 @@ const adminSlice=createSlice({
     initialState,
     reducers:{
         setAdmin:(state,action)=>{
-            console.log("Setting admin state:", action.payload);
+            // console.log("Setting admin state:", action.payload);
             state.admin=action.payload;
             state.admin.isAuthenticated=true;
         },

@@ -62,17 +62,17 @@ export const CompleteProfile = () => {
 
   useEffect(() => {
     if (currentStep === 2) {
-      console.log("step select trainer:", currentStep);
+      // console.log("step select trainer:", currentStep);
       fetchTrainers();
     }
   }, [currentStep]);
 
   const fetchTrainers = async () => {
     try {
-      console.log("Fetching trainers...");
+      // console.log("Fetching trainers...");
       const response = await getApprovedTrainers();
-      console.log("API Response:", response.data);
-      console.log("Trainers received from API:", response.data.trainers);
+      // console.log("API Response:", response.data);
+      // console.log("Trainers received from API:", response.data.trainers);
       setTrainers(response.data.trainers || []);
     } catch (err) {
       console.error("Error fetching trainers:", err);
@@ -106,7 +106,7 @@ export const CompleteProfile = () => {
     try {
       const profileupdateResponse=await updateProfile(formDataToSend);
       setCurrentStep(2);
-      console.log("Profile updated successfully",profileupdateResponse.data);
+      // console.log("Profile updated successfully",profileupdateResponse.data);
       // dispatch(set)
 
       toast.success("Profile updated, Now select a trainer");
@@ -118,11 +118,11 @@ export const CompleteProfile = () => {
   const handleTrainerSelect = async () => {
     try {
       const res = await assignTrainer({ trainerId: formData.trainerId });
-      console.log("response after trainer select : ", res);
+      // console.log("response after trainer select : ", res);
 
       if (res.data) {
         dispatch(setSelectedTrainer(formData.trainerId));
-        console.log("Trainer id set in form data", formData.trainerId);
+        // console.log("Trainer id set in form data", formData.trainerId);
         setCurrentStep(3); // Move to the next step only on success
       } else {
         toast.error(res.data.message || "Failed to assign trainer");

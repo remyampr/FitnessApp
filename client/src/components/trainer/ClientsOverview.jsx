@@ -9,7 +9,7 @@ export const ClientsOverview = ({ clients }) => {
   if (!clients || clients.length === 0) {
     return <AlertError error={"No clients yet"} />;
   }
-  console.log("CLIENTS : ", clients);
+  // console.log("CLIENTS : ", clients);
   
   const handleSort = (field) => {
     if (sortField === field) {

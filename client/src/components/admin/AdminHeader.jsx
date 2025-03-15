@@ -16,7 +16,7 @@ export const AdminHeader = ({ toggleSidebar }) => {
     try {
       const res = await adminLogout();
       dispatch(clearAdmin());
-      console.log("res : ", res);
+      // console.log("res : ", res);
       toast.success("Logout!");
       navigate("/admin/login");
     } catch (error) {

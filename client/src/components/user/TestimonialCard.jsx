@@ -10,8 +10,8 @@ import { TestimonialModal } from "./TestimonialModal";
     const { testimonial, loading } = useSelector((state) => state.user ?? { testimonial: null, loading: false });
 
     const user = useSelector((state) => state.user.user);
-    console.log("in testimonial modal (from redux ) User ",user);
-    console.log("in testimonial modal (from redux ) Testimonial ",testimonial);
+    // console.log("in testimonial modal (from redux ) User ",user);
+    // console.log("in testimonial modal (from redux ) Testimonial ",testimonial);
     
   
   

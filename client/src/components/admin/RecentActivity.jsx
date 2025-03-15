@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 export const RecentActivity = () => {
   const { recentActivity } = useSelector((state) => state.admin.dashboardStats);
 
-  console.log("ACTIVITYYY: ", recentActivity);
+  // console.log("ACTIVITYYY: ", recentActivity);
 
   // Combine all types of activities into a single array
   const allActivities = [

@@ -19,12 +19,12 @@ export const NutritionPlanPage = () => {
       state.user.progress.nutritionProgress?.[fullNutritionData?.id] || null
   );
 
-  console.log("Inside NutritionPlanPage from redux : user : ", user);
-  console.log(
-    "Inside NutritionPlanPage from redux : NutritionProgress(Nutrition status) : ",
-    savedProgress
-  );
-  console.log("inside nutritionPlanPage Fullnutritiondata : ",fullNutritionData);
+  // console.log("Inside NutritionPlanPage from redux : user : ", user);
+  // console.log(
+  //   "Inside NutritionPlanPage from redux : NutritionProgress(Nutrition status) : ",
+  //   savedProgress
+  // );
+  // console.log("inside nutritionPlanPage Fullnutritiondata : ",fullNutritionData);
   
 
   const [waterIntake, setWaterIntake] = useState(0);
@@ -140,9 +140,9 @@ export const NutritionPlanPage = () => {
 
       // Save to server
       const response = await saveProgress(nutritionCompleted);
-      console.log("nutritoncompleted send to backend : ",nutritionCompleted);
+      // console.log("nutritoncompleted send to backend : ",nutritionCompleted);
       
-      console.log("Nutrition Progress save Response : ", response);
+      // console.log("Nutrition Progress save Response : ", response);
 
       // Update Redux store with the same data
       dispatch(
@@ -152,10 +152,10 @@ export const NutritionPlanPage = () => {
         })
       );
 
-      console.log(
-        "Inside Nutrition Plan Page , from redux nutrition progress : ",
-        savedProgress
-      );
+      // console.log(
+      //   "Inside Nutrition Plan Page , from redux nutrition progress : ",
+      //   savedProgress
+      // );
 
       // Show success message
       // toast.success("Nutrition progress saved successfully!");

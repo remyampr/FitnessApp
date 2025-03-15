@@ -33,15 +33,15 @@ const [values,setValues]=useState({
       
       const res = await adminLogin({...values,role:"admin"});
 
-      console.log("Login response admin : ",res);
+      // console.log("Login response admin : ",res);
       
-      console.log("values in state : ",values);
+      // console.log("values in state : ",values);
       if (res.status === 200) {
-        console.log("admin login successfull",res.data.user);
+        // console.log("admin login successfull",res.data.user);
         
         dispatch(setAdmin(res.data.user))
         toast.success("Login successful!");
-        console.log("Navigating to /admin/dashboard");
+        // console.log("Navigating to /admin/dashboard");
         navigate("/admin/dashboard");
       } else {
         setError("Failed to sign in. Please check your credentials.");

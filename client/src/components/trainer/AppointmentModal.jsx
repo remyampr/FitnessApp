@@ -14,11 +14,11 @@ export const AppointmentDetailsModal = ({ appointment, onClose, updatedAppointme
   if (!appointment) return null;
   
   const handleStatusUpdate = async (status) => {
-    console.log("updating details : ",appointment._id,status);
+    // console.log("updating details : ",appointment._id,status);
     setIsSubmitting(true);
     try {
       const aptUpdateResponse=await updateAppointment(appointment._id, { status, notes });
-      console.log("Appointment update res : ",aptUpdateResponse.data);
+      // console.log("Appointment update res : ",aptUpdateResponse.data);
         
         dispatch(updateAppointments(aptUpdateResponse.data.data));
       

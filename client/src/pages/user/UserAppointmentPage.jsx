@@ -40,7 +40,7 @@ export const UserAppointmentPage = () => {
     try {
       setLoading(true);
       const response = await getUserAppointments();
-      console.log("GetUserAppointments response : ", response);
+      // console.log("GetUserAppointments response : ", response);
 
       setAppointments(response.data.data);
       filterAppointments(response.data.data, activeTab);
@@ -54,12 +54,12 @@ export const UserAppointmentPage = () => {
 
   const fetchTrainerAvailability = async () => {
     try {
-      console.log("Fetchingggg...");
+      // console.log("Fetchingggg...");
 
       if (!trainerId) return;
 
       const response = await getTrainerAvailability(trainerId);
-      console.log("trainerAvilabilityResponse : ", response);
+      // console.log("trainerAvilabilityResponse : ", response);
 
       if (response.data && response.data.data) {
         setTrainerAvailability(response.data.data);
@@ -200,7 +200,7 @@ export const UserAppointmentPage = () => {
 
       const bookingResponse = await bookAppointment(appointmentData);
 
-      console.log("Booking Response : ", bookingResponse);
+      // console.log("Booking Response : ", bookingResponse);
 
       //
       setModalOpen(false);
@@ -227,7 +227,7 @@ export const UserAppointmentPage = () => {
     }
 
     try {
-      console.log("details for cancelation : id,",appointmentId);
+      // console.log("details for cancelation : id,",appointmentId);
       
       const cancelResponde = await cancelAppointment(appointmentId, {
         status: "Cancelled",

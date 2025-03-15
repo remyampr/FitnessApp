@@ -50,7 +50,7 @@ export const TrainerNutritionPage = () => {
   });
 
 
-console.log("NutritionPage from redux nutrition : ",nutritionPlans);
+// console.log("NutritionPage from redux nutrition : ",nutritionPlans);
 
 
   const handleChange = (e) => {
@@ -127,7 +127,7 @@ console.log("NutritionPage from redux nutrition : ",nutritionPlans);
     const updatedSchedule = [...formData.schedule];
     updatedSchedule[dayIndex].day = value;
     setFormData({ ...formData, schedule: updatedSchedule });
-    console.log(formData);
+    // console.log(formData);
     
   };
 
@@ -171,14 +171,14 @@ console.log("NutritionPage from redux nutrition : ",nutritionPlans);
       formDataToSend.append('fitnessGoal', formData.fitnessGoal);
       formDataToSend.append('waterIntake', formData.waterIntake);
       formDataToSend.append('schedule', JSON.stringify(formData.schedule));
-      console.log("type ",typeof(formData.schedule));
+      // console.log("type ",typeof(formData.schedule));
       
       if (formData.image) {
         formDataToSend.append('image', formData.image);
       }
       
       const response = await addNewNutritionPlan(formDataToSend);
-      console.log("Addnutrition response : ",response);
+      // console.log("Addnutrition response : ",response);
       
       dispatch(addNutrition(response.data.savedNutrition))
       

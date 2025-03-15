@@ -83,7 +83,7 @@ export const createWorkout = (formData) => {
   }
   
   export const updateWorkoutPlan = (id, formData) => {
-    console.log("Sending to server:", id, formData);
+    // console.log("Sending to server:", id, formData);
     
     return axiosInstance.put(`workouts/${id}`, formData, {
       headers: {
@@ -102,7 +102,7 @@ export const createNutritionPlan = (formData) => {
   }
   
   export const updateNutritionPlan = (id, formData) => {
-    console.log("Sending to server:", id, formData);
+    // console.log("Sending to server:", id, formData);
     
     return axiosInstance.put(`nutrition/${id}`, formData, {
       headers: {

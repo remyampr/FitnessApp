@@ -29,11 +29,11 @@ export const UserModal = ({ user, isOpen, onClose }) => {
       const updatedData = { trainerId, status };
 
       const res = await updateUser(userData._id, userData);
-      console.log("response after updating user : ", res.data.user);
+      // console.log("response after updating user : ", res.data.user);
 
       if (res && res.data.user) {
         dispatch(updateUserInStore(res.data.user));
-        console.log("state update", user);
+        // console.log("state update", user);
       }
 
       onClose();

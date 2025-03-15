@@ -37,7 +37,7 @@ export const TrainerLoginPage = () => {
       const response = await trainerLogin(values);
       const trainerData = response.data.user;
 
-      console.log("trainer login");
+      // console.log("trainer login");
       
       dispatch(setTrainer(trainerData));
       dispatch(setIsApproved(trainerData.isApproved));
@@ -61,12 +61,12 @@ export const TrainerLoginPage = () => {
     }
   };
 
-  useEffect(() => {
-    console.log("Updated trainer state in Redux:", {
-      isAuthenticated,
-      trainer
-    });
-  }, [isAuthenticated, trainer]);
+  // useEffect(() => {
+  //   console.log("Updated trainer state in Redux:", {
+  //     isAuthenticated,
+  //     trainer
+  //   });
+  // }, [isAuthenticated, trainer]);
 
   const handleForgotPassword = () => {
     navigate("/forgot-password", { state: { role: "trainer" } });

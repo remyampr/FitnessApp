@@ -28,7 +28,7 @@ export const UserTrainerPage = () => {
     // If trainer info is not in redux, fetch it
     if (!trainer._id && user._id) {
       fetchTrainerData();
-      console.log("trainerInfo in redux : ",trainer);
+      // console.log("trainerInfo in redux : ",trainer);
       
     }
     
@@ -53,7 +53,7 @@ export const UserTrainerPage = () => {
     try {
 
       const response = await getMyTrainer();
-      console.log("getMyTrainer Response : ",response);
+      // console.log("getMyTrainer Response : ",response);
 
       if(response.data){
         dispatch(setTrainerInfo(response.data.trainer));
@@ -86,15 +86,15 @@ export const UserTrainerPage = () => {
     e.preventDefault();
     setLoading(true);
 
-    console.log("inside submit function ");
-    console.log("userReview send to backend : ",userReview);
+    // console.log("inside submit function ");
+    // console.log("userReview send to backend : ",userReview);
     try {
       const response = await postReview(userReview);
 
-      console.log("userReview send to backend : ",userReview);
+      // console.log("userReview send to backend : ",userReview);
       
 
-      console.log("postReview Response : ",response);
+      // console.log("postReview Response : ",response);
       
       
       // Update trainer info in redux
@@ -115,7 +115,7 @@ export const UserTrainerPage = () => {
     try {
       const response = await deleteMyReview();
 
-      console.log("deleteMyReview Response : ",response);
+      // console.log("deleteMyReview Response : ",response);
 
       dispatch(setTrainerInfo(response.data.trainer));
       

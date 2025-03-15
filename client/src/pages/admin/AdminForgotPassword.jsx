@@ -64,7 +64,7 @@ export const AdminForgotPassword = () => {
       const response = await adminResetPassword(data.email, otp, newPassword);
       setMessage("Password has been reset successfully.");
       toast.success(response.data.message);
-      console.log("role:",data.role);
+      // console.log("role:",data.role);
       
       navigate(`/${data.role}/login`);
     } catch (err) {

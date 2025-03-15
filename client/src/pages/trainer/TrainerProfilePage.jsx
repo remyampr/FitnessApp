@@ -15,7 +15,7 @@ export const TrainerProfilePage = () => {
   const fileInputRef = useRef(null);
   const [activeTab, setActiveTab] = useState('profile');
 
-  console.log("trainer : ",trainer);
+  // console.log("trainer : ",trainer);
   
   
   // Handle image selection
@@ -30,7 +30,7 @@ export const TrainerProfilePage = () => {
       
       const response= await updateProfile(formData);
 
-console.log("response : ",response.data.trainer);
+// console.log("response : ",response.data.trainer);
 
 dispatch(updateTrainerProfile(response.data.trainer))
 

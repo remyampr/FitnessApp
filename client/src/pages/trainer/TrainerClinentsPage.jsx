@@ -31,11 +31,11 @@ export const TrainerClientsPage = () => {
 
 
 
-  console.log("Getting clients from redux : ",clients);
+//   console.log("Getting clients from redux : ",clients);
   
-console.log(  "\nclient Progress :",
-  JSON.stringify(clientProgress, null, 2)
-);
+// console.log(  "\nclient Progress :",
+//   JSON.stringify(clientProgress, null, 2)
+// );
 
 
 
@@ -45,7 +45,7 @@ console.log(  "\nclient Progress :",
       
       const response = await getClientProgressByid(clientId);
 
-      console.log("response : ",response);
+      // console.log("response : ",response);
       
       setClientProgress(response.data.progress);
       setProgressLoading(false);

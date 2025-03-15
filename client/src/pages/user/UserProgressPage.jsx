@@ -57,19 +57,14 @@ export const UserProgressPage = () => {
     fetchProgressData();
   }, [userId, dispatch]);
 
-  useEffect(() => {
-    // console.log("inside ProgressPage (in redux form progress )History Data:", progress?.history?.data);
-    // console.log("inside ProgressPage (in redux form progress )summary Data:", progress?.summary?.data);
-    console.log(
-      "inside ProgressPage (in redux form progress )progress:",
-      progress
-    );
+  // useEffect(() => {
+  
 
-    console.log(
-      "inside ProgressPage (in redux form progress )nutritionDetails:",
-      progress.history.data.map((item) => item.nutritionDetails)
-    );
-  }, [progress]);
+  //   console.log(
+  //     "inside ProgressPage (in redux form progress )nutritionDetails:",
+  //     progress.history.data.map((item) => item.nutritionDetails)
+  //   );
+  // }, [progress]);
 
   if (loading) {
     return <LoadingSpinner />;

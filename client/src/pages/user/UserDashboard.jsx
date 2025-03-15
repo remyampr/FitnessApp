@@ -103,9 +103,9 @@ export const UserDashboard = () => {
         }
         // dispatch(updateWorkoutStatus(workoutStatusResp.data.completed));
 
-        console.log(" Profile : , profileResponse.data.user.testimonial ");
+        // console.log(" Profile : , profileResponse.data.user.testimonial ");
         dispatch(setTestimonial(profileResponse.data?.user.testimonial || null));
-       console.log("Mytestimonial dashboard ",testimonial);
+      //  console.log("Mytestimonial dashboard ",testimonial);
        
         
 
@@ -113,7 +113,7 @@ export const UserDashboard = () => {
         // console.log("User in redux : ", user);
         // console.log("Workouts in redux new : ", workouts);
         // console.log("Nutritios in redux : ", nutritionPlans);
-        console.log("Appointments in redux : ", appointments);
+        // console.log("Appointments in redux : ", appointments);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
       } finally {

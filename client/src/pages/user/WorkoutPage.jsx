@@ -100,7 +100,7 @@ export const WorkoutStartPage = () => {
         date: new Date().toISOString().split('T')[0]
       };
       
-      console.log("Progress Data inside useEffect to be send to backend: ", progressData);
+      // console.log("Progress Data inside useEffect to be send to backend: ", progressData);
       
       saveProgress(progressData)
         .then(response => {
@@ -135,7 +135,7 @@ export const WorkoutStartPage = () => {
   const currentExercise = workout.exercises[currentExerciseIndex];
   
   const handleCompleteExercise = (exerciseData) => {
-    console.log("handle complete exercise:");
+    // console.log("handle complete exercise:");
     
     // Create completed exercise object with basic data
     const completedExercise = {
@@ -146,7 +146,7 @@ export const WorkoutStartPage = () => {
     // For non-final exercises, just add to completed exercises
     if (currentExerciseIndex < workout.exercises.length - 1) {
       setCompletedExercises([...completedExercises, completedExercise]);
-      console.log("Added to completed exercises:", completedExercise);
+      // console.log("Added to completed exercises:", completedExercise);
       
       // Start rest timer and move to next exercise
       setIsResting(true);
@@ -181,7 +181,7 @@ export const WorkoutStartPage = () => {
     const updatedCompletedExercises = [...completedExercises, finalExercise];
     setCompletedExercises(updatedCompletedExercises);
     
-    console.log("All completed exercises:", updatedCompletedExercises);
+    // console.log("All completed exercises:", updatedCompletedExercises);
     
     // Close modal and mark workout as complete to trigger the API call
     setShowModal(false);
@@ -197,7 +197,7 @@ export const WorkoutStartPage = () => {
     
     // Set workout as complete - this will trigger the useEffect to make the API call
     setIsWorkoutComplete(true);
-    console.log("Setting workout complete to trigger API call");
+    // console.log("Setting workout complete to trigger API call");
   };
   
   const handleSkipRest = () => {
@@ -224,7 +224,7 @@ export const WorkoutStartPage = () => {
         date: new Date().toISOString().split('T')[0]
       };
 
-      console.log("Inside handleExitWorkout progress data sending ", progressData);
+      // console.log("Inside handleExitWorkout progress data sending ", progressData);
       
       saveProgress(progressData)
         .then(() => {

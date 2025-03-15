@@ -26,10 +26,10 @@ export const  TrainerAppointmentsPage = () => {
 
 
   const handleStatusUpdate = async(appointmentId, statusData) => {
-    console.log("updating details : ",appointmentId,statusData);
+    // console.log("updating details : ",appointmentId,statusData);
     
     const upadteAptResp=await updateAppointment(appointmentId, statusData);
-    console.log("after updating ",upadteAptResp);
+    // console.log("after updating ",upadteAptResp);
       
     return dispatch(updateAppointments(appointmentId, statusData));
   };

@@ -20,7 +20,7 @@ export const PaymentSuccess = () => {
 
     } else {
       toast.error("Payment verification failed: Missing session ID");
-      console.log("Payment verification failed: Missing session ID");
+      // console.log("Payment verification failed: Missing session ID");
       
       navigate("complete-profile");
     }

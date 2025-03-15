@@ -157,11 +157,11 @@ export const TrainerSignupPage = () => {
 
     setLoading(true);
     try {
-      console.log("values sending ",values);
+      // console.log("values sending ",values);
       
       const res = await trainerSignup(values);
       toast.success("Signup successful! Check your email for the OTP.");
-      console.log("response ",res);
+      // console.log("response ",res);
       
       setOtpSent(true);
     } catch (err) {

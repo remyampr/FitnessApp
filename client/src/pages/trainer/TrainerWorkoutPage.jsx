@@ -21,7 +21,7 @@ export const TrainerWorkoutPage = () => {
   });
   const [previewImage, setPreviewImage] = useState(null);
 
-console.log("WorkoutPage Workouts in redux : ",workouts);
+// console.log("WorkoutPage Workouts in redux : ",workouts);
 
 
   const handleInputChange = (e) => {
@@ -49,7 +49,7 @@ console.log("WorkoutPage Workouts in redux : ",workouts);
     const updatedSchedule = [...formData.schedule];
     updatedSchedule[index].day = value;
     setFormData({ ...formData, schedule: updatedSchedule });
-    console.log(formData);
+    // console.log(formData);
     
   };
 
@@ -107,7 +107,7 @@ console.log("WorkoutPage Workouts in redux : ",workouts);
 
       const response= await addNewWorkout(formDataToSend);
 
-console.log("addNewWorkout Respose : ",response);
+// console.log("addNewWorkout Respose : ",response);
 
 dispatch(addWorkout(response.data.savedWorkout));
   
