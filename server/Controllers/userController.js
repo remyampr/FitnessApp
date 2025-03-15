@@ -90,7 +90,9 @@ const getApprovedTrainers = async (req, res, next) => {
 
 const assignTrainer = async (req, res, next) => {
   try {
-    console.log("Request body:", req.body);
+    console.log("Inside assign Request body:", req.body);
+    console.log("user Id ",req.user.id);
+    
 
     const user = await User.findById(req.user.id);
 
@@ -136,8 +138,10 @@ const assignTrainer = async (req, res, next) => {
 
 const updateUserProfile = async (req, res, next) => {
   try {
-    console.log('Request body:', req.body);
+    console.log('Inside Update profile Request body:', req.body);
     console.log('File:', req.file);
+    console.log("User Id",req.user.id);
+    
     const user = await User.findById(req.user.id);
 
     if (!user) {
@@ -174,6 +178,7 @@ const updateUserProfile = async (req, res, next) => {
           userUpdated,
         });
     }
+console.log("Updated user : ",userUpdated);
 
     res.status(200).json({ msg: "Profile updated successfully", userUpdated });
   } catch (error) {

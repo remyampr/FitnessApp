@@ -21,6 +21,8 @@ const paymentFunction = async (req, res, next) => {
     } = req.body;
     const userId = req.user.id;
     console.log("At payment function recived details !!!!!!!!!!!! :  req.body ", req.body);
+    console.log("Inside payment User Id",req.user.id);
+    
 
     const trainer = await Trainer.findById(trainerId);
     if (!trainer) {
