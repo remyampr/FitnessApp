@@ -31,15 +31,21 @@ app.use(cookieparser());
 app.use(errorHandler);
 
 
-app.get("/", (req, res) => {
-  res.send("API Started....");
-});
 
 
 app.use(cors({
   origin:['https://fitness-appfrontend.vercel.app', 'http://localhost:5173'],
+  methods: 'GET,POST,PUT,DELETE',
   credentials: true 
 }))
+
+app.get("/", (req, res) => {
+  res.send("API Started....");
+});
+
+app.get('/api/trainer/public', (req, res) => {
+  res.json({ message: 'CORS enabled successfully!' });
+});
 
 
 
