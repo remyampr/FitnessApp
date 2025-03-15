@@ -28,9 +28,7 @@ export const userLogout=()=>{
 }
 export const updateProfile = (formDataToSend) => {
     return axiosInstance.put("/user/profile/update", formDataToSend, {
-        headers: {
-            "Content-Type": "multipart/form-data",
-        },
+       
     });
 };
 

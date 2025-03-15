@@ -7,7 +7,10 @@ console.log("Base url : ",url);
 
  const axiosInstance=axios.create({
     baseURL:url,
-    withCredentials:true  //for sending/receiving cookies
+    withCredentials:true , //for sending/receiving cookies
+    headers: {
+      'Content-Type': 'application/json'
+    }
 })
 
 

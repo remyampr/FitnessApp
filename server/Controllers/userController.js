@@ -136,6 +136,8 @@ const assignTrainer = async (req, res, next) => {
 
 const updateUserProfile = async (req, res, next) => {
   try {
+    console.log('Request body:', req.body);
+    console.log('File:', req.file);
     const user = await User.findById(req.user.id);
 
     if (!user) {

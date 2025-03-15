@@ -93,6 +93,7 @@ export const CompleteProfile = () => {
     event.preventDefault();
     console.log(import.meta.env.VITE_BASE_URL);
 
+
     const formDataToSend = new FormData();
     formDataToSend.append("phone", formData.phone);
     formDataToSend.append("weight", formData.weight);
@@ -105,13 +106,18 @@ export const CompleteProfile = () => {
     }
 
     try {
+
+      console.log("Sending profile update with data:", Object.fromEntries(formDataToSend));
+
       const profileupdateResponse=await updateProfile(formDataToSend);
       setCurrentStep(2);
-      console.log("Profile updated successfully",profileupdateResponse.data);
+
+      console.log("Profile updated successfully",profileupdateResponse);
       // dispatch(set)
 
       toast.success("Profile updated, Now select a trainer");
     } catch (error) {
+      console.error("Profile update error:", error.response?.data || error.message);
       toast.error("Failed to update profile");
     }
   };
