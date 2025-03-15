@@ -106,7 +106,7 @@ export const CompleteProfile = () => {
     try {
       const profileupdateResponse=await updateProfile(formDataToSend);
       setCurrentStep(2);
-      // console.log("Profile updated successfully",profileupdateResponse.data);
+      console.log("Profile updated successfully",profileupdateResponse.data);
       // dispatch(set)
 
       toast.success("Profile updated, Now select a trainer");
