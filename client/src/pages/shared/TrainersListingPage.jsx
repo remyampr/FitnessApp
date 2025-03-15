@@ -14,6 +14,8 @@ export const TrainersListingPage = () => {
 
   useEffect(() => {
     const fetchTrainers = async () => {
+      console.log("Fetching trainers in landing page");
+      
       try {
         const response = await getAllTrainers();
         setTrainers(response.data.trainers);
