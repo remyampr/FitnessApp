@@ -43,9 +43,9 @@ app.get("/", (req, res) => {
   res.send("API Started....");
 });
 
-app.get('/api/trainer/public', (req, res) => {
-  res.json({ message: 'CORS enabled successfully!' });
-});
+// app.get('/api/trainer/public', (req, res) => {
+//   res.json({ message: 'CORS enabled successfully!' });
+// });
 
 
 
