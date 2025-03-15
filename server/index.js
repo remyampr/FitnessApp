@@ -5,7 +5,7 @@ const cookieparser = require("cookie-parser");
 require("dotenv").config();
 const connectDB = require("./Config/db");
 const errorHandler = require("./middleware/errorrHandler");
-const userRoutes = require("./Routes/uerRoutes");
+const userRoutes = require("./Routes/userRoutes");
 const trainerRoutes = require("./Routes/trainerRoutes");
 const adminRoutes = require("./Routes/adminRoutes");
 const workoutRoutes = require("./Routes/workoutRoutes");
@@ -28,7 +28,7 @@ connectDB();
 
 app.use(express.json());
 app.use(cookieparser());
-app.use(errorHandler);
+
 
 
 
@@ -60,6 +60,8 @@ app.use("/api/payment",paymentRoutes);
 app.use("/api/progress",progressRoutes);
 app.use("/api/testimonials",testimonialRoutes);
 app.use("/api/notifications",notificationRoutes);
+
+app.use(errorHandler);
 
 
 
