@@ -19,7 +19,7 @@ axiosInstance.interceptors.response.use(
       if (error.response?.status === 401) {
         // Handle unauthorized access 
         store.dispatch(logout()); // Clears user data
-        window.location.href = '/login'; // Redirects after logout
+        window.location.href = '/'; // Redirects after logout
       }
       return Promise.reject(error);
     }

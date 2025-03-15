@@ -15,6 +15,7 @@ export const TrainersListingPage = () => {
   useEffect(() => {
     const fetchTrainers = async () => {
       console.log("Fetching trainers in landing page");
+      console.log(import.meta.env.VITE_BASE_URL);
       
       try {
         const response = await getAllTrainers();

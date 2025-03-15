@@ -91,6 +91,7 @@ export const CompleteProfile = () => {
 
   const handleProfileSubmit = async (event) => {
     event.preventDefault();
+    console.log(import.meta.env.VITE_BASE_URL);
 
     const formDataToSend = new FormData();
     formDataToSend.append("phone", formData.phone);
@@ -118,11 +119,11 @@ export const CompleteProfile = () => {
   const handleTrainerSelect = async () => {
     try {
       const res = await assignTrainer({ trainerId: formData.trainerId });
-      // console.log("response after trainer select : ", res);
+      console.log("response after trainer select : ", res);
 
       if (res.data) {
         dispatch(setSelectedTrainer(formData.trainerId));
-        // console.log("Trainer id set in form data", formData.trainerId);
+        console.log("Trainer id set in form data", formData.trainerId);
         setCurrentStep(3); // Move to the next step only on success
       } else {
         toast.error(res.data.message || "Failed to assign trainer");
