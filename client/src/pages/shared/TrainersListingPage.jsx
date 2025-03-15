@@ -58,9 +58,9 @@ export const TrainersListingPage = () => {
         ) : (
           <>
             {/* Trainers grid */}
-            {trainers.length > 0 ? (
+            {trainers?.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {trainers.map((trainer) => (
+                {trainers?.map((trainer) => (
                   <div
                     key={trainer._id}
                     className="card bg-base-200 shadow-xl hover:shadow-2xl transition-shadow"
