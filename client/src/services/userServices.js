@@ -27,7 +27,7 @@ export const userLogout=()=>{
     return axiosInstance.post("/user/logout")
 }
 export const updateProfile = (formDataToSend) => {
-    return axiosInstance.put("/user/profile/update", formDataToSend,)
+    return axiosInstance.put("/user/profile/update", formDataToSend)
 };
 
 
