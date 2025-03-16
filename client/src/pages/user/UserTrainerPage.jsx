@@ -27,16 +27,16 @@ export const UserTrainerPage = () => {
   
   useEffect(() => {
     // If trainer info is not in redux, fetch it
-    if (!trainer._id && user._id) {
+    if (!trainer?._id && user?._id) {
       fetchTrainerData();
       console.log("trainerInfo in redux : ",trainer);
       
     }
     
     // Check if user has already reviewed this trainer
-    if (trainer.reviews && user._id) {
-      const existingReview = trainer?.reviews.find(
-        review => review.userId._id === user._id
+    if (trainer.reviews && user?._id) {
+      const existingReview = trainer.reviews.find(
+        review => review.userId === user._id
       );
       
       if (existingReview) {
