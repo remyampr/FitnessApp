@@ -9,8 +9,8 @@ console.log("Base url : ",url);
     baseURL:url,
     withCredentials:true , //for sending/receiving cookies
     headers: {
-      // 'Content-Type': 'application/json'
-      "Content-Type": "multipart/form-data",
+      // // 'Content-Type': 'application/json'
+      // "Content-Type": "multipart/form-data",
     }
 })
 

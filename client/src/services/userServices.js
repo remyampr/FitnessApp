@@ -27,7 +27,12 @@ export const userSignup = (data) => {
     console.log("Data is NOT FormData");
   }
 
-  return axiosInstance.post("/user/register", data);
+  const headers = data instanceof FormData 
+  ? { "Content-Type": "multipart/form-data" }  // Use multipart/form-data if data is FormData
+  : { "Content-Type": "application/json" };    // Use application/json otherwise
+
+
+  return axiosInstance.post("/user/register", data,{ headers });
 };
 export const userVerify = (email, otp, role = "user") => {
   return axiosInstance.post("/user/verify-email", { email, otp, role });
