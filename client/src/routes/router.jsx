@@ -101,7 +101,8 @@ export const router = createBrowserRouter([
       },
       {
         path: "payment-success",
-        element: <PaymentSuccess />,
+        element: <h1>Success</h1>,
+        // element: <PaymentSuccess />,
       },
       {
         path: "dashboard",
@@ -302,16 +303,15 @@ export const router = createBrowserRouter([
       { path: "forgot-password", element: <AdminForgotPassword /> },
     ],
   },
-  // After all other routes
-{
-  path: "*",
-  element: (
-    <div>
-      <h2>Debug Information:</h2>
-      <p>Current path: {window.location.pathname}</p>
-      <p>Search params: {window.location.search}</p>
-      <p>Full URL: {window.location.href}</p>
-    </div>
-  )
-}
+// {
+//   path: "*",
+//   element: (
+//     <div>
+//       <h2>Debug Information:</h2>
+//       <p>Current path: {window.location.pathname}</p>
+//       <p>Search params: {window.location.search}</p>
+//       <p>Full URL: {window.location.href}</p>
+//     </div>
+//   )
+// }
 ]);

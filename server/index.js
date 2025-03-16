@@ -1,3 +1,4 @@
+const path=require("path");
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -48,9 +49,22 @@ app.use(cors({
 //   next();
 // });
 
+
 app.get("/", (req, res) => {
   res.send("API Started....");
 });
+
+
+
+
+
+
+app.use(express.static(path.join(__dirname, "build")));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "build", "index.html"));
+});
+
+
 
 // app.get('/api/trainer/public', (req, res) => {
 //   res.json({ message: 'CORS enabled successfully!' });

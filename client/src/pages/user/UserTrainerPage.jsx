@@ -273,7 +273,7 @@ export const UserTrainerPage = () => {
         {trainer.reviews && trainer.reviews.length > 0 ? (
           <div className="space-y-4">
             {trainer.reviews
-              .filter(review => !user._id || review.userId._id !== user._id)
+              .filter(review => !user?._id || review.userId?._id !== user?._id)
               .map((review, index) => (
                 <div key={index} className="card bg-base-100 shadow-lg">
                   <div className="card-body">
@@ -281,17 +281,17 @@ export const UserTrainerPage = () => {
                       <div className="avatar mr-4">
                         <div className="w-12 h-12 rounded-full">
                           <img 
-                            src={user.image || "/user.png"} 
-                            alt={review.userId.name} 
+                            src={user?.image || "/user.png"} 
+                            alt={review?.userId?.name} 
                           />
                         </div>
                       </div>
                       <div>
-                        <h5 className="font-bold">{review.userId.name}</h5>
+                        <h5 className="font-bold">{review?.userId?.name}</h5>
                         <div className="flex items-center mt-1">
-                          <StarRating rating={review.rating} />
+                          <StarRating rating={review?.rating} />
                         </div>
-                        <p className="mt-2">{review.comment}</p>
+                        <p className="mt-2">{review?.comment}</p>
                       </div>
                     </div>
                   </div>
