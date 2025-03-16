@@ -20,9 +20,12 @@ axiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {
       if (error.response?.status === 401) {
+
+        console.warn("Unauthorized (401) detected, but NOT logging out for debugging.");
+
         // Handle unauthorized access 
-        store.dispatch(logout()); // Clears user data
-        window.location.href = '/'; // Redirects after logout
+        // store.dispatch(logout()); // Clears user data
+        // window.location.href = '/'; // Redirects after logout
       }
       return Promise.reject(error);
     }

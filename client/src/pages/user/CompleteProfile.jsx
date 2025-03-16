@@ -93,6 +93,8 @@ export const CompleteProfile = () => {
   const handleProfileSubmit = async (event) => {
     console.log("Inside Profilesubmit !");
     
+    console.log("Sending request with token:", document.cookie); 
+
     event.preventDefault();
     console.log(import.meta.env.VITE_BASE_URL);
 
