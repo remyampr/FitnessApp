@@ -35,19 +35,12 @@ app.use(cookieparser());
 
 
 app.use(cors({
-  origin: ['https://fitnessappfrontend-ul1m.onrender.com', 'http://localhost:5174'],
+  origin: ['', 'http://localhost:5174'],
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
 
-// app.use((req, res, next) => {
-//   res.header("Access-Control-Allow-Origin", "https://fitness-appfrontend.vercel.app");
-//   res.header("Access-Control-Allow-Methods", "GET, POST, PUT,PATCH, DELETE");
-//   res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-//   res.header("Access-Control-Allow-Credentials", "true");
-//   next();
-// });
 
 
 app.get("/", (req, res) => {
@@ -59,17 +52,10 @@ app.get("/", (req, res) => {
 
 
 
-app.use(express.static(path.join(__dirname, "build")));
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "build", "index.html"));
-});
-
-
-
-// app.get('/api/trainer/public', (req, res) => {
-//   res.json({ message: 'CORS enabled successfully!' });
+// app.use(express.static(path.join(__dirname, "build")));
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(__dirname, "build", "index.html"));
 // });
-
 
 
 
