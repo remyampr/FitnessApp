@@ -117,6 +117,10 @@ export const UserSignupPage = () => {
       const res = await userVerify(values.email, otp);
       toast.success("Email verified successfully!!!!");
       dispatch(setUser(res.data.user));
+
+      localStorage.setItem('token', token);
+      console.log("form loacl storage",localStorage.getItem('token'));
+      
       
       if (res.data.user.isProfileComplete) {
         navigate("/user/dashboard");
