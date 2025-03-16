@@ -17,6 +17,8 @@ const sendEmail = require("../Utilities/EmailServices/sendEmail");
 const registerUser = async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
+    console.log("in register user req.body : ",req.body);
+    
     if (!name || !email || !password) {
       return res.status(401).json({ error: "All fields are required !" });
     }
