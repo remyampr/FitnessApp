@@ -5,6 +5,7 @@ import { UserSidebar } from '../components/user/UserSidebar'
 import { UserNavbar } from '../components/user/UserNavbar'
 
 export const UserLayout = () => {
+  console.log("UserLayout rendering");
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location=useLocation();
