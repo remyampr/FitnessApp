@@ -5,7 +5,6 @@ import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../../redux/features/userSlice';
 import { FaEnvelope, FaLock, FaUser, FaKey } from 'react-icons/fa';
-import { setAuthToken } from "../../axios/axiosInstance"
 
 export const UserSignupPage = () => {
   const navigate = useNavigate();

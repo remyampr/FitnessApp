@@ -7,13 +7,12 @@ const Admin = require("../Models/Admin");
 // Middleware for Authentication (protect)
 const protect = async (req, res, next) => {
   try {
-    // const token = req.cookies.token ;
-    // console.log("inside protect cookie recived :", token);
+    const token = req.cookies.token ;
+    console.log("inside protect cookie recived :", token);
 
-    const token = req.cookies.token || 
-    (req.headers.authorization && req.headers.authorization.split(' ')[1]);
+    // const token = req.cookies.token || 
+    // (req.headers.authorization && req.headers.authorization.split(' ')[1]);
 
-    console.log("Token received:", token);
 
     if (!token) {
       return res
