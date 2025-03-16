@@ -156,11 +156,16 @@ const updateUserProfile = async (req, res, next) => {
     console.log("height:............. ",height);
     
 
-    if (image !== "uploads/user.jpg") {
+   try {
+    if (image !== "Uploads/user.jpg") {
       const cloudinaryRes = await uploadToCloudinary(image);
       console.log("image in cloudinary : ", cloudinaryRes);
       image = cloudinaryRes;
     }
+   } catch (error) {
+    console.error("Cloudinary Upload Failed:", error);
+  image = null; // Set to null if upload fails
+   }
 
     if (phone) user.phone = phone;
     // if (trainerId) user.trainerId = trainerId;

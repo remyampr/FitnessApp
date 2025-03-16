@@ -41,12 +41,8 @@ app.use(cors({
   credentials: true
 }));
 
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "https://fitness-appfrontend.vercel.app");  // Adjust this as needed
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  next();
-});
+app.options('*', cors()); // Allows preflight requests for all routes
+
 
 app.get("/", (req, res) => {
   res.send("API Started....");
