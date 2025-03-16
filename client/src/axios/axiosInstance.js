@@ -14,6 +14,18 @@ console.log("Base url : ",url);
     }
 })
 
+const setAuthToken = (token) => {
+  if (token) {
+    axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  } else {
+    delete axiosInstance.defaults.headers.common["Authorization"];
+  }
+};
+
+// Get token from localStorage when app loads
+const token = localStorage.getItem("token");
+setAuthToken(token);
+
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -44,3 +56,4 @@ axiosInstance.interceptors.response.use(
 
 
   export default axiosInstance;
+  export { setAuthToken };
