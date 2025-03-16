@@ -13,9 +13,15 @@ export const PaymentSuccess = () => {
   useEffect(() => {
     const query = new URLSearchParams(location.search);
     const sessionId = query.get("session_id");
+    console.log("session id got in payment succesPage : ",sessionId);
+    console.log("querry : ",query);
+    console.log("token : ",localStorage.getItem('token'))
+    
     if (sessionId) {
       verifyPaymentAndRedirect(sessionId);
       const newUrl = window.location.pathname;
+      console.log("new url ",newUrl);
+      
       window.history.replaceState(null, "", newUrl);
 
     } else {
@@ -27,6 +33,8 @@ export const PaymentSuccess = () => {
   }, [location, navigate]);
 
   const verifyPaymentAndRedirect = async (sessionId) => {
+    console.log("redirecting ...");
+    
     try {
 
         toast.success('Payment successful! Your subscription is now active.');
