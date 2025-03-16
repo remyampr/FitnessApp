@@ -110,7 +110,7 @@ export const CompleteProfile = () => {
 
     try {
 
-      console.log("Sending profile update with data:", Object.fromEntries(formDataToSend));
+      // console.log("Sending profile update with data:", Object.fromEntries(formDataToSend));
 
       const profileupdateResponse=await updateProfile(formDataToSend);
       setCurrentStep(2);
