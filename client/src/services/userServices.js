@@ -135,6 +135,7 @@ export const cancelAppointment = (id, data) => {
 
 // Trainer
 export const getMyTrainer = () => {
+  console.log("Fetching trainer data...");
   return axiosInstance.get("/user/my-trainer");
 };
 export const postReview = (data) => {

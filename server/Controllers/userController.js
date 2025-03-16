@@ -215,6 +215,8 @@ const getUserProfile = async (req, res, next) => {
 
 const getMyTrainer = async (req, res, next) => {
   try {
+    console.log("Fetching trainer data...");
+
     const user = await User.findById(req.user.id).populate("trainerId");
     console.log("user ,", user.name);
 
@@ -229,7 +231,7 @@ const getMyTrainer = async (req, res, next) => {
         return res.status(404).json({ message: 'Trainer not found' });
       }
 
-    res.status(200).json({ trainer});
+    res.status(200).json({trainer});
   } catch (error) {
     next(error);
   }

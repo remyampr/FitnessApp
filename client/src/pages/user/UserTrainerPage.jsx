@@ -28,13 +28,13 @@ export const UserTrainerPage = () => {
     // If trainer info is not in redux, fetch it
     if (!trainer._id && user._id) {
       fetchTrainerData();
-      // console.log("trainerInfo in redux : ",trainer);
+      console.log("trainerInfo in redux : ",trainer);
       
     }
     
     // Check if user has already reviewed this trainer
     if (trainer.reviews && user._id) {
-      const existingReview = trainer.reviews.find(
+      const existingReview = trainer?.reviews.find(
         review => review.userId._id === user._id
       );
       
@@ -53,7 +53,7 @@ export const UserTrainerPage = () => {
     try {
 
       const response = await getMyTrainer();
-      // console.log("getMyTrainer Response : ",response);
+      console.log("getMyTrainer Response : ",response.data.trainer);
 
       if(response.data){
         dispatch(setTrainerInfo(response.data.trainer));
