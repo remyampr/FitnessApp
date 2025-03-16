@@ -302,4 +302,9 @@ export const router = createBrowserRouter([
       { path: "forgot-password", element: <AdminForgotPassword /> },
     ],
   },
+  // After all other routes
+{
+  path: "*",
+  element: <div>Catch-all route. Current path: {window.location.pathname}</div>
+}
 ]);
