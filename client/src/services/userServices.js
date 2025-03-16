@@ -44,6 +44,9 @@ export const userLogout = () => {
 
 export const updateProfile = (formDataToSend) => {
   console.log("in axios update profile sending ",formDataToSend);
+  for (let [key, value] of formDataToSend.entries()) {
+    console.log(key, value);
+  }
   if (formDataToSend instanceof FormData) {
     console.log("Data is FormData");
   } else {
