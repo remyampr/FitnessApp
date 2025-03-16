@@ -35,7 +35,7 @@ app.use(cookieparser());
 
 
 app.use(cors({
-  origin: ['https://fitness-appfrontend.vercel.app/', 'http://localhost:5174'],
+  origin: ['https://fitness-appfrontend.vercel.app', 'http://localhost:5174'],
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
