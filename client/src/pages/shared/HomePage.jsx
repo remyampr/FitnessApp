@@ -12,7 +12,7 @@ export const HomePage = () => {
     const getTestimonials = async () => {
       const response = await getAllTestimonials();
 
-      // console.log("testimonial response", response.data);
+      console.log("testimonial response", response.data);
 
       setTestimonials(response.data);
     };
