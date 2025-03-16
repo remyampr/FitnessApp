@@ -8,10 +8,10 @@ console.log("Base url : ",url);
  const axiosInstance=axios.create({
     baseURL:url,
     withCredentials:true , //for sending/receiving cookies
-    headers: {
-      // 'Content-Type': 'application/json'
-      "Content-Type": "multipart/form-data",
-    }
+    // headers: {
+    //   // 'Content-Type': 'application/json'
+    //   "Content-Type": "multipart/form-data",
+    // }
 })
 
 
