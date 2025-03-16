@@ -118,8 +118,11 @@ export const UserSignupPage = () => {
       toast.success("Email verified successfully!!!!");
       dispatch(setUser(res.data.user));
 
-      localStorage.setItem('token', token);
-      console.log("form loacl storage",localStorage.getItem('token'));
+      if (res.data.token) {
+        localStorage.setItem('token', res.data.token);
+        console.log("From localStorage", localStorage.getItem('token'));
+      }
+    
       
       
       if (res.data.user.isProfileComplete) {

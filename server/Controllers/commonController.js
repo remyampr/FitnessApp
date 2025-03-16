@@ -122,20 +122,19 @@ const verifyEmail = async (req, res, next) => {
     await account.save();
 
     const token = createToken(account._id, role);
-    res.cookie("token", token, { httpOnly: true });
+    // res.cookie("token", token, { httpOnly: true });
 
-    // res.cookie("token", token, { 
-    //   httpOnly: true,
-    //   sameSite: 'none',  // Required for cross-site cookies
-    //   secure: true,      // Required when sameSite is 'none'
-    //   // Add domain if needed
-    // });
+    res.cookie("token", token, { 
+      httpOnly: true,
+      sameSite: 'none',  // Required for cross-site cookies
+      secure: true,      // Required when sameSite is 'none'
+    });
 
     // console.log("User login successful");
     console.log("user verified with otp  user:",account);
     
 
-    return res.json({ msg: "Email verified successfully!", user: account });
+    return res.json({ msg: "Email verified successfully!", user: account,  token: token  });
   } catch (error) {
     next(error);
   }
