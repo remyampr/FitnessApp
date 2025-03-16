@@ -13,7 +13,8 @@ export const UserTrainerPage = () => {
   const { user } = useSelector((state) => state.user.user);
   const trainer = useSelector((state) => state.user.trainerInfo || {});
 
-//   console.log("user : ",user);
+  console.log("user : ",user);
+  console.log("trainer : ",trainer);
   
   
   const [userReview, setUserReview] = useState({
