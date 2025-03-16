@@ -305,6 +305,13 @@ export const router = createBrowserRouter([
   // After all other routes
 {
   path: "*",
-  element: <div>Catch-all route. Current path: {window.location.pathname}</div>
+  element: (
+    <div>
+      <h2>Debug Information:</h2>
+      <p>Current path: {window.location.pathname}</p>
+      <p>Search params: {window.location.search}</p>
+      <p>Full URL: {window.location.href}</p>
+    </div>
+  )
 }
 ]);
