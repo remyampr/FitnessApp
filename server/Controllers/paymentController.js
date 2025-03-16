@@ -86,13 +86,13 @@ console.log("success url : ",session.success_url);
 
     await payment.save();
 
-    console.log("Paymentschema Payemnt saved  ::: ", payment);
+    // console.log("Paymentschema Payemnt saved  ::: ", payment);
 
     // Update User Subscription
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ error: "User not found" });
 
-    console.log("User : ",user);
+    // console.log("User : ",user);
     
 
     if (!user.paymentHistory) {
@@ -115,7 +115,7 @@ console.log("success url : ",session.success_url);
 
     await user.save();
 
-    console.log("After payment user userschema: ", user);
+    // console.log("After payment user userschema: ", user);
     console.log(
       "After payment user.isprofileComplete : ",
       user.isProfileComplete
@@ -172,7 +172,7 @@ console.log("success url : ",session.success_url);
 
     await trainer.save();
 
-   console.log("After payment Trainer userschema: ", trainer);
+  //  console.log("After payment Trainer userschema: ", trainer);
 
     const admin = await Admin.findOne({ role: "admin" });
     if (admin) {
@@ -212,7 +212,7 @@ console.log("success url : ",session.success_url);
       admin.userId=userId
 
       await admin.save();
-      console.log("Admin payment ",admin);
+      // console.log("Admin payment ",admin);
       
     }
 

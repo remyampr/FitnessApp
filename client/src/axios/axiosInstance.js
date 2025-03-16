@@ -14,28 +14,28 @@ console.log("Base url : ",url);
     }
 })
 
-const setAuthToken = (token) => {
-  if (token) {
-    axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-  } else {
-    delete axiosInstance.defaults.headers.common["Authorization"];
-  }
-};
+// const setAuthToken = (token) => {
+//   if (token) {
+//     axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+//   } else {
+//     delete axiosInstance.defaults.headers.common["Authorization"];
+//   }
+// };
 
 // Get token from localStorage when app loads
-const token = localStorage.getItem("token");
-setAuthToken(token);
+// const token = localStorage.getItem("token");
+// setAuthToken(token);
 
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+// axiosInstance.interceptors.request.use(
+//   (config) => {
+//     const token = localStorage.getItem('token');
+//     if (token) {
+//       config.headers.Authorization = `Bearer ${token}`;
+//     }
+//     return config;
+//   },
+//   (error) => Promise.reject(error)
+// );
 
 // Response interceptor for handling errors
 axiosInstance.interceptors.response.use(

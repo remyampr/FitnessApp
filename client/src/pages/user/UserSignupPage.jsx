@@ -119,11 +119,11 @@ export const UserSignupPage = () => {
       toast.success("Email verified successfully!!!!");
       dispatch(setUser(res.data.user));
 
-      if (res.data.token) {
-        localStorage.setItem('token', res.data.token);
-        console.log("From localStorage", localStorage.getItem('token'));
-        setAuthToken(res.data.token);
-      }
+      // if (res.data.token) {
+      //   localStorage.setItem('token', res.data.token);
+      //   console.log("From localStorage", localStorage.getItem('token'));
+      //   setAuthToken(res.data.token);
+      // }
     
       
       
