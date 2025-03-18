@@ -31,13 +31,13 @@ export const RevenuePage = () => {
           period: dateFilter 
         });
 
-        // console.log("revenue response : ",revenueResponse.data);
+        console.log("revenue response : ",revenueResponse.data);
         
 
         // Fetch revenue breakdown
         const breakdownResponse = await getRevenueBreakdown();
 
-        // console.log("revenue breakdown response : ",breakdownResponse.data);
+        console.log("revenue breakdown response : ",breakdownResponse.data);
 
         dispatch(setTotalRevenue(revenueResponse.data.totalRevenue));
         dispatch(setAdminRevenue(revenueResponse.data.adminRevenue));

@@ -60,7 +60,7 @@ export const WorkoutPage = () => {
       dispatch(setLoading(true));
       const response = await getAllWorkouts();
 
-      // console.log("Workout resp ", response.data);
+      console.log("Workout resp ", response.data);
 
       if (response && response.data && response.data.workouts) {
         dispatch(setWorkouts(response.data.workouts));
@@ -145,7 +145,7 @@ export const WorkoutPage = () => {
     setCurrentWorkoutId(workout._id);
 
     const schedule =
-      workout.schedule && workout.schedule.length > 0
+      workout.schedule && workout?.schedule?.length > 0
         ? workout.schedule.map((day) => ({
             ...day,
             exercises:
@@ -468,7 +468,7 @@ export const WorkoutPage = () => {
                       </select>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {filteredWorkouts.length > 0 ? (
+                      {filteredWorkouts?.length > 0 ? (
                         filteredWorkouts.map((workout) => (
                           <div key={workout._id} className="bg-base-100 p-4 rounded shadow-sm">
                             <div className="flex justify-between items-start">
@@ -477,7 +477,7 @@ export const WorkoutPage = () => {
                                 <h3 className="font-medium text-lg mb-1">
                                   <div className="relative group">
                                     <span className="truncate" title={workout.name}>
-                                      {workout.name.length > 10
+                                      {workout?.name?.length > 10
                                         ? workout.name.slice(0, 6) + "..." + workout.name.slice(-4)
                                         : workout.name}
                                     </span>
