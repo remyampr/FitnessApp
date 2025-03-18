@@ -20,7 +20,6 @@ import { AdminProtectedRoute } from "../components/ProtectedRoute/AdminProtected
 import { AdminTrainersUsersPage } from "../pages/admin/AdminTrainersUsersPage";
 import { TrainerProtectedRoute } from "../components/ProtectedRoute/TrainerProtectedRoute";
 import { ForgotPassword } from "../pages/shared/ForgotPassword";
-import { PaymentSuccess } from "../pages/user/PaymentSuccess";
 import { PendingTrainers } from "../pages/admin/PendingTrainers";
 import { AppointmentsPage } from "../pages/admin/AppointmentsPage";
 import { RevenuePage } from "../pages/admin/RevenuePage";
@@ -44,6 +43,7 @@ import { AdminAuthLayout } from "../layout/AdminAuthLayout";
 import { TrainersListingPage } from "../pages/shared/TrainersListingPage";
 import { PricingPage } from "../pages/shared/PricingPage";
 import { ErrorPage } from "../pages/shared/ErrorPage";
+import { PaymentSuccess } from "../pages/user/PaymentSuccess";
 
 export const router = createBrowserRouter([
   {
