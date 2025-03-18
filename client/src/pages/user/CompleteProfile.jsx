@@ -34,7 +34,7 @@ export const CompleteProfile = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [trainers, setTrainers] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const [errors, setErrors] = useState({});
 
   console.log("inside ProfileComplete page !!!!!");
   
@@ -90,12 +90,61 @@ export const CompleteProfile = () => {
     }
   };
 
+
+  const validateForm=()=>{
+    let formErrors = {};
+    let isValid = true;
+
+    
+    // Phone validation - must be 10 digits
+    if (!formData.phone || formData.phone.length !== 10 || !/^\d{10}$/.test(formData.phone)) {
+      formErrors.phone = "Phone number must be exactly 10 digits";
+      isValid = false;
+    }
+    // Height validation - reasonable range (120-220 cm)
+    if (!formData.height || formData.height < 120 || formData.height > 220) {
+      formErrors.height = "Height must be between 120 and 220 cm";
+      isValid = false;
+    }
+    // Weight validation - reasonable range (30-200 kg)
+    if (!formData.weight || formData.weight < 28 || formData.weight > 200) {
+      formErrors.weight = "Weight must be between 28 and 200 kg";
+      isValid = false;
+    }
+
+        // Age validation - 18+ years
+        if (!formData.age || formData.age < 18) {
+          formErrors.age = "You must be at least 18 years old";
+          isValid = false;
+        }
+    // Gender validation
+    if (!formData.gender) {
+      formErrors.gender = "Please select your gender";
+      isValid = false;
+    }
+    // Fitness goal validation
+    if (!formData.fitnessGoal) {
+      formErrors.fitnessGoal = "Please select a fitness goal";
+      isValid = false;
+    }
+    setErrors(formErrors);
+    return isValid;
+  }
+
   const handleProfileSubmit = async (event) => {
+    event.preventDefault();
+    
+
+    if (!validateForm()) {
+      // Show error toast
+      toast.error("Please correct the errors in the form");
+      return;
+    }
+    
     console.log("Inside Profilesubmit !");
     
     console.log("Sending request with token:", document.cookie); 
-
-    event.preventDefault();
+   
     console.log(import.meta.env.VITE_BASE_URL);
 
 
@@ -124,6 +173,16 @@ export const CompleteProfile = () => {
     } catch (error) {
       console.error("Profile update error:", error.response?.data || error.message);
       toast.error("Failed to update profile");
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({...formData, [name]: value});
+    
+    // Clear error for this field when user starts typing
+    if (errors[name]) {
+      setErrors({...errors, [name]: ""});
     }
   };
 
@@ -235,10 +294,12 @@ export const CompleteProfile = () => {
                     type="tel"
                     id="phone"
                     name="phone"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className={`w-full px-4 py-2 border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                     required
-                    onChange={(e) => setFormData({...formData, [e.target.name]: e.target.value})}
+                    value={formData.phone}
+                    onChange={handleChange}
                   />
+                  {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
                 </div>
                 
                 {/* Age */}
@@ -250,12 +311,14 @@ export const CompleteProfile = () => {
                     type="number"
                     id="age"
                     name="age"
-                    min="16"
+                    min="18"
                     max="100"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className={`w-full px-4 py-2 border ${errors.age ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                     required
-                    onChange={(e) => setFormData({...formData, [e.target.name]: e.target.value})}
+                    value={formData.age}
+                    onChange={handleChange}
                   />
+                  {errors.age && <p className="text-red-500 text-xs mt-1">{errors.age}</p>}
                 </div>
               </div>
               
@@ -269,10 +332,12 @@ export const CompleteProfile = () => {
                     type="number"
                     id="height"
                     name="height"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className={`w-full px-4 py-2 border ${errors.height ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                     required
-                    onChange={(e) => setFormData({...formData, [e.target.name]: e.target.value})}
+                    value={formData.height}
+                    onChange={handleChange}
                   />
+                  {errors.height && <p className="text-red-500 text-xs mt-1">{errors.height}</p>}
                 </div>
                 
                 {/* Weight */}
@@ -285,17 +350,19 @@ export const CompleteProfile = () => {
                     id="weight"
                     name="weight"
                     step="0.1"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className={`w-full px-4 py-2 border ${errors.weight ? 'border-red-500' : 'border-gray-300'} rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                     required
-                    onChange={(e) => setFormData({...formData, [e.target.name]: e.target.value})}
+                    value={formData.weight}
+                    onChange={handleChange}
                   />
+                  {errors.weight && <p className="text-red-500 text-xs mt-1">{errors.weight}</p>}
                 </div>
               </div>
             </div>
             
             {/* Gender Selection */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium ">Gender</label>
+              <label className="block text-sm font-medium">Gender</label>
               <div className="flex space-x-6">
                 {["Male", "Female", "Other"].map((option) => (
                   <div key={option} className="flex items-center">
@@ -305,20 +372,21 @@ export const CompleteProfile = () => {
                       name="gender"
                       value={option}
                       checked={formData.gender === option}
-                      onChange={(e) => setFormData({...formData, gender: e.target.value})}
+                      onChange={handleChange}
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500"
                     />
-                    <label htmlFor={option.toLowerCase()} className="ml-2 text-sm ">
+                    <label htmlFor={option.toLowerCase()} className="ml-2 text-sm">
                       {option}
                     </label>
                   </div>
                 ))}
               </div>
+              {errors.gender && <p className="text-red-500 text-xs mt-1">{errors.gender}</p>}
             </div>
             
             {/* Fitness Goal Selection */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium ">Fitness Goal</label>
+              <label className="block text-sm font-medium">Fitness Goal</label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {[
                   "Weight Loss",
@@ -334,16 +402,17 @@ export const CompleteProfile = () => {
                       name="fitnessGoal"
                       value={goal}
                       checked={formData.fitnessGoal === goal}
-                      onChange={(e) => setFormData({...formData, fitnessGoal: e.target.value})}
+                      onChange={handleChange}
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500"
                       required
                     />
-                    <label htmlFor={goal.replace(/\s+/g, "-").toLowerCase()} className="ml-2 text-sm ">
+                    <label htmlFor={goal.replace(/\s+/g, "-").toLowerCase()} className="ml-2 text-sm">
                       {goal}
                     </label>
                   </div>
                 ))}
               </div>
+              {errors.fitnessGoal && <p className="text-red-500 text-xs mt-1">{errors.fitnessGoal}</p>}
             </div>
             
             {/* Profile Image */}

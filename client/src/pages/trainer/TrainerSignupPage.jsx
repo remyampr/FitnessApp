@@ -439,7 +439,7 @@ export const TrainerSignupPage = () => {
         ) : (
           <form onSubmit={onVerifyOtp}>
             {/* OTP Verification Section */}
-            <div className="bg-info/10 p-4 rounded-lg mb-6">
+            <div className="bg-info/10 p-4 rounded-lg mb-6 ">
               <p className="text-sm">
                 A verification code has been sent to{" "}
                 <span className="font-bold">{values.email}</span>
