@@ -9,7 +9,7 @@ const createWorkout = async (req, res, next) => {
   try {
     const { name, description, fitnessGoal, difficulty, duration, schedule } =
       req.body;
-    const image = req.file ? req.file.path :  'Uploads/workout.jpg';
+    const image = req.file ? req.file.path :  '';
 
     if (!name || !fitnessGoal || !difficulty || !duration || !schedule) {
       return res
