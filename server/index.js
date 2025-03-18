@@ -31,9 +31,6 @@ app.use(express.json());
 app.use(cookieparser());
 
 
-
-
-
 app.use(cors({
   origin: ['https://fitness-appfrontend.vercel.app', 'http://localhost:5174'],
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -42,6 +39,19 @@ app.use(cors({
 }));
 
 app.options('*', cors()); // Allows preflight requests for all routes
+
+// app.use((req, res, next) => {
+//   res.setHeader("Access-Control-Allow-Origin", "https://fitness-appfrontend.vercel.app");
+//   res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+//   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+//   res.setHeader("Access-Control-Allow-Credentials", "true");
+
+//   if (req.method === "OPTIONS") {
+//     return res.status(200).end(); // Handle preflight requests
+//   }
+
+//   next();
+// });
 
 
 app.get("/", (req, res) => {

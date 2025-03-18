@@ -79,7 +79,11 @@ export const deactivateWorkoutPlan=(id)=>{
 }
 
 export const createWorkout = (formData) => {
-    return axiosInstance.post("workouts/create", formData)
+    return axiosInstance.post("workouts/create", formData,{
+        headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+    })
   }
   
   export const updateWorkoutPlan = (id, formData) => {
@@ -98,7 +102,11 @@ export const  getAllNutritionPlans=()=>{
 }
 
 export const createNutritionPlan = (formData) => {
-    return axiosInstance.post("nutrition/create", formData)
+    return axiosInstance.post("nutrition/create", formData,{
+        headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+    })
   }
   
   export const updateNutritionPlan = (id, formData) => {

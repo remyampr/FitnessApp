@@ -97,7 +97,7 @@ export const WorkoutPage = () => {
     e.preventDefault();
     try {
       dispatch(setLoading(true));
-      // console.log("workoutForm before creating FormData:", workoutForm);
+      console.log("workoutForm before creating FormData:", workoutForm);
 
       const formData = new FormData();
       Object.keys(workoutForm).forEach((key) => {
@@ -127,7 +127,7 @@ export const WorkoutPage = () => {
         // console.log("Update response : ", updateResponse.data);
       } else {
         const createResponse = await createWorkout(formData);
-        // console.log("Create response : ", createResponse);
+        console.log("Create response : ", createResponse);
       }
 
       await fetchWorkouts();
@@ -223,7 +223,7 @@ export const WorkoutPage = () => {
             <form onSubmit={handleSubmit}>
               <div className="flex flex-col gap-4">
                 <div className="form-control">
-                  <label className="label dark:text-gray-300">Workout Name</label>
+                  <label className="label mr-1.5 ">Workout Name</label>
                   <input
                     type="text"
                     name="name"
@@ -277,7 +277,7 @@ export const WorkoutPage = () => {
                 </div>
 
                 <div className="form-control">
-                  <label className="label dark:text-gray-300">Duration (mins)</label>
+                  <label className="label mr-1.5">Duration (mins)</label>
                   <input
                     type="number"
                     name="duration"
