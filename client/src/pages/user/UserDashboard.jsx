@@ -46,7 +46,6 @@ export const UserDashboard = () => {
     workouts,
     nutritionPlans,
     testimonial,
-    trainerInfo,
     
   } = useSelector((state) => state.user);
 

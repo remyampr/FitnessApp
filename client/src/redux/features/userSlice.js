@@ -5,7 +5,7 @@ const initialState = {
   userId: null,
   userName: null,
   selectedTrainer: null,
-  trainerInfo: null,
+  trainerDetails: null,
   isActive: null,
   isProfileComplete: false,
   appointments: null,
@@ -80,14 +80,37 @@ const userSlice = createSlice({
       }
     },
 
-    setTrainerInfo: (state, action) => {
-      state.trainerInfo = action.payload;
+    // setTrainerInfo: (state, action) => {
+    //   state.trainerInfo = action.payload;
+    // },
+    setTrainerDetails: (state, action) => {
+      state.trainerDetails = action.payload;
     },
     updateTrainerReview: (state, action) => {
-      if (state.trainerInfo) {
-        state.trainerInfo = action.payload;
+      if (state.trainerDetails && state.trainerDetails.reviews) {
+        const { userId, review } = action.payload;
+        
+        // Find and update the review if it exists, otherwise add a new one
+        const existingReviewIndex = state.trainerDetails.reviews.findIndex(
+          (r) => r.userId === userId
+        );
+    
+        if (existingReviewIndex !== -1) {
+          // Update existing review
+          state.trainerDetails.reviews[existingReviewIndex].review = review;
+        } else {
+          // Add new review
+          state.trainerDetails.reviews.push({ userId, review });
+        }
+      } else {
+        console.error("Trainer details or reviews array is missing");
       }
     },
+    // updateTrainerReview: (state, action) => {
+    //   if (state.trainerDetails) {
+    //     state.trainerDetails = action.payload;
+    //   }
+    // },
 
 
     setNutritions: (state, action) => {
@@ -193,7 +216,8 @@ export const {
   setIsActive,
   updateUserProfilePic,
   setSelectedTrainer,
-  setTrainerInfo,
+  // setTrainerInfo,
+  setTrainerDetails,
   updateTrainerReview,
 
 

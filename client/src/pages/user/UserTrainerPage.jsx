@@ -3,18 +3,18 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { FaStar, FaRegStar } from 'react-icons/fa';
 import { deleteMyReview, getMyTrainer, postReview } from '../../services/userServices';
-import { setTrainerInfo } from '../../redux/features/userSlice';
 import { LoadingSpinner } from '../../components/shared/LoadingSpinner';
 import { AlertError } from '../../components/shared/AlertError';
+import { setTrainerDetails } from '../../redux/features/userSlice';
 
 
 export const UserTrainerPage = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.user.user);
-  const trainer = useSelector((state) => state.user.trainerInfo || {});
+  const trainer = useSelector((state) => state.user.trainerDetails || {});
 
   console.log("user  from redux: ",user);
-  console.log("trainer from redux : ",trainer);
+  console.log("trainer from redux(trainerDetails) : ",trainer);
   
   
   const [userReview, setUserReview] = useState({
@@ -57,7 +57,7 @@ export const UserTrainerPage = () => {
       console.log("getMyTrainer Response : ",response.data.trainer);
 
       if(response.data){
-        dispatch(setTrainerInfo(response.data.trainer));
+        dispatch(setTrainerDetails(response.data.trainer));
       }
       
       setLoading(false);
@@ -95,11 +95,11 @@ export const UserTrainerPage = () => {
       // console.log("userReview send to backend : ",userReview);
       
 
-      // console.log("postReview Response : ",response);
+      console.log("postReview Response : ",response);
       
       
       // Update trainer info in redux
-    dispatch(setTrainerInfo(response.data.trainer));
+    dispatch(setTrainerDetails(response.data.trainer));
       
       setReviewSubmitted(true);
       setLoading(false);
@@ -118,7 +118,7 @@ export const UserTrainerPage = () => {
 
       // console.log("deleteMyReview Response : ",response);
 
-      dispatch(setTrainerInfo(response.data.trainer));
+      dispatch(setTrainerDetails(response.data.trainer));
       
       setUserReview({
         rating: 5,
