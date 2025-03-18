@@ -47,7 +47,7 @@ export const UserTrainerPage = () => {
         setReviewSubmitted(true);
       }
     }
-  }, [trainer, user]);
+  }, [trainer._id, user]);
   
   const fetchTrainerData = async () => {
     setLoading(true);
@@ -195,7 +195,7 @@ export const UserTrainerPage = () => {
             </div>
             <div className="bg-base-200 p-4 rounded-lg">
               <h3 className="font-bold text-lg mb-2">Experience</h3>
-              <p>{trainer.yearsOfExperience || 0} years</p>
+              <p>{trainer.yearsOfExperience || trainer.experience || 0} years</p>
             </div>
             <div className="bg-base-200 p-4 rounded-lg">
               <h3 className="font-bold text-lg mb-2">Location</h3>
