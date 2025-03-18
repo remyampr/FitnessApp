@@ -52,7 +52,7 @@ const paymentFunction = async (req, res, next) => {
         },
       ],
       mode: "payment",
-      success_url: `${process.env.FRONTEND_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${process.env.FRONTEND_URL}/user/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       // success_url: `${process.env.FRONTEND_URL}/user/payment-success`,
       cancel_url: `${process.env.FRONTEND_URL}/subscription`,
       metadata: {
