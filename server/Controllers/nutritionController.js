@@ -9,6 +9,8 @@ const createNutrition = async (req, res, next) => {
     const { title,fitnessGoal,schedule,waterIntake,} = req.body;
     // const image = req.file ? req.file.path :  'Uploads/nutrition.jpg'; 
     const image = req.file ? req.file.path : "";
+    console.log('inside create nutrition : req.body ',req.body);
+    
 
 
 
@@ -30,7 +32,7 @@ const createNutrition = async (req, res, next) => {
    
 
     const cloudinaryRes = await uploadToCloudinary(image);
-    // console.log("image in cloudinary : ", cloudinaryRes);
+    console.log("image in cloudinary : ", cloudinaryRes);
 
     const newNutrition = new Nutrition({
       title,
@@ -51,6 +53,7 @@ const createNutrition = async (req, res, next) => {
       email: req.user.email,
       name: req.user.name
     })
+console.log("saved nutri ",savedNutrition);
 
  
 
