@@ -318,8 +318,8 @@ export const WorkoutStartPage = () => {
 
       {/* Modal for Additional Data */}
       {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
-          <div className="bg-white p-6 rounded-lg w-96">
+        <div className="fixed inset-0 flex items-center justify-center  ">
+          <div className=" p-6 rounded-lg w-96">
             <h3 className="text-lg font-bold mb-4">Log Workout Details</h3>
       
             {/* Weight Input */}
