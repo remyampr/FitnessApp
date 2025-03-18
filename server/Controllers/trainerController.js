@@ -7,9 +7,9 @@ const {
 const { createToken } = require("../Utilities/generateToken");
 const uploadToCloudinary = require("../Utilities/imageUpload");
 const { generateOTP } = require("../Utilities/generateOTP");
-const sendEmail = require("../Config/nodemailer");
 const { logActivity } = require("../Utilities/activityServices");
 const { generateTimeSlots } = require("../Utilities/trainerAppointment");
+const sendEmail = require("../Utilities/EmailServices/sendEmail");
 
 const registerTrainer = async (req, res, next) => {
   try {
