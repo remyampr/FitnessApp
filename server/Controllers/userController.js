@@ -235,6 +235,8 @@ const getMyTrainer = async (req, res, next) => {
       if (!trainer) {
         return res.status(404).json({ message: 'Trainer not found' });
       }
+      console.log("users's trainer , ",trainer);
+      
 
     res.status(200).json({trainer});
   } catch (error) {

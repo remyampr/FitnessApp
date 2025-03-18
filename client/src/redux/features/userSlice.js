@@ -170,6 +170,7 @@ const userSlice = createSlice({
       state.user = initialState;
       state.isAuthenticated = false;
       state.isProfileComplete = false;
+      return initialState;
     },
     setLoading: (state, action) => {
       state.loading = action.payload;

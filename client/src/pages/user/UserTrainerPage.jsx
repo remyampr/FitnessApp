@@ -13,8 +13,8 @@ export const UserTrainerPage = () => {
   const { user } = useSelector((state) => state.user.user);
   const trainer = useSelector((state) => state.user.trainerInfo || {});
 
-  console.log("user : ",user);
-  console.log("trainer : ",trainer);
+  console.log("user  from redux: ",user);
+  console.log("trainer from redux : ",trainer);
   
   
   const [userReview, setUserReview] = useState({
