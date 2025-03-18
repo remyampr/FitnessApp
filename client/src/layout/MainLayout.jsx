@@ -10,9 +10,9 @@ export const MainLayout = () => {
   const dispatch=useDispatch();
   const navigate=useNavigate();
 
-  const user = useSelector((state) => state.user.user);
-  const trainer = useSelector((state) => state.trainer.trainer);
-  const admin = useSelector((state) => state.admin.admin);
+  // const user = useSelector((state) => state.user?.user);
+  // const trainer = useSelector((state) => state.trainer?.trainer);
+  // const admin = useSelector((state) => state.admin?.admin);
 
  
 
