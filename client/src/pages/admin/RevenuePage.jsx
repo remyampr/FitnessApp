@@ -30,15 +30,13 @@ export const RevenuePage = () => {
     breakdown,
   } = useSelector((state) => state.admin);
 
-  console.log({
-    totalRevenue,
-    adminRevenue,
-    trainerRevenue,
-    payments,
-    loading,
-    error,
-    breakdown,
-  });
+  console.log("Inside store!!!");
+  console.log("Inside store!!! Total Revenue:", totalRevenue);
+  console.log("Inside store!!! Admin Revenue:", adminRevenue);
+  console.log("Inside store!!! Trainer Revenue:", trainerRevenue);
+  console.log("Inside store!!! Payments:", payments);
+
+  console.log("Inside store!!! Breakdown:", breakdown);
 
   useEffect(() => {
     const fetchRevenueData = async () => {
@@ -135,11 +133,9 @@ export const RevenuePage = () => {
           </select>
         </div>
 
-        {/* <RevenueChart data={breakdown?.monthlyRevenue} /> */}
-        <RevenueChart data={breakdownResponse?.data?.monthlyRevenue} />
+        <RevenueChart data={breakdown?.monthlyRevenue} />
 
-        <PaymentsTable payments={revenueResponse?.data?.payments} />
-        {/* <PaymentsTable payments={payments} /> */}
+        <PaymentsTable payments={payments} />
       </div>
     </div>
   );
