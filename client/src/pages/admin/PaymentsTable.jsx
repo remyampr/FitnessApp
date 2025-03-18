@@ -24,7 +24,7 @@ export const PaymentsTable = ({ payments }) => {
   // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentPayments = payments.slice(indexOfFirstItem, indexOfLastItem);
+  const currentPayments = payments?.slice(indexOfFirstItem, indexOfLastItem);
 
   // Calculate total pages
   const totalPages = Math.ceil(payments.length / itemsPerPage);
@@ -66,7 +66,7 @@ export const PaymentsTable = ({ payments }) => {
               {currentPayments.map((payment) => (
                 <tr key={payment.transactionId}>
                   <td title={payment.transactionId}>
-  {payment.transactionId.slice(0, 6) + "..." + payment.transactionId.slice(-4)}
+  {/* {payment?.transactionId?.slice(0, 6) + "..." + payment?.transactionId?.slice(-4)} */}
 </td>
                   <td>{payment.userId ? payment.userId.name : 'N/A'}</td>
                   <td>{payment.trainerId ? payment.trainerId.name : 'N/A'}</td>
