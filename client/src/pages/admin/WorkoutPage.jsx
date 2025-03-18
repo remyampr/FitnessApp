@@ -87,6 +87,8 @@ export const WorkoutPage = () => {
   };
 
   const handleImageChange = (e) => {
+    console.log("image adding ...");
+    
     setWorkoutForm((prev) => ({
       ...prev,
       image: e.target.files[0],
@@ -290,7 +292,7 @@ export const WorkoutPage = () => {
                 </div>
 
                 <div className="form-control">
-                  <label className="label ">Workout Image</label>
+                  <label className="label me-1.5">Workout Image</label>
                   <input
                     type="file"
                     onChange={handleImageChange}
