@@ -7,7 +7,9 @@ const uploadToCloudinary = require("../Utilities/imageUpload");
 const createNutrition = async (req, res, next) => {
   try {
     const { title,fitnessGoal,schedule,waterIntake,} = req.body;
-    const image = req.file ? req.file.path :  'Uploads/nutrition.jpg'; 
+    // const image = req.file ? req.file.path :  'Uploads/nutrition.jpg'; 
+    const image = req.file ? req.file.path : "";
+
 
 
     if (!title || !fitnessGoal || !schedule || !waterIntake) {

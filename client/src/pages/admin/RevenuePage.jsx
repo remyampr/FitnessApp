@@ -114,7 +114,7 @@ export const RevenuePage = () => {
         </div>
 
       
-        <RevenueChart data={breakdown.monthlyRevenue} />
+        <RevenueChart data={breakdown?.monthlyRevenue} />
 
    
         <PaymentsTable payments={payments} />
