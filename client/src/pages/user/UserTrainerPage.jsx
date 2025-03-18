@@ -282,7 +282,7 @@ export const UserTrainerPage = () => {
                       <div className="avatar mr-4">
                         <div className="w-12 h-12 rounded-full">
                           <img 
-                            src={user?.image || "/user.png"} 
+                            src={user?.image || "/trainer.jpg"} 
                             alt={review?.userId?.name} 
                           />
                         </div>

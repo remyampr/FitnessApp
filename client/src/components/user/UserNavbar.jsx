@@ -16,7 +16,7 @@ export const UserNavbar = ({ toggleSidebar }) => {
 
   // console.log("navbar USer :",user);
 
-  const name = user?.user?.name;
+  const name = user?.user?.name || "Guest";
   const handleLogout = async () => {
     try {
       await userLogout();
@@ -62,7 +62,8 @@ export const UserNavbar = ({ toggleSidebar }) => {
           <div className="flex items-center ">
             {/* Align items in a row */}
             <span className="font-mediumtext-3xl font-bold text-white-600 font-mono">
-              Welcome, {name}!
+              {/* Welcome, {name}! */}
+              {name ? `Welcome, ${name}!` : "Welcome, Guest!"}
             </span>
 
             <button
