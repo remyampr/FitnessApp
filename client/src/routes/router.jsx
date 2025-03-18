@@ -101,8 +101,8 @@ export const router = createBrowserRouter([
       },
       {
         path: "payment-success",
-        element: <h1>Success</h1>,
-        // element: <PaymentSuccess />,
+        // element: <h1>Success</h1>,
+        element: <PaymentSuccess />,
       },
       {
         path: "dashboard",
