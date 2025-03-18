@@ -167,9 +167,9 @@ const userSlice = createSlice({
     },
 
     clearUser: (state) => {
-      state.user = initialState;
-      state.isAuthenticated = false;
-      state.isProfileComplete = false;
+      // state.user = initialState;
+      // state.isAuthenticated = false;
+      // state.isProfileComplete = false;
       return initialState;
     },
     setLoading: (state, action) => {

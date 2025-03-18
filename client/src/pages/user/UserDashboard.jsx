@@ -45,7 +45,8 @@ export const UserDashboard = () => {
     notifications,
     workouts,
     nutritionPlans,
-    testimonial
+    testimonial,
+    trainerInfo,
     
   } = useSelector((state) => state.user);
 
