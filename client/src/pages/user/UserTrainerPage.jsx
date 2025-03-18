@@ -22,7 +22,7 @@ export const UserTrainerPage = () => {
     comment: ''
   });
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   
   useEffect(() => {

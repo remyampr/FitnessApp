@@ -10,7 +10,7 @@ export const UserLoginPage = () => {
   console.log("UserLoginPage rendered!");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const isProfileComplete = useSelector(state => state.user.isProfileComplete);
+  // const isProfileComplete = useSelector(state => state.user?.isProfileComplete);
 
 const [showPassword, setShowPassword] = useState(false);
   const [values, setValues] = useState({
