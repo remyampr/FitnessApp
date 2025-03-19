@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import { getProfile } from '../../services/trainerServices';
 import { setTrainer, setTrainerProfile } from '../../redux/features/trainerSlice';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 export const PendingApproval = () => {
 
