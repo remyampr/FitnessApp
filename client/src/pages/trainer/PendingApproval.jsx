@@ -1,6 +1,41 @@
 import React from 'react'
+import { useSelector } from 'react-redux'
+import { getProfile } from '../../services/trainerServices';
+import { setTrainer, setTrainerProfile } from '../../redux/features/trainerSlice';
+import { toast } from 'react-toastify';
 
 export const PendingApproval = () => {
+
+  const navigate = useNavigate(); 
+
+
+const OnRefresh=async()=>{
+
+try {
+
+  const profileResponse = await getProfile();
+
+  console.log("Profile response", profileResponse.data.trainer);
+
+  if (profileResponse.data.isApproved) {
+    navigate("/trainer/dashboard");
+  }else{
+    toast.warning("Your application is still under review.");
+  }
+
+ 
+  
+} catch (err) {
+  console.error(err);
+        if (err.response?.data?.error) {
+          toast.error(err.response.data.error);
+        } else {
+          toast.error("An unexpected error occurred.");
+        }
+}
+
+}
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
@@ -56,10 +91,8 @@ export const PendingApproval = () => {
           
           <div className="text-center mt-8">
             <p className="text-gray-600 mb-4">Thank you for your patience! Our admin team is reviewing your application. This typically takes 1-2 business days.</p>
-            <button className="btn btn-primary btn-block">Check Status</button>
-            <div className="mt-4">
-              <button className="btn btn-ghost btn-sm">Contact Support</button>
-            </div>
+            <button className="btn btn-primary btn-block" onClick={OnRefresh}>Refresh</button>
+           
           </div>
         </div>
         
@@ -73,9 +106,7 @@ export const PendingApproval = () => {
                 Last updated: 2 hours ago
               </span>
             </div>
-            <div className="text-sm">
-              <span className="text-primary cursor-pointer hover:underline">Refresh</span>
-            </div>
+          
           </div>
         </div>
       </div>

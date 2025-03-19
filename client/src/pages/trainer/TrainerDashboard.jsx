@@ -55,6 +55,7 @@ export const TrainerDashboard = () => {
         dispatch(setLoading(true));
 
         const profileResponse = await getProfile();
+        // ***********
         const clientResponse = await getClients();
         const appointmentResponse = await getAppointmentForTrainer();
         const revenueRsponse = await getTrainerRevenue();
@@ -71,8 +72,11 @@ export const TrainerDashboard = () => {
         // console.log("nutritionresponse", nutritionPlansResponse.data);
 
         // Update Redux state with the fetched data
+
+
         dispatch(setTrainerProfile(profileResponse.data.trainer)); 
         dispatch(setTrainer(profileResponse.data.trainer))
+        // ************
         dispatch(setClients(clientResponse.data.clients));
         dispatch(setAppointments(appointmentResponse.data.data));
 
