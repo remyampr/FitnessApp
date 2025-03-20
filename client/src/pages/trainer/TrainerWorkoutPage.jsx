@@ -198,7 +198,7 @@ dispatch(addWorkout(response.data.savedWorkout));
                   <option value="Weight Loss">Weight Loss</option>
                   <option value="Muscle Gain">Muscle Gain</option>
                   <option value="Endurance Improvement">Endurance</option>
-                  <option value="Weight Gain">"Weight Gain"</option>
+                  <option value="Weight Gain">Weight Gain</option>
                   <option value="Maintenance">Maintenance</option>
                 </select>
               </div>
