@@ -9,7 +9,7 @@ const createWorkout = async (req, res, next) => {
   try {
     const { name, description, fitnessGoal, difficulty, duration, schedule } =
       req.body;
-    const image = req.file ? req.file.path :  '';
+    const image = req.file?.path;
 
     if (!name || !fitnessGoal || !difficulty || !duration || !schedule) {
       return res
@@ -27,10 +27,16 @@ const createWorkout = async (req, res, next) => {
     //   return res.status(400).json({ error: "This workout already exists!" });
     // }
 
-    const cloudinaryRes = await uploadToCloudinary(image);
-    if (!cloudinaryRes) {
-      return res.status(500).json({ error: "Failed to upload image to Cloudinary." });
+
+    let cloudinaryRes = "";
+
+    if(image){
+      cloudinaryRes = await uploadToCloudinary(image);
+      if (!cloudinaryRes) {
+        return res.status(500).json({ error: "Failed to upload image to Cloudinary." });
+      }
     }
+
     // console.log("image in cloudinary : ", cloudinaryRes);
     // console.log("req.body : ",req.body);
     // console.log("req.file.path : ",req.file.path);
@@ -43,7 +49,7 @@ const createWorkout = async (req, res, next) => {
       difficulty,
       duration,
       schedule: parsedSchedule,
-      image: cloudinaryRes,
+      image: cloudinaryRes || "https://res.cloudinary.com/dpaermack/image/upload/v1742464190/default_excercise_wlnpnr.jpg",
       createdBy: req.user._id,
       createdByType: req.user.role,
     });
@@ -61,7 +67,7 @@ const createWorkout = async (req, res, next) => {
 
 
     if (savedWorkout) {
-      // console.log("Saved workout : ",savedWorkout);
+      console.log("Saved workout : ",savedWorkout);
       
       return res.status(200).json({ message: "New Workout added", savedWorkout });
     }

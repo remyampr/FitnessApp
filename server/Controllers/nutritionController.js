@@ -8,7 +8,7 @@ const createNutrition = async (req, res, next) => {
   try {
     const { title,fitnessGoal,schedule,waterIntake,} = req.body;
     // const image = req.file ? req.file.path :  'Uploads/nutrition.jpg'; 
-    const image = req.file ? req.file.path : "";
+    const image =  req.file?.path ;
     console.log('inside create nutrition : req.body ',req.body);
     
 
@@ -29,10 +29,12 @@ const createNutrition = async (req, res, next) => {
     }
 
     // console.log("Parsed Schedule:", parsedSchedule);
-   
+    let cloudinaryRes = "";
+if(image){
 
-    const cloudinaryRes = await uploadToCloudinary(image);
-    console.log("image in cloudinary : ", cloudinaryRes);
+ cloudinaryRes = await uploadToCloudinary(image);
+  console.log("image in cloudinary : ", cloudinaryRes);
+}
 
     const newNutrition = new Nutrition({
       title,
@@ -40,7 +42,7 @@ const createNutrition = async (req, res, next) => {
       schedule:parsedSchedule,
 
       waterIntake,
-       image: cloudinaryRes,
+       image: cloudinaryRes || "https://res.cloudinary.com/dpaermack/image/upload/v1742463588/default_meal_lkshsy.jpg",
       createdBy: req.user._id,
       createdByType: req.user.role,
     });
@@ -53,7 +55,7 @@ const createNutrition = async (req, res, next) => {
       email: req.user.email,
       name: req.user.name
     })
-console.log("saved nutri ",savedNutrition);
+console.log("saved nutrition ",savedNutrition);
 
  
 
