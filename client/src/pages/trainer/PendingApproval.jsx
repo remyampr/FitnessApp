@@ -1,14 +1,16 @@
 import React from 'react'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { getProfile } from '../../services/trainerServices';
-import { setTrainer, setTrainerProfile } from '../../redux/features/trainerSlice';
+import { setIsApproved, setTrainer, setTrainerProfile } from '../../redux/features/trainerSlice';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
 export const PendingApproval = () => {
 
   const navigate = useNavigate(); 
-
+const dispatch=useDispatch();
+const {trainer}=useSelector(state => state.trainer);
+console.log("in pending approval page : from redux trainer ",trainer);
 
 const OnRefresh=async()=>{
 
@@ -19,6 +21,8 @@ try {
   console.log("Profile response", profileResponse.data.trainer);
 
   if (profileResponse.data.isApproved) {
+          dispatch(setTrainer(profileResponse.data));
+          dispatch(setIsApproved(profileResponse.data.isApproved));
     navigate("/trainer/dashboard");
   }else{
     toast.warning("Your application is still under review.");
