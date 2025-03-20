@@ -287,9 +287,16 @@ export const WorkoutStartPage = () => {
               <div className="text-lg font-bold">{currentExercise.reps || '12'}</div>
             </div>
           </div>
+
+          {currentExercise.notes && (
+      <div className="bg-base-300 p-3 rounded-lg">
+        <div className="text-sm opacity-70">Notes</div>
+        <div className="text-gray-700">{currentExercise.notes}</div>
+      </div>
+    )}
           
           {/* Exercise image or video if available */}
-          {currentExercise.imageUrl && (
+          {currentExercise.image && (
             <div className="mb-4">
               <img 
                 src={currentExercise.imageUrl} 

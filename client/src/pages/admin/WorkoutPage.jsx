@@ -38,7 +38,7 @@ export const WorkoutPage = () => {
     schedule: [
       {
         day: "Monday",
-        exercises: [{ name: "", sets:"", reps: "", restTime: "", notes: "" }],
+        exercises: [{ name: "", sets:0, reps: 0, restTime: 0, notes: "" }],
       },
     ],
   });
@@ -153,13 +153,13 @@ export const WorkoutPage = () => {
             exercises:
               day.exercises && day.exercises.length > 0
                 ? day.exercises
-                : [{ name: "", sets: "", reps: "", restTime: "", notes: "" }],
+                : [{ name: "", sets: 0, reps: 0, restTime: 0, notes: "" }],
           }))
         : [
             {
               day: "Monday",
               exercises: [
-                { name: "", sets: "", reps: "", restTime: "", notes: "" },
+                { name: "", sets:0, reps:0, restTime:0, notes: "" },
               ],
             },
           ];
@@ -186,7 +186,7 @@ export const WorkoutPage = () => {
       schedule: [
         {
           day: "Monday",
-          exercises: [{ name: "", sets: "", reps: "", restTime: "", notes: "" }],
+          exercises: [{ name: "", sets: 0, reps: 0, restTime: 0, notes: "" }],
         },
       ],
     });
@@ -200,9 +200,9 @@ export const WorkoutPage = () => {
     const newSchedule = [...workoutForm.schedule];
     newSchedule[dayIndex].exercises.push({
       name: "",
-      sets: "",
-      reps: "",
-      restTime: "",
+      sets: 0,
+      reps: 0,
+      restTime: 0,
       notes: "",
     });
     setWorkoutForm((prev) => ({ ...prev, schedule: newSchedule }));

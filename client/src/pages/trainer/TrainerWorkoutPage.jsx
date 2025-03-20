@@ -61,7 +61,7 @@ export const TrainerWorkoutPage = () => {
 
   const addExercise = (dayIndex) => {
     const updatedSchedule = [...formData.schedule];
-    updatedSchedule[dayIndex].exercises.push({ name: '', sets: 0, reps: 0, restTime: 0, });
+    updatedSchedule[dayIndex].exercises.push({ name: '', sets: 0, reps: 0, restTime: 0, notes: "" });
     setFormData({ ...formData, schedule: updatedSchedule });
   };
 
@@ -79,7 +79,7 @@ export const TrainerWorkoutPage = () => {
       fitnessGoal: 'Weight Loss',
       difficulty: 'Easy',
       duration: '',
-      schedule: [{ day: 'Monday', exercises: [{ name: '', sets: 0, reps: 0, restTime: 0,}] }],
+      schedule: [{ day: 'Monday', exercises: [{ name: '', sets: 0, reps: 0, restTime: 0,notes: "" }] }],
       image: null
     });
     setPreviewImage(null);
@@ -328,6 +328,18 @@ dispatch(addWorkout(response.data.savedWorkout));
                           required
                         />
                       </div>
+                      <div className="form-control md:col-span-4">
+      <label className="label">
+        <span className="label-text text-sm">Notes</span>
+      </label>
+      <textarea
+        value={exercise.notes || ''}
+        onChange={(e) => handleExerciseChange(dayIndex, exerciseIndex, 'notes', e.target.value)}
+        className="textarea textarea-bordered textarea-sm"
+        rows="2"
+        placeholder="Add any additional notes here..."
+      ></textarea>
+    </div>
                       <div className="flex items-end mb-2">
                         <button 
                           type="button" 
