@@ -19,10 +19,11 @@ try {
   const profileResponse = await getProfile();
 
   console.log("Profile response", profileResponse.data.trainer);
+  console.log("Profile response trainer approved ?", profileResponse.data.trainer.isApproved);
 
-  if (profileResponse.data.isApproved) {
-          dispatch(setTrainer(profileResponse.data));
-          dispatch(setIsApproved(profileResponse.data.isApproved));
+  if (profileResponse.data.trainer.isApproved) {
+          dispatch(setTrainer(profileResponse.data.trainer));
+          dispatch(setIsApproved(profileResponse.data.trainer.isApproved));
     navigate("/trainer/dashboard");
   }else{
     toast.warning("Your application is still under review.");
