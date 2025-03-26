@@ -65,9 +65,9 @@ export const PaymentsTable = ({ payments }) => {
             <tbody>
               {currentPayments.map((payment) => (
                 <tr key={payment.transactionId}>
-                  <td title={payment.transactionId}>
+                  {/* <td title={payment.transactionId}></td> */}
   {/* {payment?.transactionId?.slice(0, 6) + "..." + payment?.transactionId?.slice(-4)} */}
-</td>
+
                   <td>{payment.userId ? payment.userId.name : 'N/A'}</td>
                   <td>{payment.trainerId ? payment.trainerId.name : 'N/A'}</td>
 
