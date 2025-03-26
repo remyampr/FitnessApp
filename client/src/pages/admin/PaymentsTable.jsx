@@ -51,7 +51,7 @@ export const PaymentsTable = ({ payments }) => {
           <table className="table table-zebra w-full">
             <thead>
               <tr>
-                <th>Transaction ID</th>
+                {/* <th>Transaction ID</th> */}
                 <th>User</th>
                 <th>Trainer</th>
                 <th>Plan</th>
