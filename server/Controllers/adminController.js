@@ -265,120 +265,121 @@ const deactivateUser = async (req, res, next) => {
   }
 };
 
-const getDashboard = async (req, res, next) => {
-  try {
-    const totalUsers = await User.countDocuments();
+// const getDashboard = async (req, res, next) => {
+//   try {
+//     const totalUsers = await User.countDocuments();
 
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    const activeUsers = await User.countDocuments({
-      lastLogin: { $gte: thirtyDaysAgo },
-    });
+//     const thirtyDaysAgo = new Date();
+//     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+   
+//     const activeUsers = await User.countDocuments({
+//       lastLogin: { $gte: thirtyDaysAgo },
+//     });
 
-    const totalTrainers = await Trainer.countDocuments({ isApproved: true });
+//     const totalTrainers = await Trainer.countDocuments({ isApproved: true });
 
-    const pendingApproval = await Trainer.countDocuments({ isApproved: false });
+//     const pendingApproval = await Trainer.countDocuments({ isApproved: false });
 
-    const totalAppointments = await Appointment.countDocuments();
-    // const completedAppointments = await Appointment.countDocuments({
-    //   status: "Completed",
-    // });
-    // const cancelledAppointments = await Appointment.countDocuments({
-    //   status: "Cancelled",
-    // });
-    const upcomingAppointments = await Appointment.countDocuments({
-      date: { $gte: new Date() },
-    });
+//     const totalAppointments = await Appointment.countDocuments();
+//     // const completedAppointments = await Appointment.countDocuments({
+//     //   status: "Completed",
+//     // });
+//     // const cancelledAppointments = await Appointment.countDocuments({
+//     //   status: "Cancelled",
+//     // });
+//     const upcomingAppointments = await Appointment.countDocuments({
+//       date: { $gte: new Date() },
+//     });
 
-    const totalWorkouts = await Workout.countDocuments();
-    const totalNutritionPlans = await Nutrition.countDocuments();
+//     const totalWorkouts = await Workout.countDocuments();
+//     const totalNutritionPlans = await Nutrition.countDocuments();
 
-    const payments = await Payment.find();
-    // const totalTransactions = await Payment.countDocuments();
-    const totalRevenue = payments.reduce(
-      (sum, payment) => sum + payment.amount,
-      0
-    );
-    const last30DaysRevenue = await Payment.aggregate([
-      { $match: { createdAt: { $gte: thirtyDaysAgo } } },
-      { $group: { _id: null, total: { $sum: "$amount" } } },
-    ]);
+//     const payments = await Payment.find();
+//     // const totalTransactions = await Payment.countDocuments();
+//     const totalRevenue = payments.reduce(
+//       (sum, payment) => sum + payment.amount,
+//       0
+//     );
+//     const last30DaysRevenue = await Payment.aggregate([
+//       { $match: { createdAt: { $gte: thirtyDaysAgo } } },
+//       { $group: { _id: null, total: { $sum: "$amount" } } },
+//     ]);
 
-    const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+//     const oneWeekAgo = new Date();
+//     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-    const lastUsers = await Activity.find({
-      activityType: "NEW_USER",
-      timestamp: { $gte: oneWeekAgo },
-    })
-      .sort({ timestamp: -1 })
-      .limit(10);
+//     const lastUsers = await Activity.find({
+//       activityType: "NEW_USER",
+//       timestamp: { $gte: oneWeekAgo },
+//     })
+//       .sort({ timestamp: -1 })
+//       .limit(10);
 
-    const lastTrainers = await Activity.find({
-      activityType: "NEW_TRAINER",
-      timestamp: { $gte: oneWeekAgo },
-    })
-      .sort({ timestamp: -1 })
-      .limit(10);
+//     const lastTrainers = await Activity.find({
+//       activityType: "NEW_TRAINER",
+//       timestamp: { $gte: oneWeekAgo },
+//     })
+//       .sort({ timestamp: -1 })
+//       .limit(10);
 
-    const recentPayments = await Activity.find({
-      activityType: "PAYMENT_RECEIVED",
-      timestamp: { $gte: oneWeekAgo },
-    })
-      .sort({ timestamp: -1 })
-      .sort({ timestamp: -1 })
-      .limit(10);
+//     const recentPayments = await Activity.find({
+//       activityType: "PAYMENT_RECEIVED",
+//       timestamp: { $gte: oneWeekAgo },
+//     })
+//       .sort({ timestamp: -1 })
+//       .sort({ timestamp: -1 })
+//       .limit(10);
 
-    const lastAppointments = await Activity.find({
-      activityType: "NEW_APPOINTMENT",
-      timestamp: { $gte: oneWeekAgo },
-    })
-      .sort({ timestamp: -1 })
-      .limit(10);
+//     const lastAppointments = await Activity.find({
+//       activityType: "NEW_APPOINTMENT",
+//       timestamp: { $gte: oneWeekAgo },
+//     })
+//       .sort({ timestamp: -1 })
+//       .limit(10);
 
-    const lastWorkouts = await Activity.find({
-      activityType: "NEW_WORKOUT",
-      timestamp: { $gte: oneWeekAgo },
-    })
-      .sort({ timestamp: -1 })
-      .limit(10)
-      .lean(); 
+//     const lastWorkouts = await Activity.find({
+//       activityType: "NEW_WORKOUT",
+//       timestamp: { $gte: oneWeekAgo },
+//     })
+//       .sort({ timestamp: -1 })
+//       .limit(10)
+//       .lean(); 
      
 
 
-    const lastNutritionPlans = await Activity.find({
-      activityType: "NEW_NUTRITION_PLAN",
-      timestamp: { $gte: oneWeekAgo },
-    })
-      .sort({ timestamp: -1 })
-      .limit(10);
+//     const lastNutritionPlans = await Activity.find({
+//       activityType: "NEW_NUTRITION_PLAN",
+//       timestamp: { $gte: oneWeekAgo },
+//     })
+//       .sort({ timestamp: -1 })
+//       .limit(10);
 
-    // const recentActivity =await getRecentActivities(10, 1);
+//     // const recentActivity =await getRecentActivities(10, 1);
 
-    res.status(200).json({
-      totalUsers,
-      activeUsers,
-      totalTrainers,
-      pendingApproval,
-      totalRevenue,
-      totalAppointments,
-      upcomingAppointments,
-      totalWorkouts,
-      totalNutritionPlans,
-      recentActivity: {
-        last30DaysRevenue,
-        lastUsers,
-        lastTrainers,
-        recentPayments,
-        lastAppointments,
-        lastWorkouts,
-        lastNutritionPlans,
-      },
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+//     res.status(200).json({
+//       totalUsers,
+//       activeUsers,
+//       totalTrainers,
+//       pendingApproval,
+//       totalRevenue,
+//       totalAppointments,
+//       upcomingAppointments,
+//       totalWorkouts,
+//       totalNutritionPlans,
+//       recentActivity: {
+//         last30DaysRevenue,
+//         lastUsers,
+//         lastTrainers,
+//         recentPayments,
+//         lastAppointments,
+//         lastWorkouts,
+//         lastNutritionPlans,
+//       },
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
 const getRevenue=async (req,res,next) => {
   try {
@@ -537,6 +538,89 @@ try {
   next(error);
 }
 }
+
+
+
+
+const getDashboard = async (req, res, next) => {
+  try {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+    // Use Promise.all to parallelize queries
+    const [
+      totalUsers,
+      activeUsers,
+      totalTrainers,
+      pendingApproval,
+      totalAppointments,
+      upcomingAppointments,
+      totalWorkouts,
+      totalNutritionPlans,
+      payments,
+      lastUsers,
+      lastTrainers,
+      recentPayments,
+      lastAppointments,
+      lastWorkouts,
+      lastNutritionPlans,
+      last30DaysRevenue
+    ] = await Promise.all([
+      User.countDocuments(),
+      User.countDocuments({ lastLogin: { $gte: thirtyDaysAgo } }),
+      Trainer.countDocuments({ isApproved: true }),
+      Trainer.countDocuments({ isApproved: false }),
+      Appointment.countDocuments(),
+      Appointment.countDocuments({ date: { $gte: new Date() } }),
+      Workout.countDocuments(),
+      Nutrition.countDocuments(),
+      Payment.find(),
+      Activity.find({ activityType: "NEW_USER", timestamp: { $gte: oneWeekAgo } }).sort({ timestamp: -1 }).limit(10),
+      Activity.find({ activityType: "NEW_TRAINER", timestamp: { $gte: oneWeekAgo } }).sort({ timestamp: -1 }).limit(10),
+      Activity.find({ activityType: "PAYMENT_RECEIVED", timestamp: { $gte: oneWeekAgo } }).sort({ timestamp: -1 }).limit(10),
+      Activity.find({ activityType: "NEW_APPOINTMENT", timestamp: { $gte: oneWeekAgo } }).sort({ timestamp: -1 }).limit(10),
+      Activity.find({ activityType: "NEW_WORKOUT", timestamp: { $gte: oneWeekAgo } }).sort({ timestamp: -1 }).limit(10).lean(),
+      Activity.find({ activityType: "NEW_NUTRITION_PLAN", timestamp: { $gte: oneWeekAgo } }).sort({ timestamp: -1 }).limit(10),
+      Payment.aggregate([
+        { $match: { createdAt: { $gte: thirtyDaysAgo } } },
+        { $group: { _id: null, total: { $sum: "$amount" } } }
+      ])
+    ]);
+
+    // Calculate total revenue
+    const totalRevenue = payments.reduce(
+      (sum, payment) => sum + payment.amount,
+      0
+    );
+
+    res.status(200).json({
+      totalUsers,
+      activeUsers,
+      totalTrainers,
+      pendingApproval,
+      totalRevenue,
+      totalAppointments,
+      upcomingAppointments,
+      totalWorkouts,
+      totalNutritionPlans,
+      recentActivity: {
+        last30DaysRevenue: last30DaysRevenue[0] ? last30DaysRevenue[0].total : 0,
+        lastUsers,
+        lastTrainers,
+        recentPayments,
+        lastAppointments,
+        lastWorkouts,
+        lastNutritionPlans,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 
 module.exports = {
   createAdmin,
