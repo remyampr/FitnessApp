@@ -280,12 +280,12 @@ const getDashboard = async (req, res, next) => {
     const pendingApproval = await Trainer.countDocuments({ isApproved: false });
 
     const totalAppointments = await Appointment.countDocuments();
-    const completedAppointments = await Appointment.countDocuments({
-      status: "Completed",
-    });
-    const cancelledAppointments = await Appointment.countDocuments({
-      status: "Cancelled",
-    });
+    // const completedAppointments = await Appointment.countDocuments({
+    //   status: "Completed",
+    // });
+    // const cancelledAppointments = await Appointment.countDocuments({
+    //   status: "Cancelled",
+    // });
     const upcomingAppointments = await Appointment.countDocuments({
       date: { $gte: new Date() },
     });
@@ -294,7 +294,7 @@ const getDashboard = async (req, res, next) => {
     const totalNutritionPlans = await Nutrition.countDocuments();
 
     const payments = await Payment.find();
-    const totalTransactions = await Payment.countDocuments();
+    // const totalTransactions = await Payment.countDocuments();
     const totalRevenue = payments.reduce(
       (sum, payment) => sum + payment.amount,
       0

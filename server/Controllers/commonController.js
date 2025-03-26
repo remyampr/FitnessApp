@@ -192,12 +192,7 @@ const login = async (req, res, next) => {
         path: "/"
     });
 
-    //       res.cookie("token", token, {
-    //     httpOnly: true,
-    //     secure: process.env.NODE_ENV === "production",  // Secure only in production
-    //     sameSite: "None",
-    //     path: "/"
-    // });
+  
 
       console.log(`${role.charAt(0).toUpperCase() + role.slice(1)} login successful`);
       console.log(` inside login isprofilecompleted? ${user.isProfileComplete}`);

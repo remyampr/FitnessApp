@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
   fitnessGoal: { type: String, enum:["Weight Loss","Weight Gain","Muscle Gain","Maintenance","Endurance Improvement"] },
   joinDate: { type: Date, default: Date.now },
   
-  isActive: { type: Boolean, default: true }, 
+  isActive: { type: Boolean, default: true },  
   
   subscription: {
     status: { type: String, enum: ["Active", "Inactive", "Suspended"], default: "Inactive" }, 

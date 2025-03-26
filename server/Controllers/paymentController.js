@@ -205,7 +205,7 @@ console.log("success url : ",session.success_url);
           revenue: adminShare,
           trainerPayouts: trainerShare,
           newUsers: user.paymentHistory.length === 1 ? 1 : 0,
-          newTrainers: 0 // You might want to increment this elsewhere when new trainers join
+          newTrainers: 0 //  increment this elsewhere when new trainers join
         });
       }
       admin.userId=userId

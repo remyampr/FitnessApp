@@ -263,7 +263,7 @@ const getMyReviews = async (req, res, next) => {
     const trainerId = req.user.id;
     const trainer = await Trainer.findById(trainerId).populate(
       "reviews.userId",
-      "name profileImage"
+      "name image"
     );
 
     if (!trainer) {

@@ -46,7 +46,7 @@ const paymentSchema = new mongoose.Schema(
 
   { timestamps: true }
 );
-
+// Pre-save Middleware (pre('save'))
 // Calculate revenue distribution before saving
 paymentSchema.pre('save', function(next) {
   if (!this.trainerRevenue || !this.adminRevenue) {
